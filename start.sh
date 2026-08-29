@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-echo "=== Instalando dependencias ==="
-cd "$(dirname "$0")/backend"
-pip install -r requirements.txt -q
+cd "$(dirname "$0")"
+PORT="${PORT:-8000}"
 
-echo ""
-echo "=== Iniciando servidor en http://localhost:5000 ==="
-python app.py
+echo "=== Iniciando ITBIS Análisis en http://localhost:${PORT} ==="
+python3 -m http.server "$PORT" --directory frontend

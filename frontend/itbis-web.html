@@ -879,10 +879,11 @@ function process607(rows) {
     if (cm.tasa_itbis) { p._tasa=cleanNum(r[cm.tasa_itbis]); }
     else if (p._total > 0 && p._itbis > 0) {
       const ratio=p._itbis/p._total*100;
-      if (Math.abs(ratio-10)<3) p._tasa=10;
-      else if (Math.abs(ratio-16)<3) p._tasa=16;
-      else if (Math.abs(ratio-18)<4) p._tasa=18;
-      else p._tasa=r2(ratio);
+      const standardRates=[10,16,18];
+      const nearest=standardRates.reduce((best,rate) =>
+        Math.abs(ratio-rate)<Math.abs(ratio-best) ? rate : best
+      );
+      p._tasa=Math.abs(ratio-nearest)<3 ? nearest : r2(ratio);
     } else { p._tasa=0; }
     if (cm.construccion) { const v=String(r[cm.construccion]||'').toLowerCase(); p._constr=v==='si'||v==='sí'||v==='1'||v==='true'||v==='construccion'; }
     else { p._constr=p._tasa===10; }
