@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITBIS Análisis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+/* ── Design tokens ── */
+:root {
+  --primary:      #0D4F8E;
+  --primary-faint:#E4EEF8;
+  --accent:       #00B4D8;
+  --green:        #10B981;
+  --amber:        #F59E0B;
+  --red:          #EF4444;
+  --bg:           #EEF2F8;
+  --surface:      #FFFFFF;
+  --surface-2:    #F4F7FC;
+  --border:       #C8D5E5;
+  --text:         #0C1B2E;
+  --muted:        #557090;
+  --shadow:       0 2px 18px rgba(13,79,142,.09);
+  --radius:       14px;
+  --f-display:    'Syne', system-ui, sans-serif;
+  --f-body:       'DM Sans', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --primary:      #4A90D9;
+    --primary-faint:#0C1F38;
+    --accent:       #38BDF8;
+    --green:        #34D399;
+    --amber:        #FBBF24;
+    --red:          #F87171;
+    --bg:           #08131D;
+    --surface:      #101D2C;
+    --surface-2:    #152234;
+    --border:       #1C3050;
+    --text:         #DCE9F5;
+    --muted:        #7A9FBF;
+    --shadow:       0 2px 18px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"] {
+  --primary:      #4A90D9;
+  --primary-faint:#0C1F38;
+  --accent:       #38BDF8;
+  --green:        #34D399;
+  --amber:        #FBBF24;
+  --red:          #F87171;
+  --bg:           #08131D;
+  --surface:      #101D2C;
+  --surface-2:    #152234;
+  --border:       #1C3050;
+  --text:         #DCE9F5;
+  --muted:        #7A9FBF;
+  --shadow:       0 2px 18px rgba(0,0,0,.45);
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--f-body); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+
+/* ── Upload view ── */
+#upload-view { min-height: 100vh; display: flex; flex-direction: column; }
+
+.app-header {
+  display: flex; align-items: center; gap: 0;
+  padding: 18px 32px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.app-logo {
+  font-family: var(--f-display); font-weight: 800; font-size: 1.15rem;
+  color: var(--primary); letter-spacing: -.5px;
+}
+.app-logo em { font-style: normal; color: var(--accent); }
+.app-tag {
+  font-size: .78rem; color: var(--muted);
+  border-left: 1px solid var(--border);
+  padding-left: 14px; margin-left: 14px;
+}
+
+.upload-stage { flex: 1; display: flex; align-items: center; justify-content: center; padding: 48px 20px; }
+
+#dropzone {
+  position: relative; width: 100%; max-width: 500px;
+  background: var(--surface); border: 2px dashed var(--border);
+  border-radius: 22px; padding: 64px 36px; text-align: center;
+  cursor: pointer; overflow: hidden;
+  transition: border-color .2s, background .2s;
+}
+#dropzone:hover, #dropzone.drag-over { border-color: var(--accent); background: var(--primary-faint); }
+#dropzone:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+#dropzone input { display: none; }
+
+/* Pulse rings */
+.pulse-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.ring {
+  position: absolute; border-radius: 50%;
+  border: 1.5px solid var(--accent); opacity: 0;
+  width: 72px; height: 72px;
+  animation: ringOut 3.6s ease-out infinite;
+}
+.ring:nth-child(2) { animation-delay: 1.2s; }
+.ring:nth-child(3) { animation-delay: 2.4s; }
+@keyframes ringOut {
+  0%   { width: 72px; height: 72px; opacity: .55; }
+  100% { width: 420px; height: 420px; opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .ring { animation: none; } }
+
+.drop-inner { position: relative; z-index: 1; }
+.drop-icon { font-size: 2.8rem; display: block; margin-bottom: 18px; }
+.drop-title {
+  font-family: var(--f-display); font-weight: 700;
+  font-size: 1.2rem; color: var(--text); text-wrap: balance;
+  margin-bottom: 8px; letter-spacing: -.2px;
+}
+.drop-sub { font-size: .83rem; color: var(--muted); margin-bottom: 28px; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 24px; border-radius: 9px; border: none;
+  font-family: var(--f-body); font-size: .88rem; font-weight: 600;
+  cursor: pointer; transition: opacity .15s, transform .1s;
+  letter-spacing: -.1px;
+}
+.btn:hover { opacity: .87; }
+.btn:active { transform: scale(.97); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-ghost {
+  background: transparent; color: var(--muted);
+  border: 1.5px solid var(--border); padding: 8px 18px; font-size: .82rem;
+}
+
+/* ── Dashboard ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 11px 28px; display: flex; align-items: center; gap: 12px;
+}
+.tb-logo {
+  font-family: var(--f-display); font-weight: 800;
+  font-size: .95rem; color: var(--primary); letter-spacing: -.4px; flex-shrink: 0;
+}
+.tb-logo em { font-style: normal; color: var(--accent); }
+.tb-file {
+  font-size: .8rem; color: var(--muted);
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 3px 10px;
+  max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tb-actions { margin-left: auto; }
+
+.dash { max-width: 1320px; margin: 0 auto; padding: 28px 22px 72px; }
+
+/* Section label */
+.slabel {
+  font-size: .7rem; font-weight: 600; letter-spacing: .9px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+}
+
+/* KPI cards */
+.kpi-row {
+  display: grid; gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  margin-bottom: 32px;
+}
+.kpi {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 18px 20px; box-shadow: var(--shadow);
+  border-top: 3px solid var(--primary);
+}
+.kpi.g { border-color: var(--green); }
+.kpi.a { border-color: var(--amber); }
+.kpi.r { border-color: var(--red); }
+.kpi.c { border-color: var(--accent); }
+.kpi-lbl {
+  font-size: .7rem; font-weight: 600; letter-spacing: .5px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+}
+.kpi-val {
+  font-family: var(--f-display); font-size: 1.5rem; font-weight: 800;
+  color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.1;
+}
+
+/* Charts */
+.charts-grid {
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  margin-bottom: 32px;
+}
+.chart-card {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 22px; box-shadow: var(--shadow);
+}
+.chart-card h3 {
+  font-size: .7rem; font-weight: 600; letter-spacing: .8px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 16px;
+}
+.chart-card canvas { max-height: 230px; }
+.chart-empty {
+  height: 160px; display: flex; align-items: center; justify-content: center;
+  color: var(--muted); font-size: .83rem;
+  border: 1px dashed var(--border); border-radius: 8px;
+}
+
+/* Table */
+.table-wrap {
+  background: var(--surface); border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow-x: auto;
+  max-height: 400px; overflow-y: auto;
+}
+table { width: 100%; border-collapse: collapse; font-size: .82rem; font-variant-numeric: tabular-nums; }
+thead th {
+  position: sticky; top: 0; background: var(--primary); color: #fff;
+  padding: 10px 14px; text-align: left; font-weight: 600;
+  white-space: nowrap; font-size: .75rem; letter-spacing: .3px; z-index: 2;
+}
+tbody td {
+  padding: 8px 14px; border-bottom: 1px solid var(--border);
+  max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+tbody tr:nth-child(even) { background: var(--surface-2); }
+tbody tr:hover { background: var(--primary-faint); }
+.tnote { font-size: .74rem; color: var(--muted); margin-top: 8px; text-align: right; }
+
+/* Loader */
+#loader {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(8,19,29,.55);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px;
+  color: #fff; font-weight: 500;
+  backdrop-filter: blur(5px);
+}
+.spinner {
+  width: 44px; height: 44px;
+  border: 3px solid rgba(255,255,255,.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .75s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+
+/* Toast */
+#toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 600;
+  background: var(--text); color: var(--bg);
+  padding: 11px 20px; border-radius: 10px;
+  font-size: .85rem; font-weight: 500; max-width: 300px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.28);
+  transform: translateY(72px); opacity: 0;
+  transition: all .35s cubic-bezier(.34,1.56,.64,1);
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.err  { background: var(--red); color: #fff; }
+
+@media (max-width: 640px) {
+  .charts-grid { grid-template-columns: 1fr; }
+  .dash { padding: 16px 14px 52px; }
+  .kpi-val { font-size: 1.2rem; }
+  .app-header { padding: 14px 16px; }
+}
+
+/* ── Export buttons ── */
+.btn-xl  { background: #217346; color: #fff; }
+.btn-pdf { background: #c0392b; color: #fff; }
+.tb-actions { display: flex; gap: 8px; align-items: center; }
+
+/* ── Print / PDF ── */
+@media print {
+  #upload-view, .topbar, #loader, #toast { display: none !important; }
+  #dashboard-view { display: block !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .dash { padding: 12px 0 !important; max-width: 100% !important; }
+  .kpi { box-shadow: none !important; border: 1px solid #ccc !important; }
+  .chart-card { box-shadow: none !important; border: 1px solid #ddd !important; break-inside: avoid; }
+  .charts-grid { grid-template-columns: 1fr 1fr !important; }
+  .table-wrap { max-height: none !important; overflow: visible !important; box-shadow: none !important; border: 1px solid #ccc !important; }
+  thead th { background: #1a3c6e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .slabel { color: #333 !important; }
+  .kpi-val { color: #000 !important; }
+}
+</style>
+
+<!-- ── Upload view ── -->
+<div id="upload-view">
+  <header class="app-header">
+    <div class="app-logo">ITBIS<em>.</em>Análisis</div>
+    <div class="app-tag">Herramienta fiscal · República Dominicana</div>
+  </header>
+  <div class="upload-stage">
+    <div id="dropzone" tabindex="0" role="button" aria-label="Zona de carga de archivos">
+      <div class="pulse-wrap">
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="ring"></div>
+      </div>
+      <div class="drop-inner">
+        <span class="drop-icon">📊</span>
+        <div class="drop-title">Arrastra tu archivo de ITBIS aquí</div>
+        <div class="drop-sub">CSV · XLSX · XLS &nbsp;·&nbsp; Máximo 20 MB</div>
+        <input type="file" id="file-input" accept=".csv,.xlsx,.xls">
+        <button class="btn btn-primary" id="btn-select">📁 Seleccionar archivo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Dashboard ── -->
+<div id="dashboard-view" hidden>
+  <div class="topbar">
+    <div class="tb-logo">ITBIS<em>.</em>Análisis</div>
+    <div class="tb-file" id="tb-file"></div>
+    <div class="tb-actions">
+      <button class="btn btn-xl"  id="btn-excel" hidden>⬇ Excel</button>
+      <button class="btn btn-pdf" id="btn-pdf"   hidden>🖨 PDF</button>
+      <button class="btn btn-ghost" id="btn-reset">↩ Nueva carga</button>
+    </div>
+  </div>
+  <div class="dash">
+    <!-- KPIs -->
+    <div class="slabel">Resumen general</div>
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-lbl">Registros</div>
+        <div class="kpi-val" id="kv-n">—</div>
+      </div>
+      <div class="kpi g">
+        <div class="kpi-lbl">Monto total facturado</div>
+        <div class="kpi-val" id="kv-monto">—</div>
+      </div>
+      <div class="kpi a">
+        <div class="kpi-lbl">ITBIS facturado</div>
+        <div class="kpi-val" id="kv-itbis">—</div>
+      </div>
+      <div class="kpi r">
+        <div class="kpi-lbl">ITBIS retenido</div>
+        <div class="kpi-val" id="kv-ret">—</div>
+      </div>
+      <div class="kpi c">
+        <div class="kpi-lbl">Tasa efectiva</div>
+        <div class="kpi-val" id="kv-tasa">—</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="slabel">Gráficas</div>
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3>ITBIS facturado · por mes</h3>
+        <canvas id="ch-monthly"></canvas>
+        <div class="chart-empty" id="ce-monthly" hidden>Sin datos de fecha</div>
+      </div>
+      <div class="chart-card">
+        <h3>Distribución · tipo de comprobante</h3>
+        <canvas id="ch-tipo"></canvas>
+        <div class="chart-empty" id="ce-tipo" hidden>Sin columna de tipo de comprobante</div>
+      </div>
+      <div class="chart-card">
+        <h3>Servicios vs bienes</h3>
+        <canvas id="ch-sb"></canvas>
+        <div class="chart-empty" id="ce-sb" hidden>Sin desglose de servicios / bienes</div>
+      </div>
+      <div class="chart-card">
+        <h3>Top 10 RNC · por monto</h3>
+        <canvas id="ch-rnc"></canvas>
+        <div class="chart-empty" id="ce-rnc" hidden>Sin columna de RNC</div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="slabel">Vista previa de datos</div>
+    <div class="table-wrap">
+      <table><thead id="t-head"></thead><tbody id="t-body"></tbody></table>
+    </div>
+    <p class="tnote" id="t-note"></p>
+  </div>
+</div>
+
+<!-- Loader / Toast -->
+<div id="loader" hidden><div class="spinner"></div><span>Procesando datos…</span></div>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+'use strict';
+
+// ── Constants ────────────────────────────────────────────────────────────────
+const MAX_FILE   = 20 * 1024 * 1024;
+const MAX_TABLE  = 200;
+const MAX_ROWS   = 100_000;
+const PALETTE    = ['#0096C7','#10B981','#F59E0B','#EF4444','#7C3AED','#0891B2','#C026D3','#B45309','#DC2626','#16A34A'];
+
+const ALIASES = {
+  rnc:              ['rnc','cedula','rncocedula','identificacion','rnco_cedula','rnc_cedula'],
+  ncf:              ['ncf','comprobante','numero_comprobante','numerodecomprobante','no_comprobante'],
+  fecha:            ['fecha','date','fecha_comprobante','fechadecomprobante','fecha_factura','fechafactura'],
+  tipo_comprobante: ['tipo','tipo_comprobante','tipodecomprobante','tipo_ncf','tipocomprobante'],
+  monto_servicios:  ['monto_servicios','servicios','montoenservicios','facturado_servicios','monto_serv'],
+  monto_bienes:     ['monto_bienes','bienes','montoenbienes','facturado_bienes','monto_bien'],
+  monto_total:      ['monto_total','total','montototal','montofacturado','importe_total','valor_total','monto_facturado','facturado_total','totalfacturado'],
+  itbis_facturado:  ['itbis_facturado','itbis','itbisfacturado','monto_itbis','impuesto','itbis_fact'],
+  itbis_retenido:   ['itbis_retenido','itbisretenido','retencion_itbis','itbis_ret','itbisretencion'],
+};
+
+// ── Utils ────────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+let charts = {};
+let _exportData = null;
+
+function showToast(msg, type) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.className = 'show' + (type === 'err' ? ' err' : '');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = ''; }, 3800);
+}
+
+function fmtMoney(n) {
+  return 'RD$ ' + new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n||0);
+}
+function fmtInt(n) { return new Intl.NumberFormat('en-US').format(n||0); }
+function fmtPct(n) { return (n||0).toFixed(2) + '%'; }
+
+function moneyTick(v) {
+  if (v >= 1e6) return 'RD$' + (v/1e6).toFixed(1) + 'M';
+  if (v >= 1e3) return 'RD$' + Math.round(v/1e3) + 'K';
+  return 'RD$' + v;
+}
+
+function normKey(s) {
+  return String(s).trim().toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[\s\-\/\\\.]+/g,'_')
+    .replace(/[^a-z0-9_]/g,'');
+}
+
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+// ── Column detection ─────────────────────────────────────────────────────────
+function detectCols(headers) {
+  const norm = {};
+  headers.forEach(h => { norm[normKey(h)] = h; });
+  const map = {};
+  for (const [canon, aliases] of Object.entries(ALIASES)) {
+    for (const a of aliases) {
+      const k = normKey(a);
+      if (norm[k]) { map[canon] = norm[k]; break; }
+    }
+  }
+  return map;
+}
+
+// ── Numeric / date cleaning ──────────────────────────────────────────────────
+function cleanNum(val) {
+  if (val == null || val === '') return 0;
+  const s = String(val).replace(/[RD$\s,]/gi,'').replace(/[^\d.\-]/g,'');
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+
+function parseDate(val) {
+  if (val == null || val === '') return null;
+  if (typeof val === 'number') {
+    // Excel serial
+    const d = new Date(Math.round((val - 25569) * 864e5));
+    return isNaN(d) ? null : d;
+  }
+  const s = String(val).trim();
+  // ISO YYYY-MM-DD
+  if (/^\d{4}-\d{1,2}-\d{1,2}/.test(s)) {
+    const d = new Date(s);
+    return isNaN(d) ? null : d;
+  }
+  // DD/MM/YYYY or DD-MM-YYYY
+  const m = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
+  if (m) {
+    const yr = m[3].length === 2 ? '20' + m[3] : m[3];
+    const d = new Date(`${yr}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`);
+    return isNaN(d) ? null : d;
+  }
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+
+function ymKey(d) {
+  if (!d) return null;
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+
+// ── File reading ─────────────────────────────────────────────────────────────
+function readExcel(buf) {
+  const wb = XLSX.read(new Uint8Array(buf), { type:'array', raw:false });
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  return XLSX.utils.sheet_to_json(ws, { defval:null, raw:true });
+}
+
+function readCSV(text) {
+  const r = Papa.parse(text, { header:true, skipEmptyLines:true, dynamicTyping:false });
+  return r.data || [];
+}
+
+function loadFile(file) {
+  return new Promise((ok, fail) => {
+    const ext = file.name.split('.').pop().toLowerCase();
+    const rd = new FileReader();
+    rd.onerror = () => fail(new Error('Error leyendo el archivo'));
+    if (['xlsx','xls'].includes(ext)) {
+      rd.onload = e => { try { ok(readExcel(e.target.result)); } catch(err) { fail(err); } };
+      rd.readAsArrayBuffer(file);
+    } else {
+      rd.onload = e => { try { ok(readCSV(e.target.result)); } catch(err) { fail(err); } };
+      rd.readAsText(file, 'UTF-8');
+    }
+  });
+}
+
+// ── Data processing ──────────────────────────────────────────────────────────
+function processData(rows) {
+  if (!rows.length) throw new Error('El archivo está vacío o no tiene datos.');
+  if (rows.length > MAX_ROWS) {
+    rows = rows.slice(0, MAX_ROWS);
+    showToast(`Archivo grande: procesando los primeros ${fmtInt(MAX_ROWS)} registros`);
+  }
+
+  const headers = Object.keys(rows[0]);
+  const cm = detectCols(headers);
+
+  // Enrich rows
+  const data = rows.map(r => {
+    const p = {...r};
+    p._fecha = cm.fecha ? parseDate(r[cm.fecha]) : null;
+    p._mes   = ymKey(p._fecha);
+    p._monto_total      = cm.monto_total      ? cleanNum(r[cm.monto_total])      : 0;
+    p._itbis_facturado  = cm.itbis_facturado  ? cleanNum(r[cm.itbis_facturado])  : 0;
+    p._itbis_retenido   = cm.itbis_retenido   ? cleanNum(r[cm.itbis_retenido])   : 0;
+    p._monto_servicios  = cm.monto_servicios  ? cleanNum(r[cm.monto_servicios])  : 0;
+    p._monto_bienes     = cm.monto_bienes     ? cleanNum(r[cm.monto_bienes])     : 0;
+    return p;
+  });
+
+  const total_registros = data.length;
+  const monto_total     = data.reduce((s,r) => s + r._monto_total, 0);
+  const itbis_total     = data.reduce((s,r) => s + r._itbis_facturado, 0);
+  const itbis_retenido  = data.reduce((s,r) => s + r._itbis_retenido, 0);
+  const tasa_efectiva   = monto_total > 0 ? itbis_total / monto_total * 100 : 0;
+
+  // Monthly
+  const mMap = {};
+  data.forEach(r => { if (r._mes) mMap[r._mes] = (mMap[r._mes]||0) + r._itbis_facturado; });
+  const mLabels = Object.keys(mMap).sort();
+  const mValues = mLabels.map(k => Math.round(mMap[k]*100)/100);
+
+  // Tipo comprobante
+  const tMap = {};
+  if (cm.tipo_comprobante) data.forEach(r => {
+    const t = String(r[cm.tipo_comprobante]||'Sin tipo').trim();
+    tMap[t] = (tMap[t]||0) + 1;
+  });
+
+  // Servicios vs bienes
+  const totalServ = Math.round(data.reduce((s,r) => s+r._monto_servicios,0)*100)/100;
+  const totalBien = Math.round(data.reduce((s,r) => s+r._monto_bienes,0)*100)/100;
+
+  // Top RNC
+  const rncMap = {};
+  if (cm.rnc) data.forEach(r => {
+    const rnc = String(r[cm.rnc]||'').trim();
+    if (rnc && rnc !== 'null' && rnc !== '0') rncMap[rnc] = (rncMap[rnc]||0) + r._monto_total;
+  });
+  const topRnc = Object.entries(rncMap).sort((a,b)=>b[1]-a[1]).slice(0,10);
+
+  // Preview (first MAX_TABLE rows) and allRows (full, clean)
+  const cleanRow = r => { const out={}; headers.forEach(h=>{out[h]=r[h];}); return out; };
+  const preview  = data.slice(0, MAX_TABLE).map(cleanRow);
+  const allRows  = data.map(cleanRow);
+
+  return {
+    summary: { total_registros, monto_total, itbis_total, itbis_retenido, tasa_efectiva },
+    charts: {
+      monthly:          { labels: mLabels, values: mValues },
+      by_tipo:          { labels: Object.keys(tMap), values: Object.values(tMap) },
+      servicios_bienes: { labels: ['Servicios', 'Bienes'], values: [totalServ, totalBien] },
+      top_rnc:          { labels: topRnc.map(e=>e[0]), values: topRnc.map(e=>Math.round(e[1]*100)/100) },
+    },
+    columns: headers,
+    preview,
+    allRows,
+    total: rows.length,
+  };
+}
+
+// ── Chart builders ───────────────────────────────────────────────────────────
+function killCharts() { Object.values(charts).forEach(c=>c.destroy()); charts={}; }
+
+function initChartDefaults() {
+  Chart.defaults.color       = cssVar('--muted');
+  Chart.defaults.borderColor = cssVar('--border');
+  Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif";
+}
+
+function makeAreaChart(id, labels, values) {
+  const ctx = $(id).getContext('2d');
+  const accent = cssVar('--accent');
+  const g = ctx.createLinearGradient(0, 0, 0, 210);
+  g.addColorStop(0, accent + '55');
+  g.addColorStop(1, accent + '00');
+  charts[id] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: values, borderColor: accent, backgroundColor: g,
+        borderWidth: 2.5, fill: true, tension: 0.42,
+        pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: accent,
+      }],
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks: { callback: moneyTick }, grid: { color: cssVar('--border')+'44' } },
+        x: { grid: { color: cssVar('--border')+'28' } },
+      },
+    },
+  });
+}
+
+function makeDoughnut(id, labels, values) {
+  charts[id] = new Chart($(id), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data: values, backgroundColor: PALETTE,
+        borderColor: cssVar('--surface'), borderWidth: 2.5, hoverOffset: 7,
+      }],
+    },
+    options: {
+      responsive: true, cutout: '62%',
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10, font:{size:11} } } },
+    },
+  });
+}
+
+function makeHBar(id, labels, values) {
+  const primary = cssVar('--primary');
+  charts[id] = new Chart($(id), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{ data: values, backgroundColor: primary + 'CC', borderRadius: 4 }],
+    },
+    options: {
+      indexAxis: 'y', responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { callback: moneyTick }, grid: { color: cssVar('--border')+'40' } },
+        y: { grid: { display: false }, ticks: { font:{size:11} } },
+      },
+    },
+  });
+}
+
+// ── Export functions ─────────────────────────────────────────────────────────
+function exportExcel() {
+  if (!_exportData) return;
+  const { summary: s, columns, allRows, filename } = _exportData;
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: Resumen
+  const sumSheet = XLSX.utils.aoa_to_sheet([
+    ['Métrica', 'Valor'],
+    ['Total de registros', s.total_registros],
+    ['Monto total facturado (RD$)', s.monto_total],
+    ['ITBIS facturado (RD$)', s.itbis_total],
+    ['ITBIS retenido (RD$)', s.itbis_retenido],
+    ['Tasa efectiva (%)', parseFloat(s.tasa_efectiva.toFixed(2))],
+  ]);
+  sumSheet['!cols'] = [{wch:34},{wch:20}];
+  XLSX.utils.book_append_sheet(wb, sumSheet, 'Resumen');
+
+  // Sheet 2: Datos completos
+  const dataSheet = XLSX.utils.json_to_sheet(allRows, { header: columns });
+  dataSheet['!cols'] = columns.map(() => ({ wch: 20 }));
+  XLSX.utils.book_append_sheet(wb, dataSheet, 'Datos');
+
+  const outName = filename.replace(/\.[^.]+$/, '') + '_analisis.xlsx';
+  XLSX.writeFile(wb, outName);
+  showToast('✓ Excel exportado: ' + outName);
+}
+
+function exportPDF() {
+  window.print();
+}
+
+// ── Render dashboard ─────────────────────────────────────────────────────────
+function renderDash(data, filename) {
+  const { summary: s, charts: ch, columns, preview, allRows, total } = data;
+  _exportData = { summary: s, columns, allRows, filename };
+
+  $('kv-n').textContent     = fmtInt(s.total_registros);
+  $('kv-monto').textContent = fmtMoney(s.monto_total);
+  $('kv-itbis').textContent = fmtMoney(s.itbis_total);
+  $('kv-ret').textContent   = fmtMoney(s.itbis_retenido);
+  $('kv-tasa').textContent  = fmtPct(s.tasa_efectiva);
+  $('tb-file').textContent  = '📄 ' + filename;
+
+  initChartDefaults();
+  killCharts();
+
+  // Monthly
+  const hasMonthly = ch.monthly.labels.length > 0;
+  $('ch-monthly').hidden = !hasMonthly;
+  $('ce-monthly').hidden =  hasMonthly;
+  if (hasMonthly) makeAreaChart('ch-monthly', ch.monthly.labels, ch.monthly.values);
+
+  // Tipo
+  const hasTipo = ch.by_tipo.labels.length > 0;
+  $('ch-tipo').hidden = !hasTipo;
+  $('ce-tipo').hidden =  hasTipo;
+  if (hasTipo) makeDoughnut('ch-tipo', ch.by_tipo.labels, ch.by_tipo.values);
+
+  // Servicios vs bienes
+  const hasSB = ch.servicios_bienes.values[0] > 0 || ch.servicios_bienes.values[1] > 0;
+  $('ch-sb').hidden = !hasSB;
+  $('ce-sb').hidden =  hasSB;
+  if (hasSB) makeDoughnut('ch-sb', ch.servicios_bienes.labels, ch.servicios_bienes.values);
+
+  // Top RNC
+  const hasRNC = ch.top_rnc.labels.length > 0;
+  $('ch-rnc').hidden = !hasRNC;
+  $('ce-rnc').hidden =  hasRNC;
+  if (hasRNC) makeHBar('ch-rnc', ch.top_rnc.labels, ch.top_rnc.values);
+
+  // Table
+  const thead = $('t-head');
+  const tbody = $('t-body');
+  const hRow = document.createElement('tr');
+  columns.forEach(c => { const th = document.createElement('th'); th.textContent = c; hRow.appendChild(th); });
+  thead.innerHTML = ''; thead.appendChild(hRow);
+  tbody.innerHTML = '';
+  preview.forEach(row => {
+    const tr = document.createElement('tr');
+    columns.forEach(c => {
+      const td = document.createElement('td');
+      const v = row[c];
+      td.textContent = v == null ? '' : v;
+      td.title = v == null ? '' : String(v);
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  const shown = Math.min(MAX_TABLE, total);
+  $('t-note').textContent = total > MAX_TABLE
+    ? `Mostrando ${fmtInt(shown)} de ${fmtInt(total)} registros`
+    : `${fmtInt(total)} registro${total !== 1 ? 's' : ''}`;
+
+  $('btn-excel').hidden = false;
+  $('btn-pdf').hidden   = false;
+  $('upload-view').hidden   = true;
+  $('dashboard-view').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  showToast(`✓ ${fmtInt(s.total_registros)} registros cargados`);
+}
+
+// ── File handling ─────────────────────────────────────────────────────────────
+async function handleFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['csv','xlsx','xls'].includes(ext)) {
+    showToast('Formato no soportado. Use CSV, XLSX o XLS.', 'err'); return;
+  }
+  if (file.size > MAX_FILE) {
+    showToast('El archivo supera el límite de 20 MB.', 'err'); return;
+  }
+  $('loader').hidden = false;
+  try {
+    const rows = await loadFile(file);
+    const data = processData(rows);
+    renderDash(data, file.name);
+  } catch(e) {
+    showToast(e.message || 'Error procesando el archivo.', 'err');
+  } finally {
+    $('loader').hidden = true;
+  }
+}
+
+// ── Events ────────────────────────────────────────────────────────────────────
+const dz = $('dropzone');
+const fi = $('file-input');
+
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag-over');
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+dz.addEventListener('click', () => fi.click());
+dz.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); fi.click(); } });
+fi.addEventListener('change',  () => { if (fi.files[0]) handleFile(fi.files[0]); });
+$('btn-select').addEventListener('click', e => { e.stopPropagation(); fi.click(); });
+
+$('btn-reset').addEventListener('click', () => {
+  killCharts();
+  _exportData = null;
+  $('btn-excel').hidden = true;
+  $('btn-pdf').hidden   = true;
+  $('dashboard-view').hidden = true;
+  $('upload-view').hidden    = false;
+  $('t-head').innerHTML = '';
+  $('t-body').innerHTML = '';
+  fi.value = '';
+});
+$('btn-excel').addEventListener('click', exportExcel);
+$('btn-pdf').addEventListener('click',   exportPDF);
+</script>
+
+</body>
+</html>
