@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Análisis ITBIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header>
+  <span class="logo">📊</span>
+  <div>
+    <h1>Sistema de Análisis ITBIS</h1>
+    <p>Importa tu archivo CSV o Excel y obtén análisis instantáneo</p>
+  </div>
+</header>
+
+<main>
+
+  <!-- Upload -->
+  <div id="upload-section">
+    <div class="upload-icon">☁️</div>
+    <h2>Arrastra tu archivo aquí o haz clic para seleccionar</h2>
+    <p>Formatos admitidos: <strong>CSV, XLSX, XLS</strong> · Máximo 20 MB</p>
+    <input type="file" id="file-input" accept=".csv,.xlsx,.xls" />
+    <button class="btn btn-primary">📁 Seleccionar archivo</button>
+  </div>
+
+  <!-- File info bar (shown after upload) -->
+  <div id="file-info" style="display:none;">
+    <span>📄</span>
+    <span class="fi-name" id="fi-name"></span>
+    <span class="fi-clear" id="btn-clear">✕ Limpiar</span>
+  </div>
+
+  <!-- Loader -->
+  <div id="loader">
+    <div class="spinner"></div>
+    <p>Procesando datos, por favor espere…</p>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard">
+
+    <!-- KPIs -->
+    <div class="section-title">Resumen general</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total de registros</div>
+        <div class="kpi-value" id="kpi-registros">—</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Monto total facturado</div>
+        <div class="kpi-value" id="kpi-monto">—</div>
+      </div>
+      <div class="kpi-card orange">
+        <div class="kpi-label">ITBIS facturado</div>
+        <div class="kpi-value" id="kpi-itbis">—</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-label">ITBIS retenido</div>
+        <div class="kpi-value" id="kpi-retenido">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Tasa efectiva ITBIS</div>
+        <div class="kpi-value" id="kpi-tasa">—</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="section-title">Gráficas</div>
+    <div class="charts-grid">
+
+      <div class="chart-card">
+        <h3>📈 ITBIS facturado por mes</h3>
+        <canvas id="chart-monthly"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h3>🍩 Por tipo de comprobante</h3>
+        <canvas id="chart-tipo"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h3>⚖️ Servicios vs Bienes</h3>
+        <canvas id="chart-sb"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h3>🏆 Top 10 RNC por monto</h3>
+        <canvas id="chart-rnc"></canvas>
+      </div>
+
+    </div>
+
+    <!-- Data table -->
+    <div class="section-title">Vista previa de datos</div>
+    <div class="table-wrapper">
+      <table>
+        <thead id="table-head"></thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+    <p class="table-note">Se muestran los primeros 100 registros</p>
+
+  </div><!-- /dashboard -->
+
+</main>
+
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
