@@ -367,14 +367,12 @@ tbody tr:hover{background:var(--blue-lt);}
 }
 .alert.warn{background:var(--amber-lt);color:#92400E;border:1px solid rgba(217,119,6,.25);}
 .alert.ok{background:var(--green-lt);color:#065F46;border:1px solid rgba(5,150,105,.25);}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  .alert.warn{background:#1F0F00;color:#FBBF24;}
-  .alert.ok{background:#002B1A;color:#34D399;}
-}}
-:root[data-theme="dark"]{
-  .alert.warn{background:#1F0F00 !important;color:#FBBF24 !important;}
-  .alert.ok{background:#002B1A !important;color:#34D399 !important;}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .alert.warn{background:#1F0F00;color:#FBBF24;}
+  :root:not([data-theme="light"]) .alert.ok{background:#002B1A;color:#34D399;}
 }
+:root[data-theme="dark"] .alert.warn{background:#1F0F00 !important;color:#FBBF24 !important;}
+:root[data-theme="dark"] .alert.ok{background:#002B1A !important;color:#34D399 !important;}
 
 .cuadre-card{
   background:var(--surface);border-radius:var(--radius);
@@ -801,9 +799,19 @@ function detectCols(headers, aliases) {
 
 function cleanNum(val) {
   if (val == null || val === '') return 0;
-  const s = String(val).replace(/[RD$\s,]/gi,'').replace(/[^\d.\-]/g,'');
+  let s = String(val).replace(/[RD$\s]/gi, '').trim();
+  const neg = /^\(.*\)$/.test(s) || s.startsWith('-');
+  s = s.replace(/[()]/g, '').replace(/^-/, '');
+  // Detect decimal separator: whichever of , or . appears last is the decimal
+  const lc = s.lastIndexOf(','), lp = s.lastIndexOf('.');
+  if (lc > lp) {
+    s = s.replace(/\./g, '').replace(',', '.');  // European: 1.234,56 → 1234.56
+  } else {
+    s = s.replace(/,/g, '');                     // Anglo: 1,234.56 → 1234.56
+  }
   const n = parseFloat(s);
-  return isNaN(n) ? 0 : n;
+  if (isNaN(n)) return 0;
+  return neg ? -Math.abs(n) : n;
 }
 
 function sum(arr, key) { return arr.reduce((s,r) => s + (r[key]||0), 0); }
@@ -828,7 +836,9 @@ function parseSheet(ws) {
 }
 
 function readExcel(buf, sheetHint) {
-  const wb = XLSX.read(new Uint8Array(buf), { type:'array', raw:false });
+  let wb;
+  try { wb = XLSX.read(new Uint8Array(buf), { type:'array', raw:false }); }
+  catch(e) { throw new Error('No se pudo leer el archivo Excel. Verifica que no esté dañado o protegido.'); }
   const hinted = sheetHint
     ? wb.SheetNames.filter(n => n.toLowerCase().includes(sheetHint.toLowerCase()))
     : [];
@@ -880,9 +890,9 @@ function process606(rows) {
     p._serv  = cm.monto_servicios  ? cleanNum(r[cm.monto_servicios])  : 0;
     p._bien  = cm.monto_bienes     ? cleanNum(r[cm.monto_bienes])     : 0;
     p._total = cm.monto_total      ? cleanNum(r[cm.monto_total])      : p._serv + p._bien;
-    p._itbis = cm.itbis_facturado  ? cleanNum(r[cm.itbis_facturado])  : 0;
-    p._ret   = cm.itbis_retenido   ? cleanNum(r[cm.itbis_retenido])   : 0;
-    p._adel  = cm.itbis_adelantado ? cleanNum(r[cm.itbis_adelantado]) : 0;
+    p._itbis = cm.itbis_facturado  ? Math.abs(cleanNum(r[cm.itbis_facturado]))  : 0;
+    p._ret   = cm.itbis_retenido   ? Math.abs(cleanNum(r[cm.itbis_retenido]))   : 0;
+    p._adel  = cm.itbis_adelantado ? Math.abs(cleanNum(r[cm.itbis_adelantado])) : 0;
     p._costo = cm.itbis_costo      ? cleanNum(r[cm.itbis_costo])      : 0;
     if (!cm.itbis_adelantado && !cm.itbis_costo && p._itbis > 0) { p._adel = r2(p._itbis - p._ret); p._costo = 0; }
     if (cm.pct_retencion) { p._pct = cleanNum(r[cm.pct_retencion]); }
@@ -913,8 +923,8 @@ function process607(rows) {
     p._serv  = cm.monto_servicios ? cleanNum(r[cm.monto_servicios]) : 0;
     p._bien  = cm.monto_bienes    ? cleanNum(r[cm.monto_bienes])    : 0;
     p._total = cm.monto_total     ? cleanNum(r[cm.monto_total])     : p._serv + p._bien;
-    p._itbis = cm.itbis_facturado ? cleanNum(r[cm.itbis_facturado]) : 0;
-    p._ret   = cm.itbis_retenido  ? cleanNum(r[cm.itbis_retenido])  : 0;
+    p._itbis = cm.itbis_facturado ? Math.abs(cleanNum(r[cm.itbis_facturado])) : 0;
+    p._ret   = cm.itbis_retenido  ? Math.abs(cleanNum(r[cm.itbis_retenido]))  : 0;
     if (cm.monto_gravado) { p._gravado=cleanNum(r[cm.monto_gravado]); p._exento=cm.monto_exento?cleanNum(r[cm.monto_exento]):r2(p._total-p._gravado); }
     else { p._gravado=p._itbis>0?p._total:0; p._exento=p._itbis>0?0:p._total; }
     if (cm.tasa_itbis) { p._tasa=cleanNum(r[cm.tasa_itbis]); }
@@ -1047,19 +1057,19 @@ function updateIT1() {
     alertEl.innerHTML=`<div class="alert warn">Hay un posible <strong>saldo a favor</strong>. Verifica el saldo anterior en la DGII e ingrésalo.</div>`;
   }else{alertEl.hidden=true;}
   const rows=[
-    {lbl:'ITBIS Débito (ventas facturadas)',sign:'+',amt:debito},
-    {lbl:'ITBIS Crédito (compras)',sign:'−',amt:credito},
-    {lbl:'ITBIS Ret. en Ventas (clientes)',sign:'−',amt:itbisRetVentas},
-    {lbl:'Saldo a Favor Anterior (DGI)',sign:'−',amt:saldo},
-    {lbl:'ITBIS Aduana',sign:'+',amt:aduana},
-  ].filter(r=>r.amt!==0||r.sign==='+');
+    {lbl:'ITBIS Débito (ventas facturadas)',always:true, sign:'+',amt:debito},
+    {lbl:'ITBIS Crédito (compras)',          always:false,sign:'−',amt:credito},
+    {lbl:'ITBIS Ret. en Ventas (clientes)', always:false,sign:'−',amt:itbisRetVentas},
+    {lbl:'Saldo a Favor Anterior (DGI)',    always:false,sign:'−',amt:saldo},
+    {lbl:'ITBIS Aduana',                    always:false,sign:'+',amt:aduana},
+  ].filter(r=>r.always||r.amt!==0);
   $('cuadre-body').innerHTML=rows.map(r=>
     `<div class="cuadre-row"><span class="cuadre-lbl">${r.lbl}</span><span><span class="cuadre-sign">${r.sign}</span><span class="cuadre-amt">${fmtM(r.amt)}</span></span></div>`
   ).join('');
-  const isPagar=resultado>0;
-  $('ct-lbl').textContent=isPagar?'ITBIS A PAGAR':'SALDO A FAVOR';
+  const isPagar=resultado>0, isEven=resultado===0;
+  $('ct-lbl').textContent=isEven?'CUADRE EXACTO':isPagar?'ITBIS A PAGAR':'SALDO A FAVOR';
   $('ct-val').textContent=fmtM(Math.abs(resultado));
-  $('ct-val').className=`cuadre-total-val ${isPagar?'pagar':'favor'}`;
+  $('ct-val').className=`cuadre-total-val ${isPagar&&!isEven?'pagar':'favor'}`;
   cuadreEl.hidden=false;
   if (s6.totRet>0){
     const nota=document.createElement('div');nota.className='alert ok';nota.style.marginTop='14px';
