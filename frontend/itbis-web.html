@@ -8,416 +8,433 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <style>
-/* ── Design tokens ── */
 :root {
-  --primary:      #0D4F8E;
-  --primary-faint:#E4EEF8;
-  --accent:       #00B4D8;
-  --green:        #10B981;
-  --amber:        #F59E0B;
-  --red:          #EF4444;
-  --bg:           #EEF2F8;
-  --surface:      #FFFFFF;
-  --surface-2:    #F4F7FC;
-  --border:       #C8D5E5;
-  --text:         #0C1B2E;
-  --muted:        #557090;
-  --shadow:       0 2px 18px rgba(13,79,142,.09);
-  --radius:       14px;
-  --f-display:    'Syne', system-ui, sans-serif;
-  --f-body:       'DM Sans', system-ui, sans-serif;
+  --primary:#0D4F8E; --primary-faint:#E4EEF8; --accent:#00B4D8;
+  --green:#10B981; --amber:#F59E0B; --red:#EF4444;
+  --bg:#EEF2F8; --surface:#FFFFFF; --surface-2:#F4F7FC;
+  --border:#C8D5E5; --text:#0C1B2E; --muted:#557090;
+  --shadow:0 2px 18px rgba(13,79,142,.09); --radius:14px;
+  --f-display:'Syne',system-ui,sans-serif; --f-body:'DM Sans',system-ui,sans-serif;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --primary:      #4A90D9;
-    --primary-faint:#0C1F38;
-    --accent:       #38BDF8;
-    --green:        #34D399;
-    --amber:        #FBBF24;
-    --red:          #F87171;
-    --bg:           #08131D;
-    --surface:      #101D2C;
-    --surface-2:    #152234;
-    --border:       #1C3050;
-    --text:         #DCE9F5;
-    --muted:        #7A9FBF;
-    --shadow:       0 2px 18px rgba(0,0,0,.45);
-  }
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --primary:#4A90D9; --primary-faint:#0C1F38; --accent:#38BDF8;
+  --green:#34D399; --amber:#FBBF24; --red:#F87171;
+  --bg:#08131D; --surface:#101D2C; --surface-2:#152234;
+  --border:#1C3050; --text:#DCE9F5; --muted:#7A9FBF;
+  --shadow:0 2px 18px rgba(0,0,0,.45);
+}}
+:root[data-theme="dark"]{
+  --primary:#4A90D9; --primary-faint:#0C1F38; --accent:#38BDF8;
+  --green:#34D399; --amber:#FBBF24; --red:#F87171;
+  --bg:#08131D; --surface:#101D2C; --surface-2:#152234;
+  --border:#1C3050; --text:#DCE9F5; --muted:#7A9FBF;
+  --shadow:0 2px 18px rgba(0,0,0,.45);
 }
-:root[data-theme="dark"] {
-  --primary:      #4A90D9;
-  --primary-faint:#0C1F38;
-  --accent:       #38BDF8;
-  --green:        #34D399;
-  --amber:        #FBBF24;
-  --red:          #F87171;
-  --bg:           #08131D;
-  --surface:      #101D2C;
-  --surface-2:    #152234;
-  --border:       #1C3050;
-  --text:         #DCE9F5;
-  --muted:        #7A9FBF;
-  --shadow:       0 2px 18px rgba(0,0,0,.45);
-}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+[hidden]{display:none!important;}
+body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased;}
 
-/* ── Reset ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-[hidden] { display: none !important; }
-body { font-family: var(--f-body); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+/* ── Shell ── */
+.shell{display:grid;grid-template-columns:210px 1fr;min-height:100vh;}
 
-/* ── Upload view ── */
-#upload-view { min-height: 100vh; display: flex; flex-direction: column; }
+/* ── Sidebar ── */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sid-logo{padding:18px 18px 14px;border-bottom:1px solid var(--border);}
+.sid-logo-mark{font-family:var(--f-display);font-weight:800;font-size:1rem;color:var(--primary);letter-spacing:-.4px;}
+.sid-logo-mark em{font-style:normal;color:var(--accent);}
+.sid-logo-sub{font-size:.65rem;color:var(--muted);margin-top:2px;}
+.nav-section{padding:14px 10px 6px;}
+.nav-label{font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:0 8px;margin-bottom:6px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:9px;cursor:pointer;font-size:.82rem;font-weight:500;color:var(--muted);transition:background .14s,color .14s;margin-bottom:2px;user-select:none;}
+.nav-item:hover{background:var(--surface-2);color:var(--text);}
+.nav-item.active{background:var(--primary-faint);color:var(--primary);font-weight:600;}
+.nav-badge{margin-left:auto;min-width:20px;height:20px;border-radius:10px;font-size:.62rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px;background:var(--surface-2);color:var(--muted);transition:background .2s,color .2s;}
+.nav-badge.ok{background:var(--green);color:#fff;}
+.nav-badge.warn{background:var(--amber);color:#000;}
+.sid-bottom{margin-top:auto;padding:12px 16px;font-size:.68rem;color:var(--muted);border-top:1px solid var(--border);}
 
-.app-header {
-  display: flex; align-items: center; gap: 0;
-  padding: 18px 32px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-}
-.app-logo {
-  font-family: var(--f-display); font-weight: 800; font-size: 1.15rem;
-  color: var(--primary); letter-spacing: -.5px;
-}
-.app-logo em { font-style: normal; color: var(--accent); }
-.app-tag {
-  font-size: .78rem; color: var(--muted);
-  border-left: 1px solid var(--border);
-  padding-left: 14px; margin-left: 14px;
-}
+/* ── Main ── */
+.main{display:flex;flex-direction:column;min-width:0;}
+.module{display:none;flex-direction:column;flex:1;}
+.module.active{display:flex;}
 
-.upload-stage { flex: 1; display: flex; align-items: center; justify-content: center; padding: 48px 20px; }
+/* ── Topbar ── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.tb-left{}
+.tb-title{font-family:var(--f-display);font-weight:700;font-size:.98rem;color:var(--text);letter-spacing:-.3px;}
+.tb-sub{font-size:.74rem;color:var(--muted);}
+.tb-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.tb-file{font-size:.76rem;color:var(--muted);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:3px 10px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-#dropzone {
-  position: relative; width: 100%; max-width: 500px;
-  background: var(--surface); border: 2px dashed var(--border);
-  border-radius: 22px; padding: 64px 36px; text-align: center;
-  cursor: pointer; overflow: hidden;
-  transition: border-color .2s, background .2s;
-}
-#dropzone:hover, #dropzone.drag-over { border-color: var(--accent); background: var(--primary-faint); }
-#dropzone:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-#dropzone input { display: none; }
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;border:none;font-family:var(--f-body);font-size:.83rem;font-weight:600;cursor:pointer;transition:opacity .14s,transform .1s;letter-spacing:-.1px;}
+.btn:hover{opacity:.85;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border);}
+.btn-xl{background:#217346;color:#fff;}
+.btn-pdf{background:#c0392b;color:#fff;}
 
-/* Pulse rings */
-.pulse-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-.ring {
-  position: absolute; border-radius: 50%;
-  border: 1.5px solid var(--accent); opacity: 0;
-  width: 72px; height: 72px;
-  animation: ringOut 3.6s ease-out infinite;
-}
-.ring:nth-child(2) { animation-delay: 1.2s; }
-.ring:nth-child(3) { animation-delay: 2.4s; }
-@keyframes ringOut {
-  0%   { width: 72px; height: 72px; opacity: .55; }
-  100% { width: 420px; height: 420px; opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) { .ring { animation: none; } }
-
-.drop-inner { position: relative; z-index: 1; }
-.drop-icon { font-size: 2.8rem; display: block; margin-bottom: 18px; }
-.drop-title {
-  font-family: var(--f-display); font-weight: 700;
-  font-size: 1.2rem; color: var(--text); text-wrap: balance;
-  margin-bottom: 8px; letter-spacing: -.2px;
-}
-.drop-sub { font-size: .83rem; color: var(--muted); margin-bottom: 28px; }
-
-/* Buttons */
-.btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 10px 24px; border-radius: 9px; border: none;
-  font-family: var(--f-body); font-size: .88rem; font-weight: 600;
-  cursor: pointer; transition: opacity .15s, transform .1s;
-  letter-spacing: -.1px;
-}
-.btn:hover { opacity: .87; }
-.btn:active { transform: scale(.97); }
-.btn-primary { background: var(--primary); color: #fff; }
-.btn-ghost {
-  background: transparent; color: var(--muted);
-  border: 1.5px solid var(--border); padding: 8px 18px; font-size: .82rem;
-}
+/* ── Upload zone ── */
+.upload-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px;}
+.dropzone{position:relative;width:100%;max-width:480px;background:var(--surface);border:2px dashed var(--border);border-radius:22px;padding:56px 32px;text-align:center;cursor:pointer;overflow:hidden;transition:border-color .2s,background .2s;}
+.dropzone:hover,.dropzone.drag-over{border-color:var(--accent);background:var(--primary-faint);}
+.dropzone:focus-visible{outline:3px solid var(--accent);outline-offset:2px;}
+.dropzone input{display:none;}
+.pulse-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.ring{position:absolute;border-radius:50%;border:1.5px solid var(--accent);opacity:0;width:68px;height:68px;animation:ringOut 3.6s ease-out infinite;}
+.ring:nth-child(2){animation-delay:1.2s;}
+.ring:nth-child(3){animation-delay:2.4s;}
+@keyframes ringOut{0%{width:68px;height:68px;opacity:.55;}100%{width:400px;height:400px;opacity:0;}}
+@media (prefers-reduced-motion:reduce){.ring{animation:none;}}
+.drop-inner{position:relative;z-index:1;}
+.drop-icon{font-size:2.6rem;display:block;margin-bottom:14px;}
+.drop-title{font-family:var(--f-display);font-weight:700;font-size:1.1rem;color:var(--text);margin-bottom:6px;letter-spacing:-.2px;}
+.drop-sub{font-size:.8rem;color:var(--muted);margin-bottom:24px;}
 
 /* ── Dashboard ── */
-.topbar {
-  position: sticky; top: 0; z-index: 100;
-  background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 11px 28px; display: flex; align-items: center; gap: 12px;
-}
-.tb-logo {
-  font-family: var(--f-display); font-weight: 800;
-  font-size: .95rem; color: var(--primary); letter-spacing: -.4px; flex-shrink: 0;
-}
-.tb-logo em { font-style: normal; color: var(--accent); }
-.tb-file {
-  font-size: .8rem; color: var(--muted);
-  background: var(--surface-2); border: 1px solid var(--border);
-  border-radius: 6px; padding: 3px 10px;
-  max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.tb-actions { margin-left: auto; }
+.dash{padding:22px 24px 64px;overflow-y:auto;}
+.slabel{font-size:.67rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
 
-.dash { max-width: 1320px; margin: 0 auto; padding: 28px 22px 72px; }
+/* ── KPI ── */
+.kpi-row{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:20px;}
+.kpi{background:var(--surface);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border-top:3px solid var(--primary);}
+.kpi.g{border-color:var(--green);}
+.kpi.a{border-color:var(--amber);}
+.kpi.r{border-color:var(--red);}
+.kpi.c{border-color:var(--accent);}
+.kpi.m{border-color:var(--muted);}
+.kpi-lbl{font-size:.67rem;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.kpi-val{font-family:var(--f-display);font-size:1.35rem;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.1;}
+.kpi-sub{font-size:.7rem;color:var(--muted);margin-top:3px;}
 
-/* Section label */
-.slabel {
-  font-size: .7rem; font-weight: 600; letter-spacing: .9px;
-  text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
-}
+/* ── Retention cards ── */
+.ret-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.ret-card{background:var(--surface);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;}
+.ret-pct{font-family:var(--f-display);font-size:2rem;font-weight:800;color:var(--primary);line-height:1;min-width:58px;}
+.ret-pct.r{color:var(--red);}
+.ret-info{}
+.ret-lbl{font-size:.67rem;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:4px;}
+.ret-val{font-family:var(--f-display);font-size:1.05rem;font-weight:700;color:var(--text);}
+.ret-cnt{font-size:.72rem;color:var(--muted);margin-top:2px;}
 
-/* KPI cards */
-.kpi-row {
-  display: grid; gap: 14px;
-  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
-  margin-bottom: 32px;
-}
-.kpi {
-  background: var(--surface); border-radius: var(--radius);
-  padding: 18px 20px; box-shadow: var(--shadow);
-  border-top: 3px solid var(--primary);
-}
-.kpi.g { border-color: var(--green); }
-.kpi.a { border-color: var(--amber); }
-.kpi.r { border-color: var(--red); }
-.kpi.c { border-color: var(--accent); }
-.kpi-lbl {
-  font-size: .7rem; font-weight: 600; letter-spacing: .5px;
-  text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
-}
-.kpi-val {
-  font-family: var(--f-display); font-size: 1.5rem; font-weight: 800;
-  color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.1;
-}
+/* ── Tasa breakdown (607) ── */
+.tasa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
 
-/* Charts */
-.charts-grid {
-  display: grid; gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  margin-bottom: 32px;
-}
-.chart-card {
-  background: var(--surface); border-radius: var(--radius);
-  padding: 22px; box-shadow: var(--shadow);
-}
-.chart-card h3 {
-  font-size: .7rem; font-weight: 600; letter-spacing: .8px;
-  text-transform: uppercase; color: var(--muted); margin-bottom: 16px;
-}
-.chart-card canvas { max-height: 230px; }
-.chart-empty {
-  height: 160px; display: flex; align-items: center; justify-content: center;
-  color: var(--muted); font-size: .83rem;
-  border: 1px dashed var(--border); border-radius: 8px;
+/* ── Table ── */
+.table-wrap{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow-x:auto;max-height:380px;overflow-y:auto;margin-bottom:8px;}
+table{width:100%;border-collapse:collapse;font-size:.79rem;font-variant-numeric:tabular-nums;}
+thead th{position:sticky;top:0;background:var(--primary);color:#fff;padding:9px 12px;text-align:left;font-weight:600;white-space:nowrap;font-size:.72rem;letter-spacing:.3px;z-index:2;}
+tbody td{padding:7px 12px;border-bottom:1px solid var(--border);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+tbody tr:nth-child(even){background:var(--surface-2);}
+tbody tr:hover{background:var(--primary-faint);}
+.tnote{font-size:.71rem;color:var(--muted);text-align:right;}
+
+/* ── IT-1 module ── */
+.it1-body{padding:22px 24px 64px;max-width:820px;}
+.prereq-card{background:var(--surface);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:18px;}
+.prereq-item{display:flex;align-items:center;gap:12px;padding:8px 0;}
+.prereq-item+.prereq-item{border-top:1px solid var(--border);}
+.prereq-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;}
+.prereq-dot.ok{background:var(--green);color:#fff;}
+.prereq-dot.pending{background:var(--surface-2);color:var(--muted);border:2px dashed var(--border);}
+.prereq-text{}
+.prereq-name{font-weight:600;font-size:.87rem;color:var(--text);}
+.prereq-hint{font-size:.73rem;color:var(--muted);}
+
+.manual-card{background:var(--surface);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:18px;}
+.manual-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+.field-grp{display:flex;flex-direction:column;gap:5px;}
+.field-lbl{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);}
+.field-inp{background:var(--surface-2);border:1.5px solid var(--border);border-radius:8px;padding:9px 13px;font-family:var(--f-body);font-size:.88rem;color:var(--text);font-variant-numeric:tabular-nums;width:100%;transition:border-color .15s;}
+.field-inp:focus{outline:none;border-color:var(--accent);}
+
+.alert{border-radius:10px;padding:13px 16px;font-size:.83rem;font-weight:500;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;}
+.alert.warn{background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;}
+.alert.ok{background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7;}
+@media (prefers-color-scheme:dark){
+  .alert.warn{background:#2D2000;color:#FBBF24;border-color:#78350F;}
+  .alert.ok{background:#022C22;color:#34D399;border-color:#065F46;}
 }
 
-/* Table */
-.table-wrap {
-  background: var(--surface); border-radius: var(--radius);
-  box-shadow: var(--shadow); overflow-x: auto;
-  max-height: 400px; overflow-y: auto;
-}
-table { width: 100%; border-collapse: collapse; font-size: .82rem; font-variant-numeric: tabular-nums; }
-thead th {
-  position: sticky; top: 0; background: var(--primary); color: #fff;
-  padding: 10px 14px; text-align: left; font-weight: 600;
-  white-space: nowrap; font-size: .75rem; letter-spacing: .3px; z-index: 2;
-}
-tbody td {
-  padding: 8px 14px; border-bottom: 1px solid var(--border);
-  max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-tbody tr:nth-child(even) { background: var(--surface-2); }
-tbody tr:hover { background: var(--primary-faint); }
-.tnote { font-size: .74rem; color: var(--muted); margin-top: 8px; text-align: right; }
+.cuadre-card{background:var(--surface);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);}
+.cuadre-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:.88rem;}
+.cuadre-row:last-child{border-bottom:none;}
+.cuadre-lbl{color:var(--text);}
+.cuadre-sign{font-size:.72rem;color:var(--muted);margin-right:4px;font-weight:600;}
+.cuadre-amt{font-family:var(--f-display);font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;}
+.cuadre-sep{border-top:2px solid var(--border);margin:10px 0 6px;}
+.cuadre-total{display:flex;align-items:center;justify-content:space-between;padding-top:10px;}
+.cuadre-total-lbl{font-family:var(--f-display);font-weight:800;font-size:.95rem;color:var(--text);}
+.cuadre-total-val{font-family:var(--f-display);font-weight:800;font-size:1.5rem;font-variant-numeric:tabular-nums;}
+.cuadre-total-val.pagar{color:var(--red);}
+.cuadre-total-val.favor{color:var(--green);}
 
-/* Loader */
-#loader {
-  position: fixed; inset: 0; z-index: 500;
-  background: rgba(8,19,29,.55);
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column; gap: 16px;
-  color: #fff; font-weight: 500;
-  backdrop-filter: blur(5px);
-}
-.spinner {
-  width: 44px; height: 44px;
-  border: 3px solid rgba(255,255,255,.15);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin .75s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+/* ── Loader / Toast ── */
+#loader{position:fixed;inset:0;z-index:500;background:rgba(8,19,29,.6);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:#fff;font-weight:500;backdrop-filter:blur(5px);}
+.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@media (prefers-reduced-motion:reduce){.spinner{animation:none;}}
+#toast{position:fixed;bottom:22px;right:22px;z-index:600;background:var(--text);color:var(--bg);padding:10px 18px;border-radius:9px;font-size:.83rem;font-weight:500;max-width:280px;box-shadow:0 4px 22px rgba(0,0,0,.28);transform:translateY(64px);opacity:0;transition:all .32s cubic-bezier(.34,1.56,.64,1);}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.err{background:var(--red);color:#fff;}
 
-/* Toast */
-#toast {
-  position: fixed; bottom: 24px; right: 24px; z-index: 600;
-  background: var(--text); color: var(--bg);
-  padding: 11px 20px; border-radius: 10px;
-  font-size: .85rem; font-weight: 500; max-width: 300px;
-  box-shadow: 0 4px 24px rgba(0,0,0,.28);
-  transform: translateY(72px); opacity: 0;
-  transition: all .35s cubic-bezier(.34,1.56,.64,1);
-}
-#toast.show { transform: translateY(0); opacity: 1; }
-#toast.err  { background: var(--red); color: #fff; }
-
-@media (max-width: 640px) {
-  .charts-grid { grid-template-columns: 1fr; }
-  .dash { padding: 16px 14px 52px; }
-  .kpi-val { font-size: 1.2rem; }
-  .app-header { padding: 14px 16px; }
+/* ── Mobile ── */
+@media (max-width:700px){
+  .shell{grid-template-columns:1fr;}
+  .sidebar{position:static;height:auto;flex-direction:row;align-items:center;border-right:none;border-bottom:1px solid var(--border);}
+  .sid-logo{border-bottom:none;padding:12px 14px;}
+  .nav-section{display:flex;flex-direction:row;gap:4px;padding:8px 8px;flex:1;}
+  .nav-label{display:none;}
+  .nav-item{font-size:.75rem;padding:7px 10px;}
+  .sid-bottom{display:none;}
+  .ret-grid{grid-template-columns:1fr;}
+  .manual-grid{grid-template-columns:1fr;}
 }
 
-/* ── Export buttons ── */
-.btn-xl  { background: #217346; color: #fff; }
-.btn-pdf { background: #c0392b; color: #fff; }
-.tb-actions { display: flex; gap: 8px; align-items: center; }
-
-/* ── Print / PDF ── */
-@media print {
-  #upload-view, .topbar, #loader, #toast { display: none !important; }
-  #dashboard-view { display: block !important; }
-  body { background: #fff !important; color: #000 !important; }
-  .dash { padding: 12px 0 !important; max-width: 100% !important; }
-  .kpi { box-shadow: none !important; border: 1px solid #ccc !important; }
-  .chart-card { box-shadow: none !important; border: 1px solid #ddd !important; break-inside: avoid; }
-  .charts-grid { grid-template-columns: 1fr 1fr !important; }
-  .table-wrap { max-height: none !important; overflow: visible !important; box-shadow: none !important; border: 1px solid #ccc !important; }
-  thead th { background: #1a3c6e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .slabel { color: #333 !important; }
-  .kpi-val { color: #000 !important; }
+/* ── Print ── */
+@media print{
+  .sidebar{display:none!important;}
+  .topbar .tb-right{display:none!important;}
+  .shell{display:block;}
+  .module{display:block!important;}
+  #mod-606,#mod-607{display:none!important;}
+  #mod-it1{display:block!important;}
+  body{background:#fff!important;color:#000!important;}
+  .cuadre-card,.prereq-card,.manual-card{box-shadow:none!important;border:1px solid #ddd!important;}
 }
 </style>
 
-<!-- ── Upload view ── -->
-<div id="upload-view">
-  <header class="app-header">
-    <div class="app-logo">ITBIS<em>.</em>Análisis</div>
-    <div class="app-tag">Herramienta fiscal · República Dominicana</div>
-  </header>
-  <div class="upload-stage">
-    <div id="dropzone" tabindex="0" role="button" aria-label="Zona de carga de archivos">
-      <div class="pulse-wrap">
-        <div class="ring"></div>
-        <div class="ring"></div>
-        <div class="ring"></div>
-      </div>
-      <div class="drop-inner">
-        <span class="drop-icon">📊</span>
-        <div class="drop-title">Arrastra tu archivo de ITBIS aquí</div>
-        <div class="drop-sub">CSV · XLSX · XLS &nbsp;·&nbsp; Máximo 20 MB</div>
-        <input type="file" id="file-input" accept=".csv,.xlsx,.xls">
-        <button class="btn btn-primary" id="btn-select">📁 Seleccionar archivo</button>
-      </div>
+<div class="shell">
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+  <div class="sid-logo">
+    <div class="sid-logo-mark">ITBIS<em>.</em>Análisis</div>
+    <div class="sid-logo-sub">Herramienta fiscal · Rep. Dominicana</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Módulos</div>
+    <div class="nav-item active" data-nav="606">
+      <span>📥</span><span>606 — Compras</span>
+      <span class="nav-badge" id="badge-606">○</span>
+    </div>
+    <div class="nav-item" data-nav="607">
+      <span>📤</span><span>607 — Ventas</span>
+      <span class="nav-badge" id="badge-607">○</span>
+    </div>
+    <div class="nav-item" data-nav="it1">
+      <span>📋</span><span>IT-1 Declaración</span>
+      <span class="nav-badge" id="badge-it1">○</span>
     </div>
   </div>
-</div>
+  <div class="sid-bottom">DGII · República Dominicana</div>
+</nav>
 
-<!-- ── Dashboard ── -->
-<div id="dashboard-view" hidden>
+<!-- ── Main ── -->
+<main class="main">
+
+<!-- ════ 606 MODULE ════ -->
+<div id="mod-606" class="module active">
   <div class="topbar">
-    <div class="tb-logo">ITBIS<em>.</em>Análisis</div>
-    <div class="tb-file" id="tb-file"></div>
-    <div class="tb-actions">
-      <button class="btn btn-xl"  id="btn-excel" hidden>⬇ Excel</button>
-      <button class="btn btn-pdf" id="btn-pdf"   hidden>🖨 PDF</button>
-      <button class="btn btn-ghost" id="btn-reset">↩ Nueva carga</button>
+    <div class="tb-left">
+      <div class="tb-title">606 — Resumen de Compras</div>
+      <div class="tb-sub">Clasificación de gastos, ITBIS facturado y retenido</div>
+    </div>
+    <div class="tb-right">
+      <span class="tb-file" id="tf-606" hidden></span>
+      <button class="btn btn-xl" id="btn-xls-606" hidden>⬇ Excel</button>
+      <button class="btn btn-ghost" id="btn-rst-606" hidden>↩ Limpiar</button>
     </div>
   </div>
-  <div class="dash">
-    <!-- KPIs -->
-    <div class="slabel">Resumen general</div>
-    <div class="kpi-row">
-      <div class="kpi">
-        <div class="kpi-lbl">Registros</div>
-        <div class="kpi-val" id="kv-n">—</div>
-      </div>
-      <div class="kpi g">
-        <div class="kpi-lbl">Monto total facturado</div>
-        <div class="kpi-val" id="kv-monto">—</div>
-      </div>
-      <div class="kpi a">
-        <div class="kpi-lbl">ITBIS facturado</div>
-        <div class="kpi-val" id="kv-itbis">—</div>
-      </div>
-      <div class="kpi r">
-        <div class="kpi-lbl">ITBIS retenido</div>
-        <div class="kpi-val" id="kv-ret">—</div>
-      </div>
-      <div class="kpi c">
-        <div class="kpi-lbl">Tasa efectiva</div>
-        <div class="kpi-val" id="kv-tasa">—</div>
+
+  <!-- Upload -->
+  <div class="upload-stage" id="up-606">
+    <div class="dropzone" id="dz-606" tabindex="0" role="button" aria-label="Cargar archivo 606">
+      <div class="pulse-wrap"><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
+      <div class="drop-inner">
+        <span class="drop-icon">📥</span>
+        <div class="drop-title">Arrastra el archivo 606 aquí</div>
+        <div class="drop-sub">CSV · XLSX · XLS &nbsp;·&nbsp; Compras del período</div>
+        <input type="file" id="fi-606" accept=".csv,.xlsx,.xls">
+        <button class="btn btn-primary" id="bs-606">📁 Seleccionar</button>
       </div>
     </div>
+  </div>
 
-    <!-- Charts -->
-    <div class="slabel">Gráficas</div>
-    <div class="charts-grid">
-      <div class="chart-card">
-        <h3>ITBIS facturado · por mes</h3>
-        <canvas id="ch-monthly"></canvas>
-        <div class="chart-empty" id="ce-monthly" hidden>Sin datos de fecha</div>
-      </div>
-      <div class="chart-card">
-        <h3>Distribución · tipo de comprobante</h3>
-        <canvas id="ch-tipo"></canvas>
-        <div class="chart-empty" id="ce-tipo" hidden>Sin columna de tipo de comprobante</div>
-      </div>
-      <div class="chart-card">
-        <h3>Servicios vs bienes</h3>
-        <canvas id="ch-sb"></canvas>
-        <div class="chart-empty" id="ce-sb" hidden>Sin desglose de servicios / bienes</div>
-      </div>
-      <div class="chart-card">
-        <h3>Top 10 RNC · por monto</h3>
-        <canvas id="ch-rnc"></canvas>
-        <div class="chart-empty" id="ce-rnc" hidden>Sin columna de RNC</div>
-      </div>
-    </div>
+  <!-- Dashboard -->
+  <div class="dash" id="da-606" hidden>
+    <div class="slabel">Totales del período</div>
+    <div class="kpi-row" id="kpis-606"></div>
 
-    <!-- Table -->
+    <div class="slabel">ITBIS — Desglose</div>
+    <div class="kpi-row" id="kpis-itbis-606"></div>
+
+    <div class="slabel">ITBIS Retenido</div>
+    <div class="ret-grid" id="ret-606"></div>
+
     <div class="slabel">Vista previa de datos</div>
-    <div class="table-wrap">
-      <table><thead id="t-head"></thead><tbody id="t-body"></tbody></table>
-    </div>
-    <p class="tnote" id="t-note"></p>
+    <div class="table-wrap"><table><thead id="th-606"></thead><tbody id="tb-606"></tbody></table></div>
+    <p class="tnote" id="tn-606"></p>
   </div>
 </div>
 
-<!-- Loader / Toast -->
-<div id="loader" hidden><div class="spinner"></div><span>Procesando datos…</span></div>
+<!-- ════ 607 MODULE ════ -->
+<div id="mod-607" class="module">
+  <div class="topbar">
+    <div class="tb-left">
+      <div class="tb-title">607 — Resumen de Ventas</div>
+      <div class="tb-sub">Ingresos facturados, tasa de ITBIS y retenciones</div>
+    </div>
+    <div class="tb-right">
+      <span class="tb-file" id="tf-607" hidden></span>
+      <button class="btn btn-xl" id="btn-xls-607" hidden>⬇ Excel</button>
+      <button class="btn btn-ghost" id="btn-rst-607" hidden>↩ Limpiar</button>
+    </div>
+  </div>
+
+  <div class="upload-stage" id="up-607">
+    <div class="dropzone" id="dz-607" tabindex="0" role="button" aria-label="Cargar archivo 607">
+      <div class="pulse-wrap"><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
+      <div class="drop-inner">
+        <span class="drop-icon">📤</span>
+        <div class="drop-title">Arrastra el archivo 607 aquí</div>
+        <div class="drop-sub">CSV · XLSX · XLS &nbsp;·&nbsp; Ventas del período</div>
+        <input type="file" id="fi-607" accept=".csv,.xlsx,.xls">
+        <button class="btn btn-primary" id="bs-607">📁 Seleccionar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash" id="da-607" hidden>
+    <div class="slabel">Totales del período</div>
+    <div class="kpi-row" id="kpis-607"></div>
+
+    <div class="slabel">Por tasa de ITBIS</div>
+    <div class="kpi-row" id="kpis-tasa-607"></div>
+
+    <div class="slabel">ITBIS Retenido en Ventas</div>
+    <div class="ret-grid" id="ret-607"></div>
+
+    <div class="slabel">Vista previa de datos</div>
+    <div class="table-wrap"><table><thead id="th-607"></thead><tbody id="tb-607"></tbody></table></div>
+    <p class="tnote" id="tn-607"></p>
+  </div>
+</div>
+
+<!-- ════ IT-1 MODULE ════ -->
+<div id="mod-it1" class="module">
+  <div class="topbar">
+    <div class="tb-left">
+      <div class="tb-title">IT-1 — Declaración ITBIS</div>
+      <div class="tb-sub">Cuadre final para presentar a la DGII</div>
+    </div>
+    <div class="tb-right">
+      <button class="btn btn-pdf" onclick="window.print()">🖨 Imprimir</button>
+    </div>
+  </div>
+
+  <div class="it1-body">
+    <!-- Estado módulos -->
+    <div class="prereq-card">
+      <div class="slabel">Estado de módulos</div>
+      <div class="prereq-item">
+        <div class="prereq-dot pending" id="pi-606">606</div>
+        <div class="prereq-text">
+          <div class="prereq-name" id="pn-606">606 — Compras: pendiente</div>
+          <div class="prereq-hint">Carga el archivo de compras en el módulo 606</div>
+        </div>
+      </div>
+      <div class="prereq-item">
+        <div class="prereq-dot pending" id="pi-607">607</div>
+        <div class="prereq-text">
+          <div class="prereq-name" id="pn-607">607 — Ventas: pendiente</div>
+          <div class="prereq-hint">Carga el archivo de ventas en el módulo 607</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Datos manuales -->
+    <div class="manual-card">
+      <div class="slabel">Datos adicionales (manuales)</div>
+      <div class="manual-grid">
+        <div class="field-grp">
+          <label class="field-lbl" for="in-saldo">Saldo a favor anterior (DGI)</label>
+          <input class="field-inp" id="in-saldo" type="number" min="0" step="0.01" placeholder="0.00" value="0">
+        </div>
+        <div class="field-grp">
+          <label class="field-lbl" for="in-aduana">ITBIS Aduana (si aplica)</label>
+          <input class="field-inp" id="in-aduana" type="number" min="0" step="0.01" placeholder="0.00" value="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- Alerta -->
+    <div id="it1-alert" hidden></div>
+
+    <!-- Cuadre -->
+    <div class="cuadre-card" id="it1-cuadre" hidden>
+      <div class="slabel">Cuadre IT-1</div>
+      <div id="cuadre-body"></div>
+      <div class="cuadre-sep"></div>
+      <div class="cuadre-total">
+        <div class="cuadre-total-lbl" id="ct-lbl">RESULTADO</div>
+        <div class="cuadre-total-val" id="ct-val">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<div id="loader" hidden><div class="spinner"></div><span>Procesando…</span></div>
 <div id="toast"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
 'use strict';
 
-// ── Constants ────────────────────────────────────────────────────────────────
-const MAX_FILE   = 20 * 1024 * 1024;
-const MAX_TABLE  = 200;
-const MAX_ROWS   = 100_000;
-const PALETTE    = ['#0096C7','#10B981','#F59E0B','#EF4444','#7C3AED','#0891B2','#C026D3','#B45309','#DC2626','#16A34A'];
+// ── Aliases 606 ──────────────────────────────────────────────────────────────
+const AL606 = {
+  rnc:              ['rnc','cedula','rncocedula','identificacion','rnc_cedula','rncoproveedor','proveedor_rnc'],
+  ncf:              ['ncf','comprobante','numero_comprobante','numerodecomprobante','no_comprobante','nfc'],
+  fecha:            ['fecha','date','fecha_comprobante','fechadecomprobante','fecha_factura','fechafactura','fechapago','fecha_pago'],
+  tipo_comprobante: ['tipo','tipo_comprobante','tipodecomprobante','tipo_ncf','tipocomprobante','tipo_bienes_servicios','tipobienesservicios'],
+  monto_servicios:  ['monto_servicios','servicios','montoenservicios','facturado_servicios','monto_serv','montoservicio','monto_facturado_servicios'],
+  monto_bienes:     ['monto_bienes','bienes','montoenbienes','facturado_bienes','monto_bien','montoenbien','monto_facturado_bienes'],
+  monto_total:      ['monto_total','total','montototal','montofacturado','importe_total','valor_total','monto_facturado','facturado_total','totalfacturado','total_monto_facturado'],
+  itbis_facturado:  ['itbis_facturado','itbis','itbisfacturado','monto_itbis','impuesto','itbisfact'],
+  itbis_retenido:   ['itbis_retenido','itbisretenido','retencion_itbis','itbis_ret','itbisretencion'],
+  itbis_adelantado: ['itbis_adelantado','itbis_por_adelantar','itbisporadelantar','credito_itbis','itbiscreditofiscal','itbis_credito','por_adelantar'],
+  itbis_costo:      ['itbis_costo','itbis_llevado_al_costo','itbisllevadoalcosto','itbis_al_costo','costo_itbis'],
+  pct_retencion:    ['porcentaje_retencion','pct_retencion','porc_retencion','retencion_pct','porcentajeretencion'],
+};
 
-const ALIASES = {
-  rnc:              ['rnc','cedula','rncocedula','identificacion','rnco_cedula','rnc_cedula'],
-  ncf:              ['ncf','comprobante','numero_comprobante','numerodecomprobante','no_comprobante'],
-  fecha:            ['fecha','date','fecha_comprobante','fechadecomprobante','fecha_factura','fechafactura'],
-  tipo_comprobante: ['tipo','tipo_comprobante','tipodecomprobante','tipo_ncf','tipocomprobante'],
+// ── Aliases 607 ──────────────────────────────────────────────────────────────
+const AL607 = {
+  rnc:              ['rnc','cedula','rncocedula','identificacion','rnc_cedula','rncocliente','cliente_rnc'],
+  ncf:              ['ncf','comprobante','numero_comprobante','numerodecomprobante','no_comprobante','nfc'],
+  fecha:            ['fecha','date','fecha_comprobante','fechadecomprobante','fecha_factura','fechafactura','fechacobro','fecha_cobro'],
+  tipo_comprobante: ['tipo','tipo_comprobante','tipodecomprobante','tipo_ncf','tipocomprobante','tipo_ingreso','tipoingreso'],
   monto_servicios:  ['monto_servicios','servicios','montoenservicios','facturado_servicios','monto_serv'],
   monto_bienes:     ['monto_bienes','bienes','montoenbienes','facturado_bienes','monto_bien'],
-  monto_total:      ['monto_total','total','montototal','montofacturado','importe_total','valor_total','monto_facturado','facturado_total','totalfacturado'],
-  itbis_facturado:  ['itbis_facturado','itbis','itbisfacturado','monto_itbis','impuesto','itbis_fact'],
-  itbis_retenido:   ['itbis_retenido','itbisretenido','retencion_itbis','itbis_ret','itbisretencion'],
+  monto_total:      ['monto_total','total','montototal','montofacturado','importe_total','valor_total','monto_facturado','facturado_total','totalfacturado','total_monto_facturado'],
+  monto_gravado:    ['monto_gravado','gravado','valor_gravado','importe_gravado','montogravado'],
+  monto_exento:     ['monto_exento','exento','valor_exento','importe_exento','montoexento','no_gravado','montonogravado'],
+  itbis_facturado:  ['itbis_facturado','itbis','itbisfacturado','monto_itbis','impuesto','itbisfact'],
+  itbis_retenido:   ['itbis_retenido','itbisretenido','retencion_itbis','itbis_ret','itbis_retenido_terceros','itbis_ret_terceros'],
+  tasa_itbis:       ['tasa_itbis','tasa','porcentaje_itbis','pct_itbis','tasa_impuesto','tasaimpuesto','tasa_gravamen'],
+  construccion:     ['construccion','es_construccion','tipo_operacion','operacion_construccion'],
 };
 
 // ── Utils ────────────────────────────────────────────────────────────────────
-const $ = id => document.getElementById(id);
-let charts = {};
-let _exportData = null;
+const $  = id => document.getElementById(id);
+const fmtM = n => 'RD$ ' + new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n||0);
+const fmtI = n => new Intl.NumberFormat('en-US').format(Math.round(n||0));
+const fmtP = n => (n||0).toFixed(2) + '%';
+const r2  = n => Math.round((n||0)*100)/100;
 
 function showToast(msg, type) {
   const el = $('toast');
@@ -427,44 +444,25 @@ function showToast(msg, type) {
   el._t = setTimeout(() => { el.className = ''; }, 3800);
 }
 
-function fmtMoney(n) {
-  return 'RD$ ' + new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n||0);
-}
-function fmtInt(n) { return new Intl.NumberFormat('en-US').format(n||0); }
-function fmtPct(n) { return (n||0).toFixed(2) + '%'; }
-
-function moneyTick(v) {
-  if (v >= 1e6) return 'RD$' + (v/1e6).toFixed(1) + 'M';
-  if (v >= 1e3) return 'RD$' + Math.round(v/1e3) + 'K';
-  return 'RD$' + v;
-}
-
 function normKey(s) {
   return String(s).trim().toLowerCase()
     .normalize('NFD').replace(/[̀-ͯ]/g,'')
-    .replace(/[\s\-\/\\\.]+/g,'_')
+    .replace(/[\s\-\/\\.]+/g,'_')
     .replace(/[^a-z0-9_]/g,'');
 }
 
-function cssVar(name) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
-// ── Column detection ─────────────────────────────────────────────────────────
-function detectCols(headers) {
+function detectCols(headers, aliases) {
   const norm = {};
   headers.forEach(h => { norm[normKey(h)] = h; });
   const map = {};
-  for (const [canon, aliases] of Object.entries(ALIASES)) {
-    for (const a of aliases) {
-      const k = normKey(a);
-      if (norm[k]) { map[canon] = norm[k]; break; }
+  for (const [canon, alts] of Object.entries(aliases)) {
+    for (const a of alts) {
+      if (norm[normKey(a)]) { map[canon] = norm[normKey(a)]; break; }
     }
   }
   return map;
 }
 
-// ── Numeric / date cleaning ──────────────────────────────────────────────────
 function cleanNum(val) {
   if (val == null || val === '') return 0;
   const s = String(val).replace(/[RD$\s,]/gi,'').replace(/[^\d.\-]/g,'');
@@ -472,51 +470,21 @@ function cleanNum(val) {
   return isNaN(n) ? 0 : n;
 }
 
-function parseDate(val) {
-  if (val == null || val === '') return null;
-  if (typeof val === 'number') {
-    // Excel serial
-    const d = new Date(Math.round((val - 25569) * 864e5));
-    return isNaN(d) ? null : d;
-  }
-  const s = String(val).trim();
-  // ISO YYYY-MM-DD
-  if (/^\d{4}-\d{1,2}-\d{1,2}/.test(s)) {
-    const d = new Date(s);
-    return isNaN(d) ? null : d;
-  }
-  // DD/MM/YYYY or DD-MM-YYYY
-  const m = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
-  if (m) {
-    const yr = m[3].length === 2 ? '20' + m[3] : m[3];
-    const d = new Date(`${yr}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`);
-    return isNaN(d) ? null : d;
-  }
-  const d = new Date(s);
-  return isNaN(d) ? null : d;
-}
+function sum(arr, key) { return arr.reduce((s,r) => s + (r[key]||0), 0); }
 
-function ymKey(d) {
-  if (!d) return null;
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-}
-
-// ── File reading ─────────────────────────────────────────────────────────────
+// ── File loading ─────────────────────────────────────────────────────────────
 function readExcel(buf) {
   const wb = XLSX.read(new Uint8Array(buf), { type:'array', raw:false });
   const ws = wb.Sheets[wb.SheetNames[0]];
   return XLSX.utils.sheet_to_json(ws, { defval:null, raw:true });
 }
-
 function readCSV(text) {
-  const r = Papa.parse(text, { header:true, skipEmptyLines:true, dynamicTyping:false });
-  return r.data || [];
+  return (Papa.parse(text, { header:true, skipEmptyLines:true, dynamicTyping:false }).data) || [];
 }
-
 function loadFile(file) {
   return new Promise((ok, fail) => {
     const ext = file.name.split('.').pop().toLowerCase();
-    const rd = new FileReader();
+    const rd  = new FileReader();
     rd.onerror = () => fail(new Error('Error leyendo el archivo'));
     if (['xlsx','xls'].includes(ext)) {
       rd.onload = e => { try { ok(readExcel(e.target.result)); } catch(err) { fail(err); } };
@@ -528,305 +496,494 @@ function loadFile(file) {
   });
 }
 
-// ── Data processing ──────────────────────────────────────────────────────────
-function processData(rows) {
-  if (!rows.length) throw new Error('El archivo está vacío o no tiene datos.');
-  if (rows.length > MAX_ROWS) {
-    rows = rows.slice(0, MAX_ROWS);
-    showToast(`Archivo grande: procesando los primeros ${fmtInt(MAX_ROWS)} registros`);
-  }
-
+// ── Process 606 ──────────────────────────────────────────────────────────────
+function process606(rows) {
+  if (!rows.length) throw new Error('Archivo vacío.');
   const headers = Object.keys(rows[0]);
-  const cm = detectCols(headers);
+  const cm = detectCols(headers, AL606);
 
-  // Enrich rows
   const data = rows.map(r => {
     const p = {...r};
-    p._fecha = cm.fecha ? parseDate(r[cm.fecha]) : null;
-    p._mes   = ymKey(p._fecha);
-    p._monto_total      = cm.monto_total      ? cleanNum(r[cm.monto_total])      : 0;
-    p._itbis_facturado  = cm.itbis_facturado  ? cleanNum(r[cm.itbis_facturado])  : 0;
-    p._itbis_retenido   = cm.itbis_retenido   ? cleanNum(r[cm.itbis_retenido])   : 0;
-    p._monto_servicios  = cm.monto_servicios  ? cleanNum(r[cm.monto_servicios])  : 0;
-    p._monto_bienes     = cm.monto_bienes     ? cleanNum(r[cm.monto_bienes])     : 0;
+    p._serv  = cm.monto_servicios ? cleanNum(r[cm.monto_servicios]) : 0;
+    p._bien  = cm.monto_bienes    ? cleanNum(r[cm.monto_bienes])    : 0;
+    p._total = cm.monto_total     ? cleanNum(r[cm.monto_total])     : p._serv + p._bien;
+    p._itbis = cm.itbis_facturado ? cleanNum(r[cm.itbis_facturado]) : 0;
+    p._ret   = cm.itbis_retenido  ? cleanNum(r[cm.itbis_retenido])  : 0;
+    p._adel  = cm.itbis_adelantado ? cleanNum(r[cm.itbis_adelantado]) : 0;
+    p._costo = cm.itbis_costo     ? cleanNum(r[cm.itbis_costo])     : 0;
+
+    // Si no hay columnas explícitas de adelantado/costo, derivar
+    if (!cm.itbis_adelantado && !cm.itbis_costo && p._itbis > 0) {
+      p._adel = r2(p._itbis - p._ret);
+      p._costo = 0;
+    }
+
+    // Determinar % retención
+    if (cm.pct_retencion) {
+      p._pct = cleanNum(r[cm.pct_retencion]);
+    } else if (p._ret > 0 && p._itbis > 0) {
+      const ratio = p._ret / p._itbis;
+      p._pct = Math.abs(ratio - 1.0) < 0.08 ? 100 : Math.abs(ratio - 0.30) < 0.08 ? 30 : r2(ratio*100);
+    } else {
+      p._pct = 0;
+    }
     return p;
   });
 
-  const total_registros = data.length;
-  const monto_total     = data.reduce((s,r) => s + r._monto_total, 0);
-  const itbis_total     = data.reduce((s,r) => s + r._itbis_facturado, 0);
-  const itbis_retenido  = data.reduce((s,r) => s + r._itbis_retenido, 0);
-  const tasa_efectiva   = monto_total > 0 ? itbis_total / monto_total * 100 : 0;
+  const totServ  = r2(sum(data,'_serv'));
+  const totBien  = r2(sum(data,'_bien'));
+  const totTotal = r2(sum(data,'_total'));
+  const totItbis = r2(sum(data,'_itbis'));
+  const totAdel  = r2(sum(data,'_adel'));
+  const totCosto = r2(sum(data,'_costo'));
+  const totRet   = r2(sum(data,'_ret'));
 
-  // Monthly
-  const mMap = {};
-  data.forEach(r => { if (r._mes) mMap[r._mes] = (mMap[r._mes]||0) + r._itbis_facturado; });
-  const mLabels = Object.keys(mMap).sort();
-  const mValues = mLabels.map(k => Math.round(mMap[k]*100)/100);
+  const ret30rows  = data.filter(r => Math.abs(r._pct - 30)  < 8);
+  const ret100rows = data.filter(r => Math.abs(r._pct - 100) < 8);
+  const ret30  = { monto: r2(sum(ret30rows,'_ret')),  count: ret30rows.length };
+  const ret100 = { monto: r2(sum(ret100rows,'_ret')), count: ret100rows.length };
 
-  // Tipo comprobante
-  const tMap = {};
-  if (cm.tipo_comprobante) data.forEach(r => {
-    const t = String(r[cm.tipo_comprobante]||'Sin tipo').trim();
-    tMap[t] = (tMap[t]||0) + 1;
-  });
-
-  // Servicios vs bienes
-  const totalServ = Math.round(data.reduce((s,r) => s+r._monto_servicios,0)*100)/100;
-  const totalBien = Math.round(data.reduce((s,r) => s+r._monto_bienes,0)*100)/100;
-
-  // Top RNC
-  const rncMap = {};
-  if (cm.rnc) data.forEach(r => {
-    const rnc = String(r[cm.rnc]||'').trim();
-    if (rnc && rnc !== 'null' && rnc !== '0') rncMap[rnc] = (rncMap[rnc]||0) + r._monto_total;
-  });
-  const topRnc = Object.entries(rncMap).sort((a,b)=>b[1]-a[1]).slice(0,10);
-
-  // Preview (first MAX_TABLE rows) and allRows (full, clean)
-  const cleanRow = r => { const out={}; headers.forEach(h=>{out[h]=r[h];}); return out; };
-  const preview  = data.slice(0, MAX_TABLE).map(cleanRow);
-  const allRows  = data.map(cleanRow);
-
+  const cleanRow = r => { const o={}; headers.forEach(h=>{o[h]=r[h];}); return o; };
   return {
-    summary: { total_registros, monto_total, itbis_total, itbis_retenido, tasa_efectiva },
-    charts: {
-      monthly:          { labels: mLabels, values: mValues },
-      by_tipo:          { labels: Object.keys(tMap), values: Object.values(tMap) },
-      servicios_bienes: { labels: ['Servicios', 'Bienes'], values: [totalServ, totalBien] },
-      top_rnc:          { labels: topRnc.map(e=>e[0]), values: topRnc.map(e=>Math.round(e[1]*100)/100) },
-    },
+    summary: { registros:data.length, totServ, totBien, totTotal, totItbis, totAdel, totCosto, totRet, ret30, ret100 },
     columns: headers,
-    preview,
-    allRows,
-    total: rows.length,
+    preview: data.slice(0,200).map(cleanRow),
+    allRows: data.map(cleanRow),
   };
 }
 
-// ── Chart builders ───────────────────────────────────────────────────────────
-function killCharts() { Object.values(charts).forEach(c=>c.destroy()); charts={}; }
+// ── Process 607 ──────────────────────────────────────────────────────────────
+function process607(rows) {
+  if (!rows.length) throw new Error('Archivo vacío.');
+  const headers = Object.keys(rows[0]);
+  const cm = detectCols(headers, AL607);
 
-function initChartDefaults() {
-  Chart.defaults.color       = cssVar('--muted');
-  Chart.defaults.borderColor = cssVar('--border');
-  Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif";
-}
+  const data = rows.map(r => {
+    const p = {...r};
+    p._serv  = cm.monto_servicios ? cleanNum(r[cm.monto_servicios]) : 0;
+    p._bien  = cm.monto_bienes    ? cleanNum(r[cm.monto_bienes])    : 0;
+    p._total = cm.monto_total     ? cleanNum(r[cm.monto_total])     : p._serv + p._bien;
+    p._itbis = cm.itbis_facturado ? cleanNum(r[cm.itbis_facturado]) : 0;
+    p._ret   = cm.itbis_retenido  ? cleanNum(r[cm.itbis_retenido])  : 0;
 
-function makeAreaChart(id, labels, values) {
-  const ctx = $(id).getContext('2d');
-  const accent = cssVar('--accent');
-  const g = ctx.createLinearGradient(0, 0, 0, 210);
-  g.addColorStop(0, accent + '55');
-  g.addColorStop(1, accent + '00');
-  charts[id] = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        data: values, borderColor: accent, backgroundColor: g,
-        borderWidth: 2.5, fill: true, tension: 0.42,
-        pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: accent,
-      }],
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { ticks: { callback: moneyTick }, grid: { color: cssVar('--border')+'44' } },
-        x: { grid: { color: cssVar('--border')+'28' } },
-      },
-    },
+    // Gravado / exento
+    if (cm.monto_gravado) {
+      p._gravado = cleanNum(r[cm.monto_gravado]);
+      p._exento  = cm.monto_exento ? cleanNum(r[cm.monto_exento]) : r2(p._total - p._gravado);
+    } else {
+      p._gravado = p._itbis > 0 ? p._total : 0;
+      p._exento  = p._itbis > 0 ? 0 : p._total;
+    }
+
+    // Detectar tasa
+    if (cm.tasa_itbis) {
+      p._tasa = cleanNum(r[cm.tasa_itbis]);
+    } else if (p._total > 0 && p._itbis > 0) {
+      const ratio = p._itbis / p._total * 100;
+      if (Math.abs(ratio - 10) < 3) p._tasa = 10;
+      else if (Math.abs(ratio - 16) < 3) p._tasa = 16;
+      else if (Math.abs(ratio - 18) < 4) p._tasa = 18;
+      else p._tasa = r2(ratio);
+    } else {
+      p._tasa = 0;
+    }
+
+    // Construcción
+    if (cm.construccion) {
+      const v = String(r[cm.construccion]||'').toLowerCase();
+      p._constr = v === 'si' || v === 'sí' || v === '1' || v === 'true' || v === 'construccion';
+    } else {
+      p._constr = p._tasa === 10;
+    }
+
+    return p;
   });
+
+  const totTotal   = r2(sum(data,'_total'));
+  const totGrav    = r2(sum(data,'_gravado'));
+  const totExento  = r2(sum(data,'_exento'));
+  const totItbis   = r2(sum(data,'_itbis'));
+  const totRet     = r2(sum(data,'_ret'));
+
+  // Por tasa
+  const tasa18 = data.filter(r => r._tasa === 18);
+  const tasa16 = data.filter(r => r._tasa === 16);
+  const tasa10 = data.filter(r => r._tasa === 10);
+  const tasa0  = data.filter(r => r._tasa === 0 || (!r._tasa && r._itbis === 0));
+
+  const byTasa = {
+    t18: { monto: r2(sum(tasa18,'_gravado')), itbis: r2(sum(tasa18,'_itbis')), count: tasa18.length },
+    t16: { monto: r2(sum(tasa16,'_gravado')), itbis: r2(sum(tasa16,'_itbis')), count: tasa16.length },
+    t10: { monto: r2(sum(tasa10,'_gravado')), itbis: r2(sum(tasa10,'_itbis')), count: tasa10.length },
+    t0:  { monto: r2(sum(tasa0, '_total')),   itbis: 0,                         count: tasa0.length  },
+  };
+
+  // Retenciones en ventas: 30% vs 100%
+  const ret30rows  = data.filter(r => r._itbis > 0 && r._ret > 0 && Math.abs(r._ret/r._itbis - 0.30) < 0.08);
+  const ret100rows = data.filter(r => r._itbis > 0 && r._ret > 0 && Math.abs(r._ret/r._itbis - 1.0)  < 0.08);
+  const ret30  = { monto: r2(sum(ret30rows,'_ret')),  count: ret30rows.length };
+  const ret100 = { monto: r2(sum(ret100rows,'_ret')), count: ret100rows.length };
+
+  const cleanRow = r => { const o={}; headers.forEach(h=>{o[h]=r[h];}); return o; };
+  return {
+    summary: { registros:data.length, totTotal, totGrav, totExento, totItbis, totRet, byTasa, ret30, ret100 },
+    columns: headers,
+    preview: data.slice(0,200).map(cleanRow),
+    allRows: data.map(cleanRow),
+  };
 }
 
-function makeDoughnut(id, labels, values) {
-  charts[id] = new Chart($(id), {
-    type: 'doughnut',
-    data: {
-      labels,
-      datasets: [{
-        data: values, backgroundColor: PALETTE,
-        borderColor: cssVar('--surface'), borderWidth: 2.5, hoverOffset: 7,
-      }],
-    },
-    options: {
-      responsive: true, cutout: '62%',
-      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10, font:{size:11} } } },
-    },
-  });
+// ── Render helpers ───────────────────────────────────────────────────────────
+function kpiCard(lbl, val, cls='', sub='') {
+  return `<div class="kpi ${cls}">
+    <div class="kpi-lbl">${lbl}</div>
+    <div class="kpi-val">${val}</div>
+    ${sub ? `<div class="kpi-sub">${sub}</div>` : ''}
+  </div>`;
 }
 
-function makeHBar(id, labels, values) {
-  const primary = cssVar('--primary');
-  charts[id] = new Chart($(id), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{ data: values, backgroundColor: primary + 'CC', borderRadius: 4 }],
-    },
-    options: {
-      indexAxis: 'y', responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { callback: moneyTick }, grid: { color: cssVar('--border')+'40' } },
-        y: { grid: { display: false }, ticks: { font:{size:11} } },
-      },
-    },
-  });
-}
-
-// ── Export functions ─────────────────────────────────────────────────────────
-function exportExcel() {
-  if (!_exportData) return;
-  const { summary: s, columns, allRows, filename } = _exportData;
-  const wb = XLSX.utils.book_new();
-
-  // Sheet 1: Resumen
-  const sumSheet = XLSX.utils.aoa_to_sheet([
-    ['Métrica', 'Valor'],
-    ['Total de registros', s.total_registros],
-    ['Monto total facturado (RD$)', s.monto_total],
-    ['ITBIS facturado (RD$)', s.itbis_total],
-    ['ITBIS retenido (RD$)', s.itbis_retenido],
-    ['Tasa efectiva (%)', parseFloat(s.tasa_efectiva.toFixed(2))],
-  ]);
-  sumSheet['!cols'] = [{wch:34},{wch:20}];
-  XLSX.utils.book_append_sheet(wb, sumSheet, 'Resumen');
-
-  // Sheet 2: Datos completos
-  const dataSheet = XLSX.utils.json_to_sheet(allRows, { header: columns });
-  dataSheet['!cols'] = columns.map(() => ({ wch: 20 }));
-  XLSX.utils.book_append_sheet(wb, dataSheet, 'Datos');
-
-  const outName = filename.replace(/\.[^.]+$/, '') + '_analisis.xlsx';
-  XLSX.writeFile(wb, outName);
-  showToast('✓ Excel exportado: ' + outName);
-}
-
-function exportPDF() {
-  window.print();
-}
-
-// ── Render dashboard ─────────────────────────────────────────────────────────
-function renderDash(data, filename) {
-  const { summary: s, charts: ch, columns, preview, allRows, total } = data;
-  _exportData = { summary: s, columns, allRows, filename };
-
-  $('kv-n').textContent     = fmtInt(s.total_registros);
-  $('kv-monto').textContent = fmtMoney(s.monto_total);
-  $('kv-itbis').textContent = fmtMoney(s.itbis_total);
-  $('kv-ret').textContent   = fmtMoney(s.itbis_retenido);
-  $('kv-tasa').textContent  = fmtPct(s.tasa_efectiva);
-  $('tb-file').textContent  = '📄 ' + filename;
-
-  initChartDefaults();
-  killCharts();
-
-  // Monthly
-  const hasMonthly = ch.monthly.labels.length > 0;
-  $('ch-monthly').hidden = !hasMonthly;
-  $('ce-monthly').hidden =  hasMonthly;
-  if (hasMonthly) makeAreaChart('ch-monthly', ch.monthly.labels, ch.monthly.values);
-
-  // Tipo
-  const hasTipo = ch.by_tipo.labels.length > 0;
-  $('ch-tipo').hidden = !hasTipo;
-  $('ce-tipo').hidden =  hasTipo;
-  if (hasTipo) makeDoughnut('ch-tipo', ch.by_tipo.labels, ch.by_tipo.values);
-
-  // Servicios vs bienes
-  const hasSB = ch.servicios_bienes.values[0] > 0 || ch.servicios_bienes.values[1] > 0;
-  $('ch-sb').hidden = !hasSB;
-  $('ce-sb').hidden =  hasSB;
-  if (hasSB) makeDoughnut('ch-sb', ch.servicios_bienes.labels, ch.servicios_bienes.values);
-
-  // Top RNC
-  const hasRNC = ch.top_rnc.labels.length > 0;
-  $('ch-rnc').hidden = !hasRNC;
-  $('ce-rnc').hidden =  hasRNC;
-  if (hasRNC) makeHBar('ch-rnc', ch.top_rnc.labels, ch.top_rnc.values);
-
-  // Table
-  const thead = $('t-head');
-  const tbody = $('t-body');
+function renderTable(thId, tbId, tnId, columns, rows, total) {
+  const thead = $(thId), tbody = $(tbId);
   const hRow = document.createElement('tr');
-  columns.forEach(c => { const th = document.createElement('th'); th.textContent = c; hRow.appendChild(th); });
-  thead.innerHTML = ''; thead.appendChild(hRow);
-  tbody.innerHTML = '';
-  preview.forEach(row => {
+  columns.forEach(c => { const th=document.createElement('th'); th.textContent=c; hRow.appendChild(th); });
+  thead.innerHTML=''; thead.appendChild(hRow);
+  tbody.innerHTML='';
+  rows.forEach(row => {
     const tr = document.createElement('tr');
     columns.forEach(c => {
-      const td = document.createElement('td');
-      const v = row[c];
-      td.textContent = v == null ? '' : v;
-      td.title = v == null ? '' : String(v);
+      const td=document.createElement('td');
+      const v=row[c]; td.textContent=v==null?'':v; td.title=v==null?'':String(v);
       tr.appendChild(td);
     });
     tbody.appendChild(tr);
   });
-  const shown = Math.min(MAX_TABLE, total);
-  $('t-note').textContent = total > MAX_TABLE
-    ? `Mostrando ${fmtInt(shown)} de ${fmtInt(total)} registros`
-    : `${fmtInt(total)} registro${total !== 1 ? 's' : ''}`;
-
-  $('btn-excel').hidden = false;
-  $('btn-pdf').hidden   = false;
-  $('upload-view').hidden   = true;
-  $('dashboard-view').hidden = false;
-  window.scrollTo({ top: 0, behavior: 'instant' });
-  showToast(`✓ ${fmtInt(s.total_registros)} registros cargados`);
+  $(tnId).textContent = total > rows.length
+    ? `Mostrando ${fmtI(rows.length)} de ${fmtI(total)} registros`
+    : `${fmtI(total)} registro${total!==1?'s':''}`;
 }
 
-// ── File handling ─────────────────────────────────────────────────────────────
-async function handleFile(file) {
+// ── Render 606 dashboard ─────────────────────────────────────────────────────
+function render606(data, filename) {
+  const s = data.summary;
+  $('kpis-606').innerHTML =
+    kpiCard('Registros',       fmtI(s.registros),  '') +
+    kpiCard('Total Servicios', fmtM(s.totServ),  'c') +
+    kpiCard('Total Bienes',    fmtM(s.totBien),  'a') +
+    kpiCard('Total Facturado', fmtM(s.totTotal), 'g');
+
+  $('kpis-itbis-606').innerHTML =
+    kpiCard('ITBIS Facturado', fmtM(s.totItbis), '') +
+    kpiCard('ITBIS Adelantado (Crédito)', fmtM(s.totAdel), 'g', 'Crédito fiscal disponible') +
+    kpiCard('ITBIS Llevado al Costo', fmtM(s.totCosto), 'a', 'No recuperable') +
+    kpiCard('ITBIS Retenido Total', fmtM(s.totRet), 'r');
+
+  $('ret-606').innerHTML = `
+    <div class="ret-card">
+      <div class="ret-pct">30%</div>
+      <div class="ret-info">
+        <div class="ret-lbl">Retención del 30%</div>
+        <div class="ret-val">${fmtM(s.ret30.monto)}</div>
+        <div class="ret-cnt">${fmtI(s.ret30.count)} comprobante${s.ret30.count!==1?'s':''}</div>
+      </div>
+    </div>
+    <div class="ret-card">
+      <div class="ret-pct r">100%</div>
+      <div class="ret-info">
+        <div class="ret-lbl">Retención del 100%</div>
+        <div class="ret-val">${fmtM(s.ret100.monto)}</div>
+        <div class="ret-cnt">${fmtI(s.ret100.count)} comprobante${s.ret100.count!==1?'s':''}</div>
+      </div>
+    </div>`;
+
+  renderTable('th-606','tb-606','tn-606', data.columns, data.preview, data.summary.registros);
+
+  $('tf-606').textContent = '📄 ' + filename;
+  $('tf-606').hidden = false;
+  $('btn-xls-606').hidden = false;
+  $('btn-rst-606').hidden = false;
+  $('up-606').hidden  = true;
+  $('da-606').hidden  = false;
+
+  // badge
+  $('badge-606').textContent = '✓';
+  $('badge-606').className   = 'nav-badge ok';
+  updateIT1();
+}
+
+// ── Render 607 dashboard ─────────────────────────────────────────────────────
+function render607(data, filename) {
+  const s = data.summary;
+  const bt = s.byTasa;
+
+  $('kpis-607').innerHTML =
+    kpiCard('Registros',        fmtI(s.registros), '') +
+    kpiCard('Total Facturado',  fmtM(s.totTotal),  'g') +
+    kpiCard('Total Gravado',    fmtM(s.totGrav),   'c') +
+    kpiCard('Total Exento/No Gravado', fmtM(s.totExento), 'm') +
+    kpiCard('ITBIS Facturado',  fmtM(s.totItbis),  'a') +
+    kpiCard('ITBIS Ret. Clientes', fmtM(s.totRet), 'r');
+
+  $('kpis-tasa-607').innerHTML =
+    kpiCard('ITBIS 18%',        fmtM(bt.t18.itbis), '', `${fmtM(bt.t18.monto)} gravado · ${fmtI(bt.t18.count)} fact.`) +
+    (bt.t16.count ? kpiCard('ITBIS 16%', fmtM(bt.t16.itbis), 'a', `${fmtM(bt.t16.monto)} gravado · ${fmtI(bt.t16.count)} fact.`) : '') +
+    kpiCard('ITBIS 10% Construcción', fmtM(bt.t10.itbis), 'c', `${fmtM(bt.t10.monto)} gravado · ${fmtI(bt.t10.count)} fact.`) +
+    kpiCard('Exentos / No Gravados', fmtM(bt.t0.monto), 'm', `${fmtI(bt.t0.count)} comprobante${bt.t0.count!==1?'s':''}`);
+
+  $('ret-607').innerHTML = `
+    <div class="ret-card">
+      <div class="ret-pct">30%</div>
+      <div class="ret-info">
+        <div class="ret-lbl">Clientes retuvieron 30%</div>
+        <div class="ret-val">${fmtM(s.ret30.monto)}</div>
+        <div class="ret-cnt">${fmtI(s.ret30.count)} comprobante${s.ret30.count!==1?'s':''}</div>
+      </div>
+    </div>
+    <div class="ret-card">
+      <div class="ret-pct r">100%</div>
+      <div class="ret-info">
+        <div class="ret-lbl">Clientes retuvieron 100%</div>
+        <div class="ret-val">${fmtM(s.ret100.monto)}</div>
+        <div class="ret-cnt">${fmtI(s.ret100.count)} comprobante${s.ret100.count!==1?'s':''}</div>
+      </div>
+    </div>`;
+
+  renderTable('th-607','tb-607','tn-607', data.columns, data.preview, data.summary.registros);
+
+  $('tf-607').textContent = '📄 ' + filename;
+  $('tf-607').hidden = false;
+  $('btn-xls-607').hidden = false;
+  $('btn-rst-607').hidden = false;
+  $('up-607').hidden  = true;
+  $('da-607').hidden  = false;
+
+  $('badge-607').textContent = '✓';
+  $('badge-607').className   = 'nav-badge ok';
+  updateIT1();
+}
+
+// ── IT-1 cuadre ──────────────────────────────────────────────────────────────
+function updateIT1() {
+  const has606 = !!STATE['606'];
+  const has607 = !!STATE['607'];
+
+  // prereq dots
+  $('pi-606').className = `prereq-dot ${has606 ? 'ok' : 'pending'}`;
+  $('pn-606').textContent = has606 ? '606 — Compras: cargado ✓' : '606 — Compras: pendiente';
+  $('pi-607').className = `prereq-dot ${has607 ? 'ok' : 'pending'}`;
+  $('pn-607').textContent = has607 ? '607 — Ventas: cargado ✓' : '607 — Ventas: pendiente';
+
+  // IT-1 badge
+  if (has606 && has607) {
+    $('badge-it1').textContent = '✓';
+    $('badge-it1').className   = 'nav-badge ok';
+  } else {
+    $('badge-it1').textContent = '○';
+    $('badge-it1').className   = 'nav-badge';
+  }
+
+  const alertEl  = $('it1-alert');
+  const cuadreEl = $('it1-cuadre');
+
+  if (!has606 || !has607) {
+    alertEl.hidden = false;
+    alertEl.innerHTML = `<div class="alert warn">⚠ Carga el archivo <strong>606 (Compras)</strong> y el <strong>607 (Ventas)</strong> para generar el cuadre IT-1.</div>`;
+    cuadreEl.hidden = true;
+    return;
+  }
+
+  const s6 = STATE['606'].summary;
+  const s7 = STATE['607'].summary;
+  const saldo  = parseFloat($('in-saldo').value)  || 0;
+  const aduana = parseFloat($('in-aduana').value) || 0;
+
+  // Crédito disponible = ITBIS adelantado 606 + ITBIS retenido en ventas (607, lo que me retuvieron)
+  const debito         = s7.totItbis;
+  const credito        = s6.totAdel;   // crédito fiscal de compras
+  const itbisRet606    = s6.totRet;    // lo que yo retuve a mis proveedores (me lo descuento del débito no, es una obligación separada)
+  const itbisRetVentas = s7.totRet;    // lo que mis clientes me retuvieron (a mi favor)
+
+  // Cálculo IT-1 simplificado
+  // Resultado = Débito - Crédito - RetVentas - SaldoAnterior + Aduana
+  const resultado = r2(debito - credito - itbisRetVentas - saldo + aduana);
+
+  // Alerta saldo a favor
+  if (saldo === 0 && credito + itbisRetVentas >= debito) {
+    alertEl.hidden = false;
+    alertEl.innerHTML = `<div class="alert warn">⚠ Hay un posible <strong>saldo a favor</strong>. Verifica el saldo anterior en la DGI e ingrésalo en el campo correspondiente.</div>`;
+  } else {
+    alertEl.hidden = true;
+  }
+
+  const rows = [
+    { lbl: 'ITBIS Débito (ventas facturadas)',      sign: '+', amt: debito,         cls: '' },
+    { lbl: 'ITBIS Crédito (compras adelantado)',    sign: '−', amt: credito,        cls: '' },
+    { lbl: 'ITBIS Ret. en Ventas (clientes)',       sign: '−', amt: itbisRetVentas, cls: '' },
+    { lbl: 'Saldo a Favor Anterior (DGI)',          sign: '−', amt: saldo,          cls: '' },
+    { lbl: 'ITBIS Aduana',                          sign: '+', amt: aduana,         cls: '' },
+  ].filter(r => r.amt !== 0 || r.sign === '+');
+
+  $('cuadre-body').innerHTML = rows.map(r =>
+    `<div class="cuadre-row">
+      <span class="cuadre-lbl">${r.lbl}</span>
+      <span><span class="cuadre-sign">${r.sign}</span><span class="cuadre-amt">${fmtM(r.amt)}</span></span>
+    </div>`
+  ).join('');
+
+  const isPagar = resultado > 0;
+  $('ct-lbl').textContent = isPagar ? 'ITBIS A PAGAR' : 'SALDO A FAVOR';
+  $('ct-val').textContent = fmtM(Math.abs(resultado));
+  $('ct-val').className   = `cuadre-total-val ${isPagar ? 'pagar' : 'favor'}`;
+
+  cuadreEl.hidden = false;
+
+  // Nota sobre ITBIS retenido en compras (606) — separado, es una obligación
+  if (s6.totRet > 0) {
+    const nota = document.createElement('div');
+    nota.className = 'alert ok';
+    nota.style.marginTop = '12px';
+    nota.innerHTML = `<span>ℹ</span> <span>ITBIS Retenido en Compras (606): <strong>${fmtM(s6.totRet)}</strong> — este monto lo declaras como agente de retención en el formulario 11 o Anexo, no en el IT-1.</span>`;
+    const existing = cuadreEl.querySelector('.alert.ok');
+    if (existing) existing.remove();
+    cuadreEl.appendChild(nota);
+  }
+}
+
+// ── State & Export ───────────────────────────────────────────────────────────
+const STATE = { '606': null, '607': null };
+
+function exportXLS(mod) {
+  const d = STATE[mod];
+  if (!d) return;
+  const wb = XLSX.utils.book_new();
+  const s  = d.summary;
+
+  if (mod === '606') {
+    const sumSheet = XLSX.utils.aoa_to_sheet([
+      ['Métrica','Valor'],
+      ['Registros', s.registros],
+      ['Total Servicios', s.totServ],
+      ['Total Bienes', s.totBien],
+      ['Total Facturado', s.totTotal],
+      ['ITBIS Facturado', s.totItbis],
+      ['ITBIS Adelantado (Crédito)', s.totAdel],
+      ['ITBIS Llevado al Costo', s.totCosto],
+      ['ITBIS Retenido Total', s.totRet],
+      ['Retención 30% - Monto', s.ret30.monto],
+      ['Retención 30% - Comprobantes', s.ret30.count],
+      ['Retención 100% - Monto', s.ret100.monto],
+      ['Retención 100% - Comprobantes', s.ret100.count],
+    ]);
+    sumSheet['!cols'] = [{wch:36},{wch:20}];
+    XLSX.utils.book_append_sheet(wb, sumSheet, 'Resumen 606');
+  } else {
+    const bt = s.byTasa;
+    const sumSheet = XLSX.utils.aoa_to_sheet([
+      ['Métrica','Valor'],
+      ['Registros', s.registros],
+      ['Total Facturado', s.totTotal],
+      ['Total Gravado', s.totGrav],
+      ['Total Exento', s.totExento],
+      ['ITBIS Facturado Total', s.totItbis],
+      ['ITBIS Retenido por Clientes', s.totRet],
+      ['ITBIS 18% - Base', bt.t18.monto], ['ITBIS 18% - Impuesto', bt.t18.itbis],
+      ['ITBIS 16% - Base', bt.t16.monto], ['ITBIS 16% - Impuesto', bt.t16.itbis],
+      ['ITBIS 10% Construcción - Base', bt.t10.monto], ['ITBIS 10% - Impuesto', bt.t10.itbis],
+      ['Exentos - Monto', bt.t0.monto],
+      ['Ret. Clientes 30% - Monto', s.ret30.monto],
+      ['Ret. Clientes 100% - Monto', s.ret100.monto],
+    ]);
+    sumSheet['!cols'] = [{wch:36},{wch:20}];
+    XLSX.utils.book_append_sheet(wb, sumSheet, 'Resumen 607');
+  }
+
+  const dataSheet = XLSX.utils.json_to_sheet(d.allRows, { header: d.columns });
+  dataSheet['!cols'] = d.columns.map(() => ({wch:18}));
+  XLSX.utils.book_append_sheet(wb, dataSheet, 'Datos');
+  XLSX.writeFile(wb, `${mod}_analisis.xlsx`);
+  showToast(`✓ Excel exportado: ${mod}_analisis.xlsx`);
+}
+
+// ── File handler ──────────────────────────────────────────────────────────────
+async function handleFile(file, mod) {
   const ext = file.name.split('.').pop().toLowerCase();
   if (!['csv','xlsx','xls'].includes(ext)) {
-    showToast('Formato no soportado. Use CSV, XLSX o XLS.', 'err'); return;
+    showToast('Formato no soportado. Use CSV, XLSX o XLS.','err'); return;
   }
-  if (file.size > MAX_FILE) {
-    showToast('El archivo supera el límite de 20 MB.', 'err'); return;
+  if (file.size > 20*1024*1024) {
+    showToast('El archivo supera el límite de 20 MB.','err'); return;
   }
   $('loader').hidden = false;
   try {
     const rows = await loadFile(file);
-    const data = processData(rows);
-    renderDash(data, file.name);
+    if (mod === '606') {
+      STATE['606'] = process606(rows);
+      render606(STATE['606'], file.name);
+    } else {
+      STATE['607'] = process607(rows);
+      render607(STATE['607'], file.name);
+    }
   } catch(e) {
-    showToast(e.message || 'Error procesando el archivo.', 'err');
+    showToast(e.message || 'Error procesando el archivo.','err');
   } finally {
     $('loader').hidden = true;
   }
 }
 
-// ── Events ────────────────────────────────────────────────────────────────────
-const dz = $('dropzone');
-const fi = $('file-input');
+function resetMod(mod) {
+  STATE[mod] = null;
+  if (mod === '606') {
+    $('da-606').hidden=true; $('up-606').hidden=false;
+    $('tf-606').hidden=true; $('btn-xls-606').hidden=true; $('btn-rst-606').hidden=true;
+    $('th-606').innerHTML=''; $('tb-606').innerHTML='';
+    $('fi-606').value='';
+  } else {
+    $('da-607').hidden=true; $('up-607').hidden=false;
+    $('tf-607').hidden=true; $('btn-xls-607').hidden=true; $('btn-rst-607').hidden=true;
+    $('th-607').innerHTML=''; $('tb-607').innerHTML='';
+    $('fi-607').value='';
+  }
+  $(`badge-${mod}`).textContent='○';
+  $(`badge-${mod}`).className='nav-badge';
+  updateIT1();
+}
 
-dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-dz.addEventListener('drop', e => {
-  e.preventDefault(); dz.classList.remove('drag-over');
-  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+// ── Navigation ────────────────────────────────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+    el.classList.add('active');
+    const target = el.dataset.nav;
+    $('mod-' + (target === 'it1' ? 'it1' : target)).classList.add('active');
+    if (target === 'it1') updateIT1();
+  });
 });
-dz.addEventListener('click', () => fi.click());
-dz.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); fi.click(); } });
-fi.addEventListener('change',  () => { if (fi.files[0]) handleFile(fi.files[0]); });
-$('btn-select').addEventListener('click', e => { e.stopPropagation(); fi.click(); });
 
-$('btn-reset').addEventListener('click', () => {
-  killCharts();
-  _exportData = null;
-  $('btn-excel').hidden = true;
-  $('btn-pdf').hidden   = true;
-  $('dashboard-view').hidden = true;
-  $('upload-view').hidden    = false;
-  $('t-head').innerHTML = '';
-  $('t-body').innerHTML = '';
-  fi.value = '';
+// ── Wire dropzones & inputs ───────────────────────────────────────────────────
+['606','607'].forEach(mod => {
+  const dz  = $(`dz-${mod}`);
+  const fi  = $(`fi-${mod}`);
+  const bs  = $(`bs-${mod}`);
+
+  dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0], mod);
+  });
+  dz.addEventListener('click', () => fi.click());
+  dz.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' '){e.preventDefault();fi.click();} });
+  fi.addEventListener('change', () => { if (fi.files[0]) handleFile(fi.files[0], mod); });
+  bs.addEventListener('click', e => { e.stopPropagation(); fi.click(); });
+
+  $(`btn-xls-${mod}`).addEventListener('click', () => exportXLS(mod));
+  $(`btn-rst-${mod}`).addEventListener('click', () => resetMod(mod));
 });
-$('btn-excel').addEventListener('click', exportExcel);
-$('btn-pdf').addEventListener('click',   exportPDF);
+
+// Recalc IT-1 on manual input change
+['in-saldo','in-aduana'].forEach(id => {
+  $(id).addEventListener('input', updateIT1);
+});
 </script>
-
 </body>
 </html>
