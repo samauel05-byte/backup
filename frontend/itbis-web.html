@@ -6,52 +6,151 @@
 <title>ITBIS Análisis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* ── Token system ── */
 :root {
-  --primary:#0D4F8E; --primary-faint:#E4EEF8; --accent:#00B4D8;
-  --green:#10B981; --amber:#F59E0B; --red:#EF4444;
-  --bg:#EEF2F8; --surface:#FFFFFF; --surface-2:#F4F7FC;
-  --border:#C8D5E5; --text:#0C1B2E; --muted:#557090;
-  --shadow:0 2px 18px rgba(13,79,142,.09); --radius:14px;
-  --f-display:'Syne',system-ui,sans-serif; --f-body:'DM Sans',system-ui,sans-serif;
+  /* Brand */
+  --blue:#3B5BDB; --blue-lt:#EEF2FF; --blue-dk:#2C44B0;
+  --violet:#7C3AED; --violet-lt:#F5F3FF;
+  --teal:#0D9488;  --teal-lt:#F0FDFA;
+  --green:#059669; --green-lt:#ECFDF5;
+  --amber:#D97706; --amber-lt:#FFFBEB;
+  --red:#DC2626;   --red-lt:#FEF2F2;
+  --sky:#0284C7;   --sky-lt:#F0F9FF;
+  /* Neutrals */
+  --bg:#F1F5FB;
+  --surface:#FFFFFF;
+  --surface-2:#F7F9FE;
+  --border:#DDE4F0;
+  --text:#0E1B36;
+  --muted:#637898;
+  /* Sidebar */
+  --sid-bg:#0E1B36;
+  --sid-text:#8FA4C4;
+  --sid-text-bright:#C9D8EF;
+  --sid-active-from:#3B5BDB;
+  --sid-active-to:#2C44B0;
+  /* Shadows */
+  --shadow:0 1px 12px rgba(14,27,54,.07);
+  --shadow-md:0 4px 24px rgba(14,27,54,.1);
+  --radius:12px;
+  /* Type */
+  --f-display:'Syne',system-ui,sans-serif;
+  --f-body:'Inter',system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --primary:#4A90D9; --primary-faint:#0C1F38; --accent:#38BDF8;
-  --green:#34D399; --amber:#FBBF24; --red:#F87171;
-  --bg:#08131D; --surface:#101D2C; --surface-2:#152234;
-  --border:#1C3050; --text:#DCE9F5; --muted:#7A9FBF;
-  --shadow:0 2px 18px rgba(0,0,0,.45);
+  --blue:#6185F5; --blue-lt:#1A2350; --blue-dk:#7C9BFF;
+  --violet:#A78BFA; --violet-lt:#1F1440;
+  --teal:#2DD4BF;  --teal-lt:#062820;
+  --green:#34D399; --green-lt:#032117;
+  --amber:#FBBF24; --amber-lt:#2A1A00;
+  --red:#F87171;   --red-lt:#2A0808;
+  --sky:#38BDF8;   --sky-lt:#021C2A;
+  --bg:#080F1E;
+  --surface:#0E1B36;
+  --surface-2:#111E3A;
+  --border:#1C2E50;
+  --text:#C9D8EF;
+  --muted:#5A7499;
+  --sid-bg:#060D1C;
+  --sid-text:#4E6B8C;
+  --sid-text-bright:#8FA4C4;
+  --shadow:0 1px 12px rgba(0,0,0,.4);
+  --shadow-md:0 4px 24px rgba(0,0,0,.5);
 }}
 :root[data-theme="dark"]{
-  --primary:#4A90D9; --primary-faint:#0C1F38; --accent:#38BDF8;
-  --green:#34D399; --amber:#FBBF24; --red:#F87171;
-  --bg:#08131D; --surface:#101D2C; --surface-2:#152234;
-  --border:#1C3050; --text:#DCE9F5; --muted:#7A9FBF;
-  --shadow:0 2px 18px rgba(0,0,0,.45);
+  --blue:#6185F5; --blue-lt:#1A2350; --blue-dk:#7C9BFF;
+  --violet:#A78BFA; --violet-lt:#1F1440;
+  --teal:#2DD4BF;  --teal-lt:#062820;
+  --green:#34D399; --green-lt:#032117;
+  --amber:#FBBF24; --amber-lt:#2A1A00;
+  --red:#F87171;   --red-lt:#2A0808;
+  --sky:#38BDF8;   --sky-lt:#021C2A;
+  --bg:#080F1E;
+  --surface:#0E1B36;
+  --surface-2:#111E3A;
+  --border:#1C2E50;
+  --text:#C9D8EF;
+  --muted:#5A7499;
+  --sid-bg:#060D1C;
+  --sid-text:#4E6B8C;
+  --sid-text-bright:#8FA4C4;
+  --shadow:0 1px 12px rgba(0,0,0,.4);
+  --shadow-md:0 4px 24px rgba(0,0,0,.5);
 }
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 [hidden]{display:none!important;}
 body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased;}
 
 /* ── Shell ── */
-.shell{display:grid;grid-template-columns:210px 1fr;min-height:100vh;}
+.shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
 
 /* ── Sidebar ── */
-.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
-.sid-logo{padding:18px 18px 14px;border-bottom:1px solid var(--border);}
-.sid-logo-mark{font-family:var(--f-display);font-weight:800;font-size:1rem;color:var(--primary);letter-spacing:-.4px;}
-.sid-logo-mark em{font-style:normal;color:var(--accent);}
-.sid-logo-sub{font-size:.65rem;color:var(--muted);margin-top:2px;}
-.nav-section{padding:14px 10px 6px;}
-.nav-label{font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:0 8px;margin-bottom:6px;}
-.nav-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:9px;cursor:pointer;font-size:.82rem;font-weight:500;color:var(--muted);transition:background .14s,color .14s;margin-bottom:2px;user-select:none;}
-.nav-item:hover{background:var(--surface-2);color:var(--text);}
-.nav-item.active{background:var(--primary-faint);color:var(--primary);font-weight:600;}
-.nav-badge{margin-left:auto;min-width:20px;height:20px;border-radius:10px;font-size:.62rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px;background:var(--surface-2);color:var(--muted);transition:background .2s,color .2s;}
-.nav-badge.ok{background:var(--green);color:#fff;}
-.nav-badge.warn{background:var(--amber);color:#000;}
-.sid-bottom{margin-top:auto;padding:12px 16px;font-size:.68rem;color:var(--muted);border-top:1px solid var(--border);}
+.sidebar{
+  background:var(--sid-bg);
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  box-shadow:4px 0 24px rgba(0,0,0,.18);
+}
+.sid-logo{
+  padding:20px 18px 16px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;gap:12px;
+}
+.sid-logo-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,#3B5BDB,#7C3AED);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;font-weight:800;color:#fff;font-family:var(--f-display);
+  flex-shrink:0;letter-spacing:-.5px;
+  box-shadow:0 2px 10px rgba(59,91,219,.45);
+}
+.sid-logo-text{}
+.sid-logo-mark{font-family:var(--f-display);font-weight:800;font-size:.9rem;color:#fff;letter-spacing:-.3px;line-height:1;}
+.sid-logo-sub{font-size:.62rem;color:var(--sid-text);margin-top:2px;letter-spacing:.2px;}
+
+.nav-section{padding:16px 10px 8px;}
+.nav-label{font-size:.58rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--sid-text);padding:0 10px;margin-bottom:8px;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;cursor:pointer;
+  font-size:.8rem;font-weight:500;color:var(--sid-text);
+  transition:background .15s,color .15s;margin-bottom:3px;user-select:none;
+  position:relative;
+}
+.nav-item:hover{background:rgba(255,255,255,.07);color:var(--sid-text-bright);}
+.nav-item.active{
+  background:linear-gradient(135deg,var(--sid-active-from),var(--sid-active-to));
+  color:#fff;font-weight:600;
+  box-shadow:0 3px 14px rgba(59,91,219,.4);
+}
+.nav-item .ni-icon{
+  width:28px;height:28px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;flex-shrink:0;
+  background:rgba(255,255,255,.07);
+  transition:background .15s;
+}
+.nav-item.active .ni-icon{background:rgba(255,255,255,.18);}
+.nav-badge{
+  margin-left:auto;min-width:22px;height:22px;border-radius:11px;
+  font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;
+  padding:0 6px;background:rgba(255,255,255,.08);color:var(--sid-text);
+  transition:background .2s,color .2s;
+}
+.nav-badge.ok{background:#059669;color:#fff;}
+
+.sid-divider{height:1px;background:rgba(255,255,255,.06);margin:6px 14px;}
+
+.sid-bottom{
+  margin-top:auto;padding:14px 18px;
+  font-size:.64rem;color:var(--sid-text);
+  border-top:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;gap:8px;
+}
+.sid-bottom-dot{width:6px;height:6px;border-radius:50%;background:#059669;flex-shrink:0;}
 
 /* ── Main ── */
 .main{display:flex;flex-direction:column;min-width:0;}
@@ -59,137 +158,309 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
 .module.active{display:flex;}
 
 /* ── Topbar ── */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.topbar{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:14px 28px;
+  display:flex;align-items:center;gap:14px;
+  flex-shrink:0;
+  box-shadow:var(--shadow);
+}
+.tb-stripe{
+  width:4px;height:36px;border-radius:3px;flex-shrink:0;
+  background:linear-gradient(180deg,var(--blue),var(--violet));
+}
 .tb-left{}
-.tb-title{font-family:var(--f-display);font-weight:700;font-size:.98rem;color:var(--text);letter-spacing:-.3px;}
-.tb-sub{font-size:.74rem;color:var(--muted);}
+.tb-title{font-family:var(--f-display);font-weight:800;font-size:1.05rem;color:var(--text);letter-spacing:-.4px;line-height:1.2;}
+.tb-sub{font-size:.73rem;color:var(--muted);margin-top:1px;}
 .tb-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
-.tb-file{font-size:.76rem;color:var(--muted);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:3px 10px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tb-file{
+  font-size:.74rem;color:var(--blue);
+  background:var(--blue-lt);border:1px solid rgba(59,91,219,.2);
+  border-radius:6px;padding:4px 10px;
+  max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-weight:500;
+}
 
 /* ── Buttons ── */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;border:none;font-family:var(--f-body);font-size:.83rem;font-weight:600;cursor:pointer;transition:opacity .14s,transform .1s;letter-spacing:-.1px;}
-.btn:hover{opacity:.85;}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:8px 16px;border-radius:8px;border:none;
+  font-family:var(--f-body);font-size:.8rem;font-weight:600;
+  cursor:pointer;letter-spacing:-.1px;
+  transition:filter .15s,transform .1s,box-shadow .15s;
+}
+.btn:hover{filter:brightness(1.08);}
 .btn:active{transform:scale(.97);}
-.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(59,91,219,.3);}
 .btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border);}
-.btn-xl{background:#217346;color:#fff;}
-.btn-pdf{background:#c0392b;color:#fff;}
+.btn-ghost:hover{background:var(--surface-2);filter:none;}
+.btn-xl{background:#217346;color:#fff;box-shadow:0 2px 8px rgba(33,115,70,.3);}
+.btn-pdf{background:var(--red);color:#fff;box-shadow:0 2px 8px rgba(220,38,38,.3);}
 
 /* ── Upload zone ── */
 .upload-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px;}
-.dropzone{position:relative;width:100%;max-width:480px;background:var(--surface);border:2px dashed var(--border);border-radius:22px;padding:56px 32px;text-align:center;cursor:pointer;overflow:hidden;transition:border-color .2s,background .2s;}
-.dropzone:hover,.dropzone.drag-over{border-color:var(--accent);background:var(--primary-faint);}
-.dropzone:focus-visible{outline:3px solid var(--accent);outline-offset:2px;}
+.dropzone{
+  position:relative;width:100%;max-width:500px;
+  background:var(--surface);
+  border:2px dashed var(--border);border-radius:20px;
+  padding:60px 36px;text-align:center;cursor:pointer;overflow:hidden;
+  transition:border-color .2s,background .2s,box-shadow .2s;
+}
+.dropzone:hover,.dropzone.drag-over{
+  border-color:var(--blue);
+  background:var(--blue-lt);
+  box-shadow:0 0 0 4px rgba(59,91,219,.08);
+}
+.dropzone:focus-visible{outline:3px solid var(--blue);outline-offset:3px;}
 .dropzone input{display:none;}
-.pulse-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
-.ring{position:absolute;border-radius:50%;border:1.5px solid var(--accent);opacity:0;width:68px;height:68px;animation:ringOut 3.6s ease-out infinite;}
-.ring:nth-child(2){animation-delay:1.2s;}
-.ring:nth-child(3){animation-delay:2.4s;}
-@keyframes ringOut{0%{width:68px;height:68px;opacity:.55;}100%{width:400px;height:400px;opacity:0;}}
-@media (prefers-reduced-motion:reduce){.ring{animation:none;}}
 .drop-inner{position:relative;z-index:1;}
-.drop-icon{font-size:2.6rem;display:block;margin-bottom:14px;}
-.drop-title{font-family:var(--f-display);font-weight:700;font-size:1.1rem;color:var(--text);margin-bottom:6px;letter-spacing:-.2px;}
-.drop-sub{font-size:.8rem;color:var(--muted);margin-bottom:24px;}
-
-/* ── Dashboard ── */
-.dash{padding:22px 24px 64px;overflow-y:auto;}
-.slabel{font-size:.67rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
-
-/* ── KPI ── */
-.kpi-row{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:20px;}
-.kpi{background:var(--surface);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border-top:3px solid var(--primary);}
-.kpi.g{border-color:var(--green);}
-.kpi.a{border-color:var(--amber);}
-.kpi.r{border-color:var(--red);}
-.kpi.c{border-color:var(--accent);}
-.kpi.m{border-color:var(--muted);}
-.kpi-lbl{font-size:.67rem;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
-.kpi-val{font-family:var(--f-display);font-size:1.35rem;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.1;}
-.kpi-sub{font-size:.7rem;color:var(--muted);margin-top:3px;}
-
-/* ── Retention cards ── */
-.ret-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
-.ret-card{background:var(--surface);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;}
-.ret-pct{font-family:var(--f-display);font-size:2rem;font-weight:800;color:var(--primary);line-height:1;min-width:58px;}
-.ret-pct.r{color:var(--red);}
-.ret-info{}
-.ret-lbl{font-size:.67rem;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:4px;}
-.ret-val{font-family:var(--f-display);font-size:1.05rem;font-weight:700;color:var(--text);}
-.ret-cnt{font-size:.72rem;color:var(--muted);margin-top:2px;}
-
-/* ── Tasa breakdown (607) ── */
-.tasa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
-
-/* ── Table ── */
-.table-wrap{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow-x:auto;max-height:380px;overflow-y:auto;margin-bottom:8px;}
-table{width:100%;border-collapse:collapse;font-size:.79rem;font-variant-numeric:tabular-nums;}
-thead th{position:sticky;top:0;background:var(--primary);color:#fff;padding:9px 12px;text-align:left;font-weight:600;white-space:nowrap;font-size:.72rem;letter-spacing:.3px;z-index:2;}
-tbody td{padding:7px 12px;border-bottom:1px solid var(--border);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-tbody tr:nth-child(even){background:var(--surface-2);}
-tbody tr:hover{background:var(--primary-faint);}
-.tnote{font-size:.71rem;color:var(--muted);text-align:right;}
-
-/* ── IT-1 module ── */
-.it1-body{padding:22px 24px 64px;max-width:820px;}
-.prereq-card{background:var(--surface);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:18px;}
-.prereq-item{display:flex;align-items:center;gap:12px;padding:8px 0;}
-.prereq-item+.prereq-item{border-top:1px solid var(--border);}
-.prereq-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;}
-.prereq-dot.ok{background:var(--green);color:#fff;}
-.prereq-dot.pending{background:var(--surface-2);color:var(--muted);border:2px dashed var(--border);}
-.prereq-text{}
-.prereq-name{font-weight:600;font-size:.87rem;color:var(--text);}
-.prereq-hint{font-size:.73rem;color:var(--muted);}
-
-.manual-card{background:var(--surface);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:18px;}
-.manual-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
-.field-grp{display:flex;flex-direction:column;gap:5px;}
-.field-lbl{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);}
-.field-inp{background:var(--surface-2);border:1.5px solid var(--border);border-radius:8px;padding:9px 13px;font-family:var(--f-body);font-size:.88rem;color:var(--text);font-variant-numeric:tabular-nums;width:100%;transition:border-color .15s;}
-.field-inp:focus{outline:none;border-color:var(--accent);}
-
-.alert{border-radius:10px;padding:13px 16px;font-size:.83rem;font-weight:500;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;}
-.alert.warn{background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;}
-.alert.ok{background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7;}
-@media (prefers-color-scheme:dark){
-  .alert.warn{background:#2D2000;color:#FBBF24;border-color:#78350F;}
-  .alert.ok{background:#022C22;color:#34D399;border-color:#065F46;}
+.drop-icon-wrap{
+  width:72px;height:72px;border-radius:18px;
+  background:linear-gradient(135deg,var(--blue),var(--violet));
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+  box-shadow:0 6px 20px rgba(59,91,219,.35);
+}
+.drop-icon{font-size:2rem;display:block;}
+.drop-title{font-family:var(--f-display);font-weight:800;font-size:1.15rem;color:var(--text);margin-bottom:8px;letter-spacing:-.3px;}
+.drop-sub{font-size:.79rem;color:var(--muted);margin-bottom:26px;line-height:1.6;}
+.drop-sub strong{color:var(--text);}
+.drop-tags{display:flex;gap:6px;justify-content:center;margin-bottom:22px;flex-wrap:wrap;}
+.drop-tag{
+  font-size:.66rem;font-weight:600;letter-spacing:.3px;text-transform:uppercase;
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:5px;padding:3px 8px;color:var(--muted);
 }
 
-.cuadre-card{background:var(--surface);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);}
-.cuadre-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:.88rem;}
+/* ── Dashboard ── */
+.dash{padding:24px 28px 72px;overflow-y:auto;}
+.section-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;margin-top:4px;}
+.section-hd+.section-hd,.slabel+.section-hd{margin-top:16px;}
+.sh-bar{width:3px;height:16px;border-radius:2px;background:linear-gradient(180deg,var(--blue),var(--violet));flex-shrink:0;}
+.sh-lbl{font-size:.68rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);}
+.slabel{font-size:.68rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.slabel::before{content:'';display:block;width:3px;height:14px;border-radius:2px;background:linear-gradient(180deg,var(--blue),var(--violet));flex-shrink:0;}
+
+/* ── KPI ── */
+.kpi-row{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));margin-bottom:22px;}
+.kpi{
+  background:var(--surface);
+  border-radius:var(--radius);
+  padding:16px 18px 14px;
+  box-shadow:var(--shadow);
+  border-left:4px solid var(--blue);
+  position:relative;overflow:hidden;
+}
+.kpi::after{
+  content:'';position:absolute;top:-20px;right:-20px;
+  width:80px;height:80px;border-radius:50%;
+  background:currentColor;opacity:.04;
+  pointer-events:none;
+}
+.kpi.g{border-color:var(--green);background:var(--green-lt);}
+.kpi.a{border-color:var(--amber);background:var(--amber-lt);}
+.kpi.r{border-color:var(--red);background:var(--red-lt);}
+.kpi.c{border-color:var(--sky);background:var(--sky-lt);}
+.kpi.v{border-color:var(--violet);background:var(--violet-lt);}
+.kpi.t{border-color:var(--teal);background:var(--teal-lt);}
+.kpi.m{border-color:var(--muted);background:var(--surface-2);}
+.kpi-lbl{font-size:.64rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.kpi-val{font-family:var(--f-display);font-size:1.25rem;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.1;}
+.kpi.g .kpi-val{color:var(--green);}
+.kpi.r .kpi-val{color:var(--red);}
+.kpi.a .kpi-val{color:var(--amber);}
+.kpi.c .kpi-val{color:var(--sky);}
+.kpi.v .kpi-val{color:var(--violet);}
+.kpi.t .kpi-val{color:var(--teal);}
+.kpi-sub{font-size:.67rem;color:var(--muted);margin-top:4px;}
+
+/* ── Retention cards ── */
+.ret-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;}
+.ret-card{
+  background:var(--surface);border-radius:var(--radius);
+  padding:18px 20px;box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:16px;
+  border:1px solid var(--border);
+}
+.ret-badge{
+  width:56px;height:56px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.ret-badge.blue{background:var(--blue-lt);}
+.ret-badge.red{background:var(--red-lt);}
+.ret-pct{font-family:var(--f-display);font-size:1.35rem;font-weight:800;line-height:1;}
+.ret-badge.blue .ret-pct{color:var(--blue);}
+.ret-badge.red  .ret-pct{color:var(--red);}
+.ret-info{}
+.ret-lbl{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px;}
+.ret-val{font-family:var(--f-display);font-size:1rem;font-weight:700;color:var(--text);}
+.ret-cnt{font-size:.7rem;color:var(--muted);margin-top:2px;}
+
+/* ── Table ── */
+.table-wrap{
+  background:var(--surface);border-radius:var(--radius);
+  box-shadow:var(--shadow);border:1px solid var(--border);
+  overflow-x:auto;max-height:400px;overflow-y:auto;margin-bottom:8px;
+}
+table{width:100%;border-collapse:collapse;font-size:.77rem;font-variant-numeric:tabular-nums;}
+thead th{
+  position:sticky;top:0;
+  background:var(--blue);color:#fff;
+  padding:10px 14px;text-align:left;
+  font-weight:600;white-space:nowrap;font-size:.7rem;letter-spacing:.4px;z-index:2;
+}
+thead th:first-child{border-radius:0;}
+tbody td{
+  padding:8px 14px;border-bottom:1px solid var(--border);
+  max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:var(--text);
+}
+tbody tr:nth-child(even){background:var(--surface-2);}
+tbody tr:hover{background:var(--blue-lt);}
+.tnote{font-size:.7rem;color:var(--muted);text-align:right;padding:6px 0;}
+
+/* ── IT-1 module ── */
+.it1-body{padding:24px 28px 72px;max-width:860px;}
+
+.prereq-card{
+  background:var(--surface);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);border:1px solid var(--border);
+  margin-bottom:18px;
+}
+.prereq-item{display:flex;align-items:center;gap:14px;padding:10px 0;}
+.prereq-item+.prereq-item{border-top:1px solid var(--border);}
+.prereq-dot{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:700;flex-shrink:0;letter-spacing:-.3px;
+}
+.prereq-dot.ok{background:var(--green);color:#fff;box-shadow:0 2px 8px rgba(5,150,105,.3);}
+.prereq-dot.pending{background:var(--surface-2);color:var(--muted);border:2px dashed var(--border);}
+.prereq-text{}
+.prereq-name{font-weight:600;font-size:.88rem;color:var(--text);}
+.prereq-hint{font-size:.72rem;color:var(--muted);margin-top:2px;}
+
+.manual-card{
+  background:var(--surface);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);border:1px solid var(--border);
+  margin-bottom:18px;
+}
+.manual-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+.field-grp{display:flex;flex-direction:column;gap:6px;}
+.field-lbl{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+.field-inp{
+  background:var(--surface-2);border:1.5px solid var(--border);
+  border-radius:8px;padding:10px 14px;
+  font-family:var(--f-body);font-size:.9rem;color:var(--text);
+  font-variant-numeric:tabular-nums;width:100%;
+  transition:border-color .15s,box-shadow .15s;
+}
+.field-inp:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,91,219,.12);}
+
+.alert{
+  border-radius:10px;padding:14px 18px;font-size:.83rem;font-weight:500;
+  margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;
+}
+.alert.warn{background:var(--amber-lt);color:#92400E;border:1px solid rgba(217,119,6,.25);}
+.alert.ok{background:var(--green-lt);color:#065F46;border:1px solid rgba(5,150,105,.25);}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  .alert.warn{background:#1F0F00;color:#FBBF24;}
+  .alert.ok{background:#002B1A;color:#34D399;}
+}}
+:root[data-theme="dark"]{
+  .alert.warn{background:#1F0F00 !important;color:#FBBF24 !important;}
+  .alert.ok{background:#002B1A !important;color:#34D399 !important;}
+}
+
+.cuadre-card{
+  background:var(--surface);border-radius:var(--radius);
+  padding:24px;box-shadow:var(--shadow-md);border:1px solid var(--border);
+}
+.cuadre-hd{
+  display:flex;align-items:center;gap:12px;margin-bottom:18px;
+  padding-bottom:14px;border-bottom:2px solid var(--border);
+}
+.cuadre-hd-icon{
+  width:40px;height:40px;border-radius:11px;
+  background:linear-gradient(135deg,var(--blue),var(--violet));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;
+  box-shadow:0 3px 10px rgba(59,91,219,.3);
+}
+.cuadre-hd-title{font-family:var(--f-display);font-weight:800;font-size:1rem;color:var(--text);}
+.cuadre-hd-sub{font-size:.72rem;color:var(--muted);margin-top:1px;}
+.cuadre-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 0;border-bottom:1px solid var(--border);font-size:.88rem;
+}
 .cuadre-row:last-child{border-bottom:none;}
 .cuadre-lbl{color:var(--text);}
-.cuadre-sign{font-size:.72rem;color:var(--muted);margin-right:4px;font-weight:600;}
+.cuadre-sign{
+  font-size:.7rem;color:var(--muted);margin-right:5px;font-weight:700;
+  width:14px;text-align:center;display:inline-block;
+}
 .cuadre-amt{font-family:var(--f-display);font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;}
-.cuadre-sep{border-top:2px solid var(--border);margin:10px 0 6px;}
-.cuadre-total{display:flex;align-items:center;justify-content:space-between;padding-top:10px;}
-.cuadre-total-lbl{font-family:var(--f-display);font-weight:800;font-size:.95rem;color:var(--text);}
-.cuadre-total-val{font-family:var(--f-display);font-weight:800;font-size:1.5rem;font-variant-numeric:tabular-nums;}
+.cuadre-sep{height:2px;background:var(--border);border-radius:2px;margin:14px 0 10px;}
+.cuadre-total{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-radius:10px;
+  background:var(--surface-2);border:1px solid var(--border);
+}
+.cuadre-total-lbl{font-family:var(--f-display);font-weight:800;font-size:.9rem;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+.cuadre-total-val{font-family:var(--f-display);font-weight:800;font-size:1.7rem;font-variant-numeric:tabular-nums;}
 .cuadre-total-val.pagar{color:var(--red);}
 .cuadre-total-val.favor{color:var(--green);}
 
 /* ── Loader / Toast ── */
-#loader{position:fixed;inset:0;z-index:500;background:rgba(8,19,29,.6);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:#fff;font-weight:500;backdrop-filter:blur(5px);}
-.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite;}
+#loader{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(8,15,30,.7);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  gap:16px;color:#fff;font-weight:500;backdrop-filter:blur(6px);
+}
+.loader-box{
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;padding:28px 40px;display:flex;flex-direction:column;
+  align-items:center;gap:14px;
+}
+.spinner{
+  width:36px;height:36px;border:3px solid rgba(255,255,255,.12);
+  border-top-color:#6185F5;border-radius:50%;
+  animation:spin .7s linear infinite;
+}
 @keyframes spin{to{transform:rotate(360deg);}}
 @media (prefers-reduced-motion:reduce){.spinner{animation:none;}}
-#toast{position:fixed;bottom:22px;right:22px;z-index:600;background:var(--text);color:var(--bg);padding:10px 18px;border-radius:9px;font-size:.83rem;font-weight:500;max-width:280px;box-shadow:0 4px 22px rgba(0,0,0,.28);transform:translateY(64px);opacity:0;transition:all .32s cubic-bezier(.34,1.56,.64,1);}
+.loader-txt{font-size:.85rem;color:rgba(255,255,255,.75);}
+
+#toast{
+  position:fixed;bottom:24px;right:24px;z-index:600;
+  background:var(--sid-bg);color:#fff;
+  padding:12px 20px;border-radius:10px;font-size:.83rem;font-weight:500;
+  max-width:300px;box-shadow:0 6px 28px rgba(0,0,0,.35);
+  transform:translateY(72px);opacity:0;
+  transition:all .32s cubic-bezier(.34,1.56,.64,1);
+  border:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:8px;
+}
 #toast.show{transform:translateY(0);opacity:1;}
-#toast.err{background:var(--red);color:#fff;}
+#toast.err{background:var(--red);}
 
 /* ── Mobile ── */
-@media (max-width:700px){
+@media (max-width:720px){
   .shell{grid-template-columns:1fr;}
-  .sidebar{position:static;height:auto;flex-direction:row;align-items:center;border-right:none;border-bottom:1px solid var(--border);}
-  .sid-logo{border-bottom:none;padding:12px 14px;}
-  .nav-section{display:flex;flex-direction:row;gap:4px;padding:8px 8px;flex:1;}
+  .sidebar{position:static;height:auto;flex-direction:row;align-items:center;box-shadow:0 2px 12px rgba(0,0,0,.2);}
+  .sid-logo{border-bottom:none;padding:10px 14px;flex:none;}
+  .nav-section{display:flex;flex-direction:row;gap:4px;padding:8px;flex:1;overflow-x:auto;}
   .nav-label{display:none;}
-  .nav-item{font-size:.75rem;padding:7px 10px;}
-  .sid-bottom{display:none;}
+  .nav-item{font-size:.73rem;padding:7px 10px;white-space:nowrap;}
+  .nav-item .ni-icon{width:22px;height:22px;font-size:.7rem;}
+  .sid-divider,.sid-bottom{display:none;}
   .ret-grid{grid-template-columns:1fr;}
   .manual-grid{grid-template-columns:1fr;}
+  .topbar{padding:12px 16px;}
+  .dash,.it1-body{padding:16px 14px 60px;}
 }
 
 /* ── Print ── */
@@ -210,25 +481,37 @@ tbody tr:hover{background:var(--primary-faint);}
 <!-- ── Sidebar ── -->
 <nav class="sidebar">
   <div class="sid-logo">
-    <div class="sid-logo-mark">ITBIS<em>.</em>Análisis</div>
-    <div class="sid-logo-sub">Herramienta fiscal · Rep. Dominicana</div>
+    <div class="sid-logo-icon">IT</div>
+    <div class="sid-logo-text">
+      <div class="sid-logo-mark">ITBIS Análisis</div>
+      <div class="sid-logo-sub">Herramienta fiscal · Rep. Dom.</div>
+    </div>
   </div>
+
   <div class="nav-section">
     <div class="nav-label">Módulos</div>
     <div class="nav-item active" data-nav="606">
-      <span>📥</span><span>606 — Compras</span>
+      <div class="ni-icon">📥</div>
+      <span>606 — Compras</span>
       <span class="nav-badge" id="badge-606">○</span>
     </div>
     <div class="nav-item" data-nav="607">
-      <span>📤</span><span>607 — Ventas</span>
+      <div class="ni-icon">📤</div>
+      <span>607 — Ventas</span>
       <span class="nav-badge" id="badge-607">○</span>
     </div>
+    <div class="sid-divider"></div>
     <div class="nav-item" data-nav="it1">
-      <span>📋</span><span>IT-1 Declaración</span>
+      <div class="ni-icon">📋</div>
+      <span>IT-1 Declaración</span>
       <span class="nav-badge" id="badge-it1">○</span>
     </div>
   </div>
-  <div class="sid-bottom">DGII · República Dominicana</div>
+
+  <div class="sid-bottom">
+    <div class="sid-bottom-dot"></div>
+    DGII · República Dominicana
+  </div>
 </nav>
 
 <!-- ── Main ── -->
@@ -237,9 +520,10 @@ tbody tr:hover{background:var(--primary-faint);}
 <!-- ════ 606 MODULE ════ -->
 <div id="mod-606" class="module active">
   <div class="topbar">
+    <div class="tb-stripe" style="background:linear-gradient(180deg,#3B5BDB,#0EA5E9);"></div>
     <div class="tb-left">
       <div class="tb-title">606 — Resumen de Compras</div>
-      <div class="tb-sub">Clasificación de gastos, ITBIS facturado y retenido</div>
+      <div class="tb-sub">Gastos, ITBIS facturado, retenciones y crédito fiscal</div>
     </div>
     <div class="tb-right">
       <span class="tb-file" id="tf-606" hidden></span>
@@ -248,21 +532,23 @@ tbody tr:hover{background:var(--primary-faint);}
     </div>
   </div>
 
-  <!-- Upload -->
   <div class="upload-stage" id="up-606">
     <div class="dropzone" id="dz-606" tabindex="0" role="button" aria-label="Cargar archivo 606">
-      <div class="pulse-wrap"><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
       <div class="drop-inner">
-        <span class="drop-icon">📥</span>
+        <div class="drop-icon-wrap"><span class="drop-icon">📥</span></div>
         <div class="drop-title">Arrastra el archivo 606 aquí</div>
-        <div class="drop-sub">CSV · XLSX · XLS &nbsp;·&nbsp; Compras del período</div>
+        <div class="drop-sub">Suelta cualquier archivo de compras del período<br><strong>CSV · XLSX · XLS</strong> — cualquier formato</div>
+        <div class="drop-tags">
+          <span class="drop-tag">DGI Plantilla</span>
+          <span class="drop-tag">Excel Propio</span>
+          <span class="drop-tag">CSV Exportado</span>
+        </div>
         <input type="file" id="fi-606" accept=".csv,.xlsx,.xls">
-        <button class="btn btn-primary" id="bs-606">📁 Seleccionar</button>
+        <button class="btn btn-primary" id="bs-606">📁 Seleccionar archivo</button>
       </div>
     </div>
   </div>
 
-  <!-- Dashboard -->
   <div class="dash" id="da-606" hidden>
     <div class="slabel">Totales del período</div>
     <div class="kpi-row" id="kpis-606"></div>
@@ -270,7 +556,7 @@ tbody tr:hover{background:var(--primary-faint);}
     <div class="slabel">ITBIS — Desglose</div>
     <div class="kpi-row" id="kpis-itbis-606"></div>
 
-    <div class="slabel">ITBIS Retenido</div>
+    <div class="slabel">ITBIS Retenido a Proveedores</div>
     <div class="ret-grid" id="ret-606"></div>
 
     <div class="slabel">Vista previa de datos</div>
@@ -282,9 +568,10 @@ tbody tr:hover{background:var(--primary-faint);}
 <!-- ════ 607 MODULE ════ -->
 <div id="mod-607" class="module">
   <div class="topbar">
+    <div class="tb-stripe" style="background:linear-gradient(180deg,#7C3AED,#06B6D4);"></div>
     <div class="tb-left">
       <div class="tb-title">607 — Resumen de Ventas</div>
-      <div class="tb-sub">Ingresos facturados, tasa de ITBIS y retenciones</div>
+      <div class="tb-sub">Ingresos facturados, tasa de ITBIS y retenciones de clientes</div>
     </div>
     <div class="tb-right">
       <span class="tb-file" id="tf-607" hidden></span>
@@ -295,13 +582,17 @@ tbody tr:hover{background:var(--primary-faint);}
 
   <div class="upload-stage" id="up-607">
     <div class="dropzone" id="dz-607" tabindex="0" role="button" aria-label="Cargar archivo 607">
-      <div class="pulse-wrap"><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
       <div class="drop-inner">
-        <span class="drop-icon">📤</span>
+        <div class="drop-icon-wrap" style="background:linear-gradient(135deg,#7C3AED,#06B6D4);"><span class="drop-icon">📤</span></div>
         <div class="drop-title">Arrastra el archivo 607 aquí</div>
-        <div class="drop-sub">CSV · XLSX · XLS &nbsp;·&nbsp; Ventas del período</div>
+        <div class="drop-sub">Suelta cualquier archivo de ventas del período<br><strong>CSV · XLSX · XLS</strong> — cualquier formato</div>
+        <div class="drop-tags">
+          <span class="drop-tag">DGI Plantilla</span>
+          <span class="drop-tag">Excel Propio</span>
+          <span class="drop-tag">CSV Exportado</span>
+        </div>
         <input type="file" id="fi-607" accept=".csv,.xlsx,.xls">
-        <button class="btn btn-primary" id="bs-607">📁 Seleccionar</button>
+        <button class="btn btn-primary" id="bs-607" style="background:var(--violet);box-shadow:0 2px 8px rgba(124,58,237,.3);">📁 Seleccionar archivo</button>
       </div>
     </div>
   </div>
@@ -313,11 +604,11 @@ tbody tr:hover{background:var(--primary-faint);}
     <div class="slabel">Por tasa de ITBIS</div>
     <div class="kpi-row" id="kpis-tasa-607"></div>
 
-    <div class="slabel">ITBIS Retenido en Ventas</div>
+    <div class="slabel">ITBIS Retenido por Clientes</div>
     <div class="ret-grid" id="ret-607"></div>
 
     <div class="slabel">Vista previa de datos</div>
-    <div class="table-wrap"><table><thead id="th-607"></thead><tbody id="tb-607"></tbody></table></div>
+    <div class="table-wrap" id="tw-607"><table><thead id="th-607"></thead><tbody id="tb-607"></tbody></table></div>
     <p class="tnote" id="tn-607"></p>
   </div>
 </div>
@@ -325,9 +616,10 @@ tbody tr:hover{background:var(--primary-faint);}
 <!-- ════ IT-1 MODULE ════ -->
 <div id="mod-it1" class="module">
   <div class="topbar">
+    <div class="tb-stripe" style="background:linear-gradient(180deg,#059669,#0D9488);"></div>
     <div class="tb-left">
       <div class="tb-title">IT-1 — Declaración ITBIS</div>
-      <div class="tb-sub">Cuadre final para presentar a la DGII</div>
+      <div class="tb-sub">Cuadre automático para presentar a la DGII</div>
     </div>
     <div class="tb-right">
       <button class="btn btn-pdf" onclick="window.print()">🖨 Imprimir</button>
@@ -335,9 +627,8 @@ tbody tr:hover{background:var(--primary-faint);}
   </div>
 
   <div class="it1-body">
-    <!-- Estado módulos -->
     <div class="prereq-card">
-      <div class="slabel">Estado de módulos</div>
+      <div class="slabel" style="margin-bottom:10px;">Estado de módulos</div>
       <div class="prereq-item">
         <div class="prereq-dot pending" id="pi-606">606</div>
         <div class="prereq-text">
@@ -354,9 +645,8 @@ tbody tr:hover{background:var(--primary-faint);}
       </div>
     </div>
 
-    <!-- Datos manuales -->
     <div class="manual-card">
-      <div class="slabel">Datos adicionales (manuales)</div>
+      <div class="slabel" style="margin-bottom:6px;">Datos adicionales (manuales)</div>
       <div class="manual-grid">
         <div class="field-grp">
           <label class="field-lbl" for="in-saldo">Saldo a favor anterior (DGI)</label>
@@ -369,12 +659,16 @@ tbody tr:hover{background:var(--primary-faint);}
       </div>
     </div>
 
-    <!-- Alerta -->
     <div id="it1-alert" hidden></div>
 
-    <!-- Cuadre -->
     <div class="cuadre-card" id="it1-cuadre" hidden>
-      <div class="slabel">Cuadre IT-1</div>
+      <div class="cuadre-hd">
+        <div class="cuadre-hd-icon">📋</div>
+        <div>
+          <div class="cuadre-hd-title">Cuadre IT-1</div>
+          <div class="cuadre-hd-sub">Cálculo automático basado en 606 y 607</div>
+        </div>
+      </div>
       <div id="cuadre-body"></div>
       <div class="cuadre-sep"></div>
       <div class="cuadre-total">
@@ -388,7 +682,12 @@ tbody tr:hover{background:var(--primary-faint);}
 </main>
 </div>
 
-<div id="loader" hidden><div class="spinner"></div><span>Procesando…</span></div>
+<div id="loader" hidden>
+  <div class="loader-box">
+    <div class="spinner"></div>
+    <div class="loader-txt">Procesando archivo…</div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -396,7 +695,6 @@ tbody tr:hover{background:var(--primary-faint);}
 <script>
 'use strict';
 
-// ── Aliases 606 ──────────────────────────────────────────────────────────────
 const AL606 = {
   rnc:              ['rnc','cedula','rncocedula','rnc_o_cedula','identificacion','rnc_cedula','rncoproveedor','proveedor_rnc'],
   ncf:              ['ncf','comprobante','numero_comprobante','numerodecomprobante','no_comprobante','nfc'],
@@ -412,7 +710,6 @@ const AL606 = {
   pct_retencion:    ['porcentaje_retencion','pct_retencion','porc_retencion','retencion_pct','porcentajeretencion'],
 };
 
-// ── Aliases 607 ──────────────────────────────────────────────────────────────
 const AL607 = {
   rnc:              ['rnc','cedula','rncocedula','rnc_o_cedula','identificacion','rnc_cedula','rncocliente','cliente_rnc'],
   ncf:              ['ncf','comprobante','numero_comprobante','numerodecomprobante','no_comprobante','nfc'],
@@ -429,11 +726,9 @@ const AL607 = {
   construccion:     ['construccion','es_construccion','tipo_operacion','operacion_construccion'],
 };
 
-// ── Utils ────────────────────────────────────────────────────────────────────
 const $  = id => document.getElementById(id);
 const fmtM = n => 'RD$ ' + new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n||0);
 const fmtI = n => new Intl.NumberFormat('en-US').format(Math.round(n||0));
-const fmtP = n => (n||0).toFixed(2) + '%';
 const r2  = n => Math.round((n||0)*100)/100;
 
 function showToast(msg, type) {
@@ -472,23 +767,16 @@ function cleanNum(val) {
 
 function sum(arr, key) { return arr.reduce((s,r) => s + (r[key]||0), 0); }
 
-// ── File loading ─────────────────────────────────────────────────────────────
 function parseSheet(ws) {
-  // Get all rows as raw arrays
   const raw = XLSX.utils.sheet_to_json(ws, { header:1, defval:'', raw:false });
-
-  // Find the best header row among first 20 rows:
-  // must have at least one alphabetic cell AND the most non-empty cells overall
   let bestRow = -1, bestScore = 0;
   for (let i = 0; i < Math.min(20, raw.length); i++) {
     const cells = raw[i].map(c => String(c).trim()).filter(Boolean);
     const score = cells.length;
-    // A header row must contain at least one cell with a letter (not pure numbers/dates)
     const hasText = cells.some(c => /[A-Za-zÀ-ɏ]/.test(c));
     if (score > bestScore && hasText) { bestScore = score; bestRow = i; }
   }
-  if (bestRow < 0) bestRow = 0; // fallback: use first row
-
+  if (bestRow < 0) bestRow = 0;
   const headers = raw[bestRow].map((h, i) =>
     (h && String(h).trim()) ? String(h).trim() : 'col_' + i
   );
@@ -500,37 +788,29 @@ function parseSheet(ws) {
 
 function readExcel(buf, sheetHint) {
   const wb = XLSX.read(new Uint8Array(buf), { type:'array', raw:false });
-
-  // Candidate sheets: sheet matching sheetHint first, then all others
   const hinted = sheetHint
     ? wb.SheetNames.filter(n => n.toLowerCase().includes(sheetHint.toLowerCase()))
     : [];
   const rest = wb.SheetNames.filter(n => !hinted.includes(n));
   const ordered = [...hinted, ...rest];
-
-  // Pick the sheet that yields the most data rows (≥1); fall back to first
-  let bestSheet = ordered[0];
-  let bestCount = -1;
+  let bestSheet = ordered[0], bestCount = -1;
   for (const name of ordered) {
     const { rowCount } = parseSheet(wb.Sheets[name]);
     if (rowCount > bestCount) { bestCount = rowCount; bestSheet = name; }
-    if (hinted.includes(name) && rowCount >= 5) break; // hinted sheet has enough data — use it
+    if (hinted.includes(name) && rowCount >= 5) break;
   }
-
   const { headers, dataRows } = parseSheet(wb.Sheets[bestSheet]);
-
   return dataRows.map(row => {
     const obj = {};
-    headers.forEach((h, i) => {
-      const v = row[i];
-      obj[h] = (v !== undefined && v !== '') ? v : null;
-    });
+    headers.forEach((h, i) => { const v = row[i]; obj[h] = (v !== undefined && v !== '') ? v : null; });
     return obj;
   });
 }
+
 function readCSV(text) {
   return (Papa.parse(text, { header:true, skipEmptyLines:true, dynamicTyping:false }).data) || [];
 }
+
 function loadFile(file, sheetHint) {
   return new Promise((ok, fail) => {
     const ext = file.name.split('.').pop().toLowerCase();
@@ -546,79 +826,47 @@ function loadFile(file, sheetHint) {
   });
 }
 
-// ── Process 606 ──────────────────────────────────────────────────────────────
 function process606(rows) {
   if (!rows.length) throw new Error('Archivo vacío.');
   const headers = Object.keys(rows[0]);
   const cm = detectCols(headers, AL606);
-
-  // Filter out summary/blank rows: keep only rows that have a non-zero monto OR an NCF-like value
   const keyField = cm.monto_total || cm.monto_servicios || cm.monto_bienes || cm.itbis_facturado || cm.ncf;
   const validRows = keyField
     ? rows.filter(r => r[keyField] != null && String(r[keyField]).trim() !== '' && String(r[keyField]).trim() !== '0')
     : rows;
-
   const data = validRows.map(r => {
     const p = {...r};
-    p._serv  = cm.monto_servicios ? cleanNum(r[cm.monto_servicios]) : 0;
-    p._bien  = cm.monto_bienes    ? cleanNum(r[cm.monto_bienes])    : 0;
-    p._total = cm.monto_total     ? cleanNum(r[cm.monto_total])     : p._serv + p._bien;
-    p._itbis = cm.itbis_facturado ? cleanNum(r[cm.itbis_facturado]) : 0;
-    p._ret   = cm.itbis_retenido  ? cleanNum(r[cm.itbis_retenido])  : 0;
+    p._serv  = cm.monto_servicios  ? cleanNum(r[cm.monto_servicios])  : 0;
+    p._bien  = cm.monto_bienes     ? cleanNum(r[cm.monto_bienes])     : 0;
+    p._total = cm.monto_total      ? cleanNum(r[cm.monto_total])      : p._serv + p._bien;
+    p._itbis = cm.itbis_facturado  ? cleanNum(r[cm.itbis_facturado])  : 0;
+    p._ret   = cm.itbis_retenido   ? cleanNum(r[cm.itbis_retenido])   : 0;
     p._adel  = cm.itbis_adelantado ? cleanNum(r[cm.itbis_adelantado]) : 0;
-    p._costo = cm.itbis_costo     ? cleanNum(r[cm.itbis_costo])     : 0;
-
-    // Si no hay columnas explícitas de adelantado/costo, derivar
-    if (!cm.itbis_adelantado && !cm.itbis_costo && p._itbis > 0) {
-      p._adel = r2(p._itbis - p._ret);
-      p._costo = 0;
-    }
-
-    // Determinar % retención
-    if (cm.pct_retencion) {
-      p._pct = cleanNum(r[cm.pct_retencion]);
-    } else if (p._ret > 0 && p._itbis > 0) {
+    p._costo = cm.itbis_costo      ? cleanNum(r[cm.itbis_costo])      : 0;
+    if (!cm.itbis_adelantado && !cm.itbis_costo && p._itbis > 0) { p._adel = r2(p._itbis - p._ret); p._costo = 0; }
+    if (cm.pct_retencion) { p._pct = cleanNum(r[cm.pct_retencion]); }
+    else if (p._ret > 0 && p._itbis > 0) {
       const ratio = p._ret / p._itbis;
       p._pct = Math.abs(ratio - 1.0) < 0.08 ? 100 : Math.abs(ratio - 0.30) < 0.08 ? 30 : r2(ratio*100);
-    } else {
-      p._pct = 0;
-    }
+    } else { p._pct = 0; }
     return p;
   });
-
-  const totServ  = r2(sum(data,'_serv'));
-  const totBien  = r2(sum(data,'_bien'));
-  const totTotal = r2(sum(data,'_total'));
-  const totItbis = r2(sum(data,'_itbis'));
-  const totAdel  = r2(sum(data,'_adel'));
-  const totCosto = r2(sum(data,'_costo'));
-  const totRet   = r2(sum(data,'_ret'));
-
-  const ret30rows  = data.filter(r => Math.abs(r._pct - 30)  < 8);
-  const ret100rows = data.filter(r => Math.abs(r._pct - 100) < 8);
-  const ret30  = { monto: r2(sum(ret30rows,'_ret')),  count: ret30rows.length };
-  const ret100 = { monto: r2(sum(ret100rows,'_ret')), count: ret100rows.length };
-
+  const totServ=r2(sum(data,'_serv')),totBien=r2(sum(data,'_bien')),totTotal=r2(sum(data,'_total'));
+  const totItbis=r2(sum(data,'_itbis')),totAdel=r2(sum(data,'_adel')),totCosto=r2(sum(data,'_costo')),totRet=r2(sum(data,'_ret'));
+  const ret30rows=data.filter(r=>Math.abs(r._pct-30)<8),ret100rows=data.filter(r=>Math.abs(r._pct-100)<8);
+  const ret30={monto:r2(sum(ret30rows,'_ret')),count:ret30rows.length},ret100={monto:r2(sum(ret100rows,'_ret')),count:ret100rows.length};
   const cleanRow = r => { const o={}; headers.forEach(h=>{o[h]=r[h];}); return o; };
-  return {
-    summary: { registros:data.length, totServ, totBien, totTotal, totItbis, totAdel, totCosto, totRet, ret30, ret100 },
-    columns: headers,
-    preview: data.slice(0,200).map(cleanRow),
-    allRows: data.map(cleanRow),
-  };
+  return { summary:{registros:data.length,totServ,totBien,totTotal,totItbis,totAdel,totCosto,totRet,ret30,ret100}, columns:headers, preview:data.slice(0,200).map(cleanRow), allRows:data.map(cleanRow) };
 }
 
-// ── Process 607 ──────────────────────────────────────────────────────────────
 function process607(rows) {
   if (!rows.length) throw new Error('Archivo vacío.');
   const headers = Object.keys(rows[0]);
   const cm = detectCols(headers, AL607);
-
   const keyField = cm.monto_total || cm.monto_servicios || cm.monto_bienes || cm.itbis_facturado || cm.ncf;
   const validRows = keyField
     ? rows.filter(r => r[keyField] != null && String(r[keyField]).trim() !== '' && String(r[keyField]).trim() !== '0')
     : rows;
-
   const data = validRows.map(r => {
     const p = {...r};
     p._serv  = cm.monto_servicios ? cleanNum(r[cm.monto_servicios]) : 0;
@@ -626,425 +874,227 @@ function process607(rows) {
     p._total = cm.monto_total     ? cleanNum(r[cm.monto_total])     : p._serv + p._bien;
     p._itbis = cm.itbis_facturado ? cleanNum(r[cm.itbis_facturado]) : 0;
     p._ret   = cm.itbis_retenido  ? cleanNum(r[cm.itbis_retenido])  : 0;
-
-    // Gravado / exento
-    if (cm.monto_gravado) {
-      p._gravado = cleanNum(r[cm.monto_gravado]);
-      p._exento  = cm.monto_exento ? cleanNum(r[cm.monto_exento]) : r2(p._total - p._gravado);
-    } else {
-      p._gravado = p._itbis > 0 ? p._total : 0;
-      p._exento  = p._itbis > 0 ? 0 : p._total;
-    }
-
-    // Detectar tasa
-    if (cm.tasa_itbis) {
-      p._tasa = cleanNum(r[cm.tasa_itbis]);
-    } else if (p._total > 0 && p._itbis > 0) {
-      const ratio = p._itbis / p._total * 100;
-      if (Math.abs(ratio - 10) < 3) p._tasa = 10;
-      else if (Math.abs(ratio - 16) < 3) p._tasa = 16;
-      else if (Math.abs(ratio - 18) < 4) p._tasa = 18;
-      else p._tasa = r2(ratio);
-    } else {
-      p._tasa = 0;
-    }
-
-    // Construcción
-    if (cm.construccion) {
-      const v = String(r[cm.construccion]||'').toLowerCase();
-      p._constr = v === 'si' || v === 'sí' || v === '1' || v === 'true' || v === 'construccion';
-    } else {
-      p._constr = p._tasa === 10;
-    }
-
+    if (cm.monto_gravado) { p._gravado=cleanNum(r[cm.monto_gravado]); p._exento=cm.monto_exento?cleanNum(r[cm.monto_exento]):r2(p._total-p._gravado); }
+    else { p._gravado=p._itbis>0?p._total:0; p._exento=p._itbis>0?0:p._total; }
+    if (cm.tasa_itbis) { p._tasa=cleanNum(r[cm.tasa_itbis]); }
+    else if (p._total > 0 && p._itbis > 0) {
+      const ratio=p._itbis/p._total*100;
+      if (Math.abs(ratio-10)<3) p._tasa=10;
+      else if (Math.abs(ratio-16)<3) p._tasa=16;
+      else if (Math.abs(ratio-18)<4) p._tasa=18;
+      else p._tasa=r2(ratio);
+    } else { p._tasa=0; }
+    if (cm.construccion) { const v=String(r[cm.construccion]||'').toLowerCase(); p._constr=v==='si'||v==='sí'||v==='1'||v==='true'||v==='construccion'; }
+    else { p._constr=p._tasa===10; }
     return p;
   });
-
-  const totTotal   = r2(sum(data,'_total'));
-  const totGrav    = r2(sum(data,'_gravado'));
-  const totExento  = r2(sum(data,'_exento'));
-  const totItbis   = r2(sum(data,'_itbis'));
-  const totRet     = r2(sum(data,'_ret'));
-
-  // Por tasa
-  const tasa18 = data.filter(r => r._tasa === 18);
-  const tasa16 = data.filter(r => r._tasa === 16);
-  const tasa10 = data.filter(r => r._tasa === 10);
-  const tasa0  = data.filter(r => r._tasa === 0 || (!r._tasa && r._itbis === 0));
-
-  const byTasa = {
-    t18: { monto: r2(sum(tasa18,'_gravado')), itbis: r2(sum(tasa18,'_itbis')), count: tasa18.length },
-    t16: { monto: r2(sum(tasa16,'_gravado')), itbis: r2(sum(tasa16,'_itbis')), count: tasa16.length },
-    t10: { monto: r2(sum(tasa10,'_gravado')), itbis: r2(sum(tasa10,'_itbis')), count: tasa10.length },
-    t0:  { monto: r2(sum(tasa0, '_total')),   itbis: 0,                         count: tasa0.length  },
+  const totTotal=r2(sum(data,'_total')),totGrav=r2(sum(data,'_gravado')),totExento=r2(sum(data,'_exento'));
+  const totItbis=r2(sum(data,'_itbis')),totRet=r2(sum(data,'_ret'));
+  const tasa18=data.filter(r=>r._tasa===18),tasa16=data.filter(r=>r._tasa===16),tasa10=data.filter(r=>r._tasa===10);
+  const tasa0=data.filter(r=>r._tasa===0||(!r._tasa&&r._itbis===0));
+  const byTasa={
+    t18:{monto:r2(sum(tasa18,'_gravado')),itbis:r2(sum(tasa18,'_itbis')),count:tasa18.length},
+    t16:{monto:r2(sum(tasa16,'_gravado')),itbis:r2(sum(tasa16,'_itbis')),count:tasa16.length},
+    t10:{monto:r2(sum(tasa10,'_gravado')),itbis:r2(sum(tasa10,'_itbis')),count:tasa10.length},
+    t0: {monto:r2(sum(tasa0,'_total')),itbis:0,count:tasa0.length},
   };
-
-  // Retenciones en ventas: 30% vs 100%
-  const ret30rows  = data.filter(r => r._itbis > 0 && r._ret > 0 && Math.abs(r._ret/r._itbis - 0.30) < 0.08);
-  const ret100rows = data.filter(r => r._itbis > 0 && r._ret > 0 && Math.abs(r._ret/r._itbis - 1.0)  < 0.08);
-  const ret30  = { monto: r2(sum(ret30rows,'_ret')),  count: ret30rows.length };
-  const ret100 = { monto: r2(sum(ret100rows,'_ret')), count: ret100rows.length };
-
+  const ret30rows=data.filter(r=>r._itbis>0&&r._ret>0&&Math.abs(r._ret/r._itbis-0.30)<0.08);
+  const ret100rows=data.filter(r=>r._itbis>0&&r._ret>0&&Math.abs(r._ret/r._itbis-1.0)<0.08);
+  const ret30={monto:r2(sum(ret30rows,'_ret')),count:ret30rows.length},ret100={monto:r2(sum(ret100rows,'_ret')),count:ret100rows.length};
   const cleanRow = r => { const o={}; headers.forEach(h=>{o[h]=r[h];}); return o; };
-  return {
-    summary: { registros:data.length, totTotal, totGrav, totExento, totItbis, totRet, byTasa, ret30, ret100 },
-    columns: headers,
-    preview: data.slice(0,200).map(cleanRow),
-    allRows: data.map(cleanRow),
-  };
+  return { summary:{registros:data.length,totTotal,totGrav,totExento,totItbis,totRet,byTasa,ret30,ret100}, columns:headers, preview:data.slice(0,200).map(cleanRow), allRows:data.map(cleanRow) };
 }
 
-// ── Render helpers ───────────────────────────────────────────────────────────
 function kpiCard(lbl, val, cls='', sub='') {
-  return `<div class="kpi ${cls}">
-    <div class="kpi-lbl">${lbl}</div>
-    <div class="kpi-val">${val}</div>
-    ${sub ? `<div class="kpi-sub">${sub}</div>` : ''}
-  </div>`;
+  return `<div class="kpi ${cls}"><div class="kpi-lbl">${lbl}</div><div class="kpi-val">${val}</div>${sub?`<div class="kpi-sub">${sub}</div>`:''}</div>`;
 }
 
 function renderTable(thId, tbId, tnId, columns, rows, total) {
-  const thead = $(thId), tbody = $(tbId);
-  const hRow = document.createElement('tr');
-  columns.forEach(c => { const th=document.createElement('th'); th.textContent=c; hRow.appendChild(th); });
-  thead.innerHTML=''; thead.appendChild(hRow);
-  tbody.innerHTML='';
-  rows.forEach(row => {
-    const tr = document.createElement('tr');
-    columns.forEach(c => {
-      const td=document.createElement('td');
-      const v=row[c]; td.textContent=v==null?'':v; td.title=v==null?'':String(v);
-      tr.appendChild(td);
-    });
+  const thead=$(thId),tbody=$(tbId);
+  const hRow=document.createElement('tr');
+  columns.forEach(c=>{const th=document.createElement('th');th.textContent=c;hRow.appendChild(th);});
+  thead.innerHTML='';thead.appendChild(hRow);tbody.innerHTML='';
+  rows.forEach(row=>{
+    const tr=document.createElement('tr');
+    columns.forEach(c=>{const td=document.createElement('td');const v=row[c];td.textContent=v==null?'':v;td.title=v==null?'':String(v);tr.appendChild(td);});
     tbody.appendChild(tr);
   });
-  $(tnId).textContent = total > rows.length
-    ? `Mostrando ${fmtI(rows.length)} de ${fmtI(total)} registros`
-    : `${fmtI(total)} registro${total!==1?'s':''}`;
+  $(tnId).textContent=total>rows.length?`Mostrando ${fmtI(rows.length)} de ${fmtI(total)} registros`:`${fmtI(total)} registro${total!==1?'s':''}`;
 }
 
-// ── Render 606 dashboard ─────────────────────────────────────────────────────
 function render606(data, filename) {
-  const s = data.summary;
-  $('kpis-606').innerHTML =
-    kpiCard('Registros',       fmtI(s.registros),  '') +
-    kpiCard('Total Servicios', fmtM(s.totServ),  'c') +
-    kpiCard('Total Bienes',    fmtM(s.totBien),  'a') +
-    kpiCard('Total Facturado', fmtM(s.totTotal), 'g');
-
-  $('kpis-itbis-606').innerHTML =
-    kpiCard('ITBIS Facturado', fmtM(s.totItbis), '') +
-    kpiCard('ITBIS Adelantado (Crédito)', fmtM(s.totAdel), 'g', 'Crédito fiscal disponible') +
-    kpiCard('ITBIS Llevado al Costo', fmtM(s.totCosto), 'a', 'No recuperable') +
-    kpiCard('ITBIS Retenido Total', fmtM(s.totRet), 'r');
-
-  $('ret-606').innerHTML = `
+  const s=data.summary;
+  $('kpis-606').innerHTML=
+    kpiCard('Registros',fmtI(s.registros),'c')+
+    kpiCard('Total Servicios',fmtM(s.totServ),'v')+
+    kpiCard('Total Bienes',fmtM(s.totBien),'t')+
+    kpiCard('Total Facturado',fmtM(s.totTotal),'g');
+  $('kpis-itbis-606').innerHTML=
+    kpiCard('ITBIS Facturado',fmtM(s.totItbis),'')+
+    kpiCard('ITBIS Crédito Fiscal',fmtM(s.totAdel),'g','Disponible para deducir')+
+    kpiCard('ITBIS al Costo',fmtM(s.totCosto),'a','No recuperable')+
+    kpiCard('ITBIS Retenido',fmtM(s.totRet),'r');
+  $('ret-606').innerHTML=`
     <div class="ret-card">
-      <div class="ret-pct">30%</div>
-      <div class="ret-info">
-        <div class="ret-lbl">Retención del 30%</div>
-        <div class="ret-val">${fmtM(s.ret30.monto)}</div>
-        <div class="ret-cnt">${fmtI(s.ret30.count)} comprobante${s.ret30.count!==1?'s':''}</div>
-      </div>
+      <div class="ret-badge blue"><div class="ret-pct">30%</div></div>
+      <div class="ret-info"><div class="ret-lbl">Retención del 30%</div><div class="ret-val">${fmtM(s.ret30.monto)}</div><div class="ret-cnt">${fmtI(s.ret30.count)} comprobante${s.ret30.count!==1?'s':''}</div></div>
     </div>
     <div class="ret-card">
-      <div class="ret-pct r">100%</div>
-      <div class="ret-info">
-        <div class="ret-lbl">Retención del 100%</div>
-        <div class="ret-val">${fmtM(s.ret100.monto)}</div>
-        <div class="ret-cnt">${fmtI(s.ret100.count)} comprobante${s.ret100.count!==1?'s':''}</div>
-      </div>
+      <div class="ret-badge red"><div class="ret-pct">100%</div></div>
+      <div class="ret-info"><div class="ret-lbl">Retención del 100%</div><div class="ret-val">${fmtM(s.ret100.monto)}</div><div class="ret-cnt">${fmtI(s.ret100.count)} comprobante${s.ret100.count!==1?'s':''}</div></div>
     </div>`;
-
-  renderTable('th-606','tb-606','tn-606', data.columns, data.preview, data.summary.registros);
-
-  $('tf-606').textContent = '📄 ' + filename;
-  $('tf-606').hidden = false;
-  $('btn-xls-606').hidden = false;
-  $('btn-rst-606').hidden = false;
-  $('up-606').hidden  = true;
-  $('da-606').hidden  = false;
-
-  // badge
-  $('badge-606').textContent = '✓';
-  $('badge-606').className   = 'nav-badge ok';
+  renderTable('th-606','tb-606','tn-606',data.columns,data.preview,data.summary.registros);
+  $('tf-606').textContent='📄 '+filename; $('tf-606').hidden=false;
+  $('btn-xls-606').hidden=false; $('btn-rst-606').hidden=false;
+  $('up-606').hidden=true; $('da-606').hidden=false;
+  $('badge-606').textContent='✓'; $('badge-606').className='nav-badge ok';
   updateIT1();
 }
 
-// ── Render 607 dashboard ─────────────────────────────────────────────────────
 function render607(data, filename) {
-  const s = data.summary;
-  const bt = s.byTasa;
-
-  $('kpis-607').innerHTML =
-    kpiCard('Registros',        fmtI(s.registros), '') +
-    kpiCard('Total Facturado',  fmtM(s.totTotal),  'g') +
-    kpiCard('Total Gravado',    fmtM(s.totGrav),   'c') +
-    kpiCard('Total Exento/No Gravado', fmtM(s.totExento), 'm') +
-    kpiCard('ITBIS Facturado',  fmtM(s.totItbis),  'a') +
-    kpiCard('ITBIS Ret. Clientes', fmtM(s.totRet), 'r');
-
-  $('kpis-tasa-607').innerHTML =
-    kpiCard('ITBIS 18%',        fmtM(bt.t18.itbis), '', `${fmtM(bt.t18.monto)} gravado · ${fmtI(bt.t18.count)} fact.`) +
-    (bt.t16.count ? kpiCard('ITBIS 16%', fmtM(bt.t16.itbis), 'a', `${fmtM(bt.t16.monto)} gravado · ${fmtI(bt.t16.count)} fact.`) : '') +
-    kpiCard('ITBIS 10% Construcción', fmtM(bt.t10.itbis), 'c', `${fmtM(bt.t10.monto)} gravado · ${fmtI(bt.t10.count)} fact.`) +
-    kpiCard('Exentos / No Gravados', fmtM(bt.t0.monto), 'm', `${fmtI(bt.t0.count)} comprobante${bt.t0.count!==1?'s':''}`);
-
-  $('ret-607').innerHTML = `
+  const s=data.summary,bt=s.byTasa;
+  $('kpis-607').innerHTML=
+    kpiCard('Registros',fmtI(s.registros),'c')+
+    kpiCard('Total Facturado',fmtM(s.totTotal),'g')+
+    kpiCard('Total Gravado',fmtM(s.totGrav),'v')+
+    kpiCard('Total Exento',fmtM(s.totExento),'m')+
+    kpiCard('ITBIS Facturado',fmtM(s.totItbis),'a')+
+    kpiCard('ITBIS Ret. Clientes',fmtM(s.totRet),'r');
+  $('kpis-tasa-607').innerHTML=
+    kpiCard('ITBIS 18%',fmtM(bt.t18.itbis),'',`${fmtM(bt.t18.monto)} gravado · ${fmtI(bt.t18.count)} fact.`)+
+    (bt.t16.count?kpiCard('ITBIS 16%',fmtM(bt.t16.itbis),'a',`${fmtM(bt.t16.monto)} gravado · ${fmtI(bt.t16.count)} fact.`):'')+
+    kpiCard('ITBIS 10% Constr.',fmtM(bt.t10.itbis),'t',`${fmtM(bt.t10.monto)} gravado · ${fmtI(bt.t10.count)} fact.`)+
+    kpiCard('Exentos / No Grav.',fmtM(bt.t0.monto),'m',`${fmtI(bt.t0.count)} comprobante${bt.t0.count!==1?'s':''}`);
+  $('ret-607').innerHTML=`
     <div class="ret-card">
-      <div class="ret-pct">30%</div>
-      <div class="ret-info">
-        <div class="ret-lbl">Clientes retuvieron 30%</div>
-        <div class="ret-val">${fmtM(s.ret30.monto)}</div>
-        <div class="ret-cnt">${fmtI(s.ret30.count)} comprobante${s.ret30.count!==1?'s':''}</div>
-      </div>
+      <div class="ret-badge blue"><div class="ret-pct">30%</div></div>
+      <div class="ret-info"><div class="ret-lbl">Clientes retuvieron 30%</div><div class="ret-val">${fmtM(s.ret30.monto)}</div><div class="ret-cnt">${fmtI(s.ret30.count)} comprobante${s.ret30.count!==1?'s':''}</div></div>
     </div>
     <div class="ret-card">
-      <div class="ret-pct r">100%</div>
-      <div class="ret-info">
-        <div class="ret-lbl">Clientes retuvieron 100%</div>
-        <div class="ret-val">${fmtM(s.ret100.monto)}</div>
-        <div class="ret-cnt">${fmtI(s.ret100.count)} comprobante${s.ret100.count!==1?'s':''}</div>
-      </div>
+      <div class="ret-badge red"><div class="ret-pct">100%</div></div>
+      <div class="ret-info"><div class="ret-lbl">Clientes retuvieron 100%</div><div class="ret-val">${fmtM(s.ret100.monto)}</div><div class="ret-cnt">${fmtI(s.ret100.count)} comprobante${s.ret100.count!==1?'s':''}</div></div>
     </div>`;
-
-  renderTable('th-607','tb-607','tn-607', data.columns, data.preview, data.summary.registros);
-
-  $('tf-607').textContent = '📄 ' + filename;
-  $('tf-607').hidden = false;
-  $('btn-xls-607').hidden = false;
-  $('btn-rst-607').hidden = false;
-  $('up-607').hidden  = true;
-  $('da-607').hidden  = false;
-
-  $('badge-607').textContent = '✓';
-  $('badge-607').className   = 'nav-badge ok';
+  renderTable('th-607','tb-607','tn-607',data.columns,data.preview,data.summary.registros);
+  $('tf-607').textContent='📄 '+filename; $('tf-607').hidden=false;
+  $('btn-xls-607').hidden=false; $('btn-rst-607').hidden=false;
+  $('up-607').hidden=true; $('da-607').hidden=false;
+  $('badge-607').textContent='✓'; $('badge-607').className='nav-badge ok';
   updateIT1();
 }
 
-// ── IT-1 cuadre ──────────────────────────────────────────────────────────────
 function updateIT1() {
-  const has606 = !!STATE['606'];
-  const has607 = !!STATE['607'];
-
-  // prereq dots
-  $('pi-606').className = `prereq-dot ${has606 ? 'ok' : 'pending'}`;
-  $('pn-606').textContent = has606 ? '606 — Compras: cargado ✓' : '606 — Compras: pendiente';
-  $('pi-607').className = `prereq-dot ${has607 ? 'ok' : 'pending'}`;
-  $('pn-607').textContent = has607 ? '607 — Ventas: cargado ✓' : '607 — Ventas: pendiente';
-
-  // IT-1 badge
-  if (has606 && has607) {
-    $('badge-it1').textContent = '✓';
-    $('badge-it1').className   = 'nav-badge ok';
-  } else {
-    $('badge-it1').textContent = '○';
-    $('badge-it1').className   = 'nav-badge';
+  const has606=!!STATE['606'],has607=!!STATE['607'];
+  $('pi-606').className=`prereq-dot ${has606?'ok':'pending'}`;
+  $('pn-606').textContent=has606?'606 — Compras: cargado ✓':'606 — Compras: pendiente';
+  $('pi-607').className=`prereq-dot ${has607?'ok':'pending'}`;
+  $('pn-607').textContent=has607?'607 — Ventas: cargado ✓':'607 — Ventas: pendiente';
+  if (has606&&has607){$('badge-it1').textContent='✓';$('badge-it1').className='nav-badge ok';}
+  else{$('badge-it1').textContent='○';$('badge-it1').className='nav-badge';}
+  const alertEl=$('it1-alert'),cuadreEl=$('it1-cuadre');
+  if (!has606||!has607){
+    alertEl.hidden=false;
+    alertEl.innerHTML=`<div class="alert warn">⚠ Carga el archivo <strong>606 (Compras)</strong> y el <strong>607 (Ventas)</strong> para generar el cuadre IT-1.</div>`;
+    cuadreEl.hidden=true;return;
   }
-
-  const alertEl  = $('it1-alert');
-  const cuadreEl = $('it1-cuadre');
-
-  if (!has606 || !has607) {
-    alertEl.hidden = false;
-    alertEl.innerHTML = `<div class="alert warn">⚠ Carga el archivo <strong>606 (Compras)</strong> y el <strong>607 (Ventas)</strong> para generar el cuadre IT-1.</div>`;
-    cuadreEl.hidden = true;
-    return;
-  }
-
-  const s6 = STATE['606'].summary;
-  const s7 = STATE['607'].summary;
-  const saldo  = parseFloat($('in-saldo').value)  || 0;
-  const aduana = parseFloat($('in-aduana').value) || 0;
-
-  // Crédito disponible = ITBIS adelantado 606 + ITBIS retenido en ventas (607, lo que me retuvieron)
-  const debito         = s7.totItbis;
-  const credito        = s6.totAdel;   // crédito fiscal de compras
-  const itbisRet606    = s6.totRet;    // lo que yo retuve a mis proveedores (me lo descuento del débito no, es una obligación separada)
-  const itbisRetVentas = s7.totRet;    // lo que mis clientes me retuvieron (a mi favor)
-
-  // Cálculo IT-1 simplificado
-  // Resultado = Débito - Crédito - RetVentas - SaldoAnterior + Aduana
-  const resultado = r2(debito - credito - itbisRetVentas - saldo + aduana);
-
-  // Alerta saldo a favor
-  if (saldo === 0 && credito + itbisRetVentas >= debito) {
-    alertEl.hidden = false;
-    alertEl.innerHTML = `<div class="alert warn">⚠ Hay un posible <strong>saldo a favor</strong>. Verifica el saldo anterior en la DGI e ingrésalo en el campo correspondiente.</div>`;
-  } else {
-    alertEl.hidden = true;
-  }
-
-  const rows = [
-    { lbl: 'ITBIS Débito (ventas facturadas)',      sign: '+', amt: debito,         cls: '' },
-    { lbl: 'ITBIS Crédito (compras adelantado)',    sign: '−', amt: credito,        cls: '' },
-    { lbl: 'ITBIS Ret. en Ventas (clientes)',       sign: '−', amt: itbisRetVentas, cls: '' },
-    { lbl: 'Saldo a Favor Anterior (DGI)',          sign: '−', amt: saldo,          cls: '' },
-    { lbl: 'ITBIS Aduana',                          sign: '+', amt: aduana,         cls: '' },
-  ].filter(r => r.amt !== 0 || r.sign === '+');
-
-  $('cuadre-body').innerHTML = rows.map(r =>
-    `<div class="cuadre-row">
-      <span class="cuadre-lbl">${r.lbl}</span>
-      <span><span class="cuadre-sign">${r.sign}</span><span class="cuadre-amt">${fmtM(r.amt)}</span></span>
-    </div>`
+  const s6=STATE['606'].summary,s7=STATE['607'].summary;
+  const saldo=parseFloat($('in-saldo').value)||0,aduana=parseFloat($('in-aduana').value)||0;
+  const debito=s7.totItbis,credito=s6.totAdel,itbisRetVentas=s7.totRet;
+  const resultado=r2(debito-credito-itbisRetVentas-saldo+aduana);
+  if (saldo===0&&credito+itbisRetVentas>=debito){
+    alertEl.hidden=false;
+    alertEl.innerHTML=`<div class="alert warn">⚠ Hay un posible <strong>saldo a favor</strong>. Verifica el saldo anterior en la DGI e ingrésalo.</div>`;
+  }else{alertEl.hidden=true;}
+  const rows=[
+    {lbl:'ITBIS Débito (ventas facturadas)',sign:'+',amt:debito},
+    {lbl:'ITBIS Crédito (compras)',sign:'−',amt:credito},
+    {lbl:'ITBIS Ret. en Ventas (clientes)',sign:'−',amt:itbisRetVentas},
+    {lbl:'Saldo a Favor Anterior (DGI)',sign:'−',amt:saldo},
+    {lbl:'ITBIS Aduana',sign:'+',amt:aduana},
+  ].filter(r=>r.amt!==0||r.sign==='+');
+  $('cuadre-body').innerHTML=rows.map(r=>
+    `<div class="cuadre-row"><span class="cuadre-lbl">${r.lbl}</span><span><span class="cuadre-sign">${r.sign}</span><span class="cuadre-amt">${fmtM(r.amt)}</span></span></div>`
   ).join('');
-
-  const isPagar = resultado > 0;
-  $('ct-lbl').textContent = isPagar ? 'ITBIS A PAGAR' : 'SALDO A FAVOR';
-  $('ct-val').textContent = fmtM(Math.abs(resultado));
-  $('ct-val').className   = `cuadre-total-val ${isPagar ? 'pagar' : 'favor'}`;
-
-  cuadreEl.hidden = false;
-
-  // Nota sobre ITBIS retenido en compras (606) — separado, es una obligación
-  if (s6.totRet > 0) {
-    const nota = document.createElement('div');
-    nota.className = 'alert ok';
-    nota.style.marginTop = '12px';
-    nota.innerHTML = `<span>ℹ</span> <span>ITBIS Retenido en Compras (606): <strong>${fmtM(s6.totRet)}</strong> — este monto lo declaras como agente de retención en el formulario 11 o Anexo, no en el IT-1.</span>`;
-    const existing = cuadreEl.querySelector('.alert.ok');
-    if (existing) existing.remove();
-    cuadreEl.appendChild(nota);
+  const isPagar=resultado>0;
+  $('ct-lbl').textContent=isPagar?'ITBIS A PAGAR':'SALDO A FAVOR';
+  $('ct-val').textContent=fmtM(Math.abs(resultado));
+  $('ct-val').className=`cuadre-total-val ${isPagar?'pagar':'favor'}`;
+  cuadreEl.hidden=false;
+  if (s6.totRet>0){
+    const nota=document.createElement('div');nota.className='alert ok';nota.style.marginTop='14px';
+    nota.innerHTML=`<span>ℹ</span> <span>ITBIS Retenido en Compras (606): <strong>${fmtM(s6.totRet)}</strong> — se declara como agente de retención (Form. 11 o Anexo), no en el IT-1.</span>`;
+    const existing=cuadreEl.querySelector('.alert.ok');if(existing)existing.remove();cuadreEl.appendChild(nota);
   }
 }
 
-// ── State & Export ───────────────────────────────────────────────────────────
-const STATE = { '606': null, '607': null };
+const STATE={'606':null,'607':null};
 
 function exportXLS(mod) {
-  const d = STATE[mod];
-  if (!d) return;
-  const wb = XLSX.utils.book_new();
-  const s  = d.summary;
-
-  if (mod === '606') {
-    const sumSheet = XLSX.utils.aoa_to_sheet([
-      ['Métrica','Valor'],
-      ['Registros', s.registros],
-      ['Total Servicios', s.totServ],
-      ['Total Bienes', s.totBien],
-      ['Total Facturado', s.totTotal],
-      ['ITBIS Facturado', s.totItbis],
-      ['ITBIS Adelantado (Crédito)', s.totAdel],
-      ['ITBIS Llevado al Costo', s.totCosto],
-      ['ITBIS Retenido Total', s.totRet],
-      ['Retención 30% - Monto', s.ret30.monto],
-      ['Retención 30% - Comprobantes', s.ret30.count],
-      ['Retención 100% - Monto', s.ret100.monto],
-      ['Retención 100% - Comprobantes', s.ret100.count],
-    ]);
-    sumSheet['!cols'] = [{wch:36},{wch:20}];
-    XLSX.utils.book_append_sheet(wb, sumSheet, 'Resumen 606');
-  } else {
-    const bt = s.byTasa;
-    const sumSheet = XLSX.utils.aoa_to_sheet([
-      ['Métrica','Valor'],
-      ['Registros', s.registros],
-      ['Total Facturado', s.totTotal],
-      ['Total Gravado', s.totGrav],
-      ['Total Exento', s.totExento],
-      ['ITBIS Facturado Total', s.totItbis],
-      ['ITBIS Retenido por Clientes', s.totRet],
-      ['ITBIS 18% - Base', bt.t18.monto], ['ITBIS 18% - Impuesto', bt.t18.itbis],
-      ['ITBIS 16% - Base', bt.t16.monto], ['ITBIS 16% - Impuesto', bt.t16.itbis],
-      ['ITBIS 10% Construcción - Base', bt.t10.monto], ['ITBIS 10% - Impuesto', bt.t10.itbis],
-      ['Exentos - Monto', bt.t0.monto],
-      ['Ret. Clientes 30% - Monto', s.ret30.monto],
-      ['Ret. Clientes 100% - Monto', s.ret100.monto],
-    ]);
-    sumSheet['!cols'] = [{wch:36},{wch:20}];
-    XLSX.utils.book_append_sheet(wb, sumSheet, 'Resumen 607');
+  const d=STATE[mod];if(!d)return;
+  const wb=XLSX.utils.book_new(),s=d.summary;
+  if (mod==='606'){
+    const ss=XLSX.utils.aoa_to_sheet([['Métrica','Valor'],['Registros',s.registros],['Total Servicios',s.totServ],['Total Bienes',s.totBien],['Total Facturado',s.totTotal],['ITBIS Facturado',s.totItbis],['ITBIS Crédito Fiscal',s.totAdel],['ITBIS al Costo',s.totCosto],['ITBIS Retenido',s.totRet],['Ret.30% Monto',s.ret30.monto],['Ret.30% Comprobantes',s.ret30.count],['Ret.100% Monto',s.ret100.monto],['Ret.100% Comprobantes',s.ret100.count]]);
+    ss['!cols']=[{wch:36},{wch:20}];XLSX.utils.book_append_sheet(wb,ss,'Resumen 606');
+  }else{
+    const bt=s.byTasa;
+    const ss=XLSX.utils.aoa_to_sheet([['Métrica','Valor'],['Registros',s.registros],['Total Facturado',s.totTotal],['Total Gravado',s.totGrav],['Total Exento',s.totExento],['ITBIS Facturado',s.totItbis],['ITBIS Ret. Clientes',s.totRet],['18% Base',bt.t18.monto],['18% ITBIS',bt.t18.itbis],['16% Base',bt.t16.monto],['16% ITBIS',bt.t16.itbis],['10% Base',bt.t10.monto],['10% ITBIS',bt.t10.itbis],['Exentos',bt.t0.monto],['Ret.30%',s.ret30.monto],['Ret.100%',s.ret100.monto]]);
+    ss['!cols']=[{wch:36},{wch:20}];XLSX.utils.book_append_sheet(wb,ss,'Resumen 607');
   }
-
-  const dataSheet = XLSX.utils.json_to_sheet(d.allRows, { header: d.columns });
-  dataSheet['!cols'] = d.columns.map(() => ({wch:18}));
-  XLSX.utils.book_append_sheet(wb, dataSheet, 'Datos');
-  XLSX.writeFile(wb, `${mod}_analisis.xlsx`);
+  const ds=XLSX.utils.json_to_sheet(d.allRows,{header:d.columns});
+  ds['!cols']=d.columns.map(()=>({wch:18}));
+  XLSX.utils.book_append_sheet(wb,ds,'Datos');
+  XLSX.writeFile(wb,`${mod}_analisis.xlsx`);
   showToast(`✓ Excel exportado: ${mod}_analisis.xlsx`);
 }
 
-// ── File handler ──────────────────────────────────────────────────────────────
 async function handleFile(file, mod) {
-  const ext = file.name.split('.').pop().toLowerCase();
-  if (!['csv','xlsx','xls'].includes(ext)) {
-    showToast('Formato no soportado. Use CSV, XLSX o XLS.','err'); return;
-  }
-  if (file.size > 20*1024*1024) {
-    showToast('El archivo supera el límite de 20 MB.','err'); return;
-  }
-  $('loader').hidden = false;
+  const ext=file.name.split('.').pop().toLowerCase();
+  if (!['csv','xlsx','xls'].includes(ext)){showToast('Formato no soportado. Use CSV, XLSX o XLS.','err');return;}
+  if (file.size>20*1024*1024){showToast('El archivo supera el límite de 20 MB.','err');return;}
+  $('loader').hidden=false;
   try {
-    const rows = await loadFile(file, mod);
-    if (mod === '606') {
-      STATE['606'] = process606(rows);
-      render606(STATE['606'], file.name);
-    } else {
-      STATE['607'] = process607(rows);
-      render607(STATE['607'], file.name);
-    }
+    const rows=await loadFile(file,mod);
+    if (mod==='606'){STATE['606']=process606(rows);render606(STATE['606'],file.name);}
+    else{STATE['607']=process607(rows);render607(STATE['607'],file.name);}
   } catch(e) {
-    showToast(e.message || 'Error procesando el archivo.','err');
+    showToast(e.message||'Error procesando el archivo.','err');
   } finally {
-    $('loader').hidden = true;
+    $('loader').hidden=true;
   }
 }
 
 function resetMod(mod) {
-  STATE[mod] = null;
-  if (mod === '606') {
-    $('da-606').hidden=true; $('up-606').hidden=false;
-    $('tf-606').hidden=true; $('btn-xls-606').hidden=true; $('btn-rst-606').hidden=true;
-    $('th-606').innerHTML=''; $('tb-606').innerHTML='';
-    $('fi-606').value='';
-  } else {
-    $('da-607').hidden=true; $('up-607').hidden=false;
-    $('tf-607').hidden=true; $('btn-xls-607').hidden=true; $('btn-rst-607').hidden=true;
-    $('th-607').innerHTML=''; $('tb-607').innerHTML='';
-    $('fi-607').value='';
-  }
-  $(`badge-${mod}`).textContent='○';
-  $(`badge-${mod}`).className='nav-badge';
+  STATE[mod]=null;
+  if (mod==='606'){$('da-606').hidden=true;$('up-606').hidden=false;$('tf-606').hidden=true;$('btn-xls-606').hidden=true;$('btn-rst-606').hidden=true;$('th-606').innerHTML='';$('tb-606').innerHTML='';$('fi-606').value='';}
+  else{$('da-607').hidden=true;$('up-607').hidden=false;$('tf-607').hidden=true;$('btn-xls-607').hidden=true;$('btn-rst-607').hidden=true;$('th-607').innerHTML='';$('tb-607').innerHTML='';$('fi-607').value='';}
+  $(`badge-${mod}`).textContent='○';$(`badge-${mod}`).className='nav-badge';
   updateIT1();
 }
 
-// ── Navigation ────────────────────────────────────────────────────────────────
-document.querySelectorAll('.nav-item').forEach(el => {
-  el.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+document.querySelectorAll('.nav-item').forEach(el=>{
+  el.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
     el.classList.add('active');
-    const target = el.dataset.nav;
-    $('mod-' + (target === 'it1' ? 'it1' : target)).classList.add('active');
-    if (target === 'it1') updateIT1();
+    const target=el.dataset.nav;
+    $('mod-'+(target==='it1'?'it1':target)).classList.add('active');
+    if (target==='it1') updateIT1();
   });
 });
 
-// ── Wire dropzones & inputs ───────────────────────────────────────────────────
-['606','607'].forEach(mod => {
-  const dz  = $(`dz-${mod}`);
-  const fi  = $(`fi-${mod}`);
-  const bs  = $(`bs-${mod}`);
-
-  dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
-  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-  dz.addEventListener('drop', e => {
-    e.preventDefault(); dz.classList.remove('drag-over');
-    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0], mod);
-  });
-  dz.addEventListener('click', () => fi.click());
-  dz.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' '){e.preventDefault();fi.click();} });
-  fi.addEventListener('change', () => { if (fi.files[0]) handleFile(fi.files[0], mod); });
-  bs.addEventListener('click', e => { e.stopPropagation(); fi.click(); });
-
-  $(`btn-xls-${mod}`).addEventListener('click', () => exportXLS(mod));
-  $(`btn-rst-${mod}`).addEventListener('click', () => resetMod(mod));
+['606','607'].forEach(mod=>{
+  const dz=$(`dz-${mod}`),fi=$(`fi-${mod}`),bs=$(`bs-${mod}`);
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+  dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0],mod);});
+  dz.addEventListener('click',()=>fi.click());
+  dz.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fi.click();}});
+  fi.addEventListener('change',()=>{if(fi.files[0])handleFile(fi.files[0],mod);});
+  bs.addEventListener('click',e=>{e.stopPropagation();fi.click();});
+  $(`btn-xls-${mod}`).addEventListener('click',()=>exportXLS(mod));
+  $(`btn-rst-${mod}`).addEventListener('click',()=>resetMod(mod));
 });
 
-// Recalc IT-1 on manual input change
-['in-saldo','in-aduana'].forEach(id => {
-  $(id).addEventListener('input', updateIT1);
-});
+['in-saldo','in-aduana'].forEach(id=>{$(id).addEventListener('input',updateIT1);});
 </script>
 </body>
 </html>
