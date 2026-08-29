@@ -398,29 +398,29 @@ tbody tr:hover{background:var(--primary-faint);}
 
 // ── Aliases 606 ──────────────────────────────────────────────────────────────
 const AL606 = {
-  rnc:              ['rnc','cedula','rncocedula','identificacion','rnc_cedula','rncoproveedor','proveedor_rnc'],
+  rnc:              ['rnc','cedula','rncocedula','rnc_o_cedula','identificacion','rnc_cedula','rncoproveedor','proveedor_rnc'],
   ncf:              ['ncf','comprobante','numero_comprobante','numerodecomprobante','no_comprobante','nfc'],
   fecha:            ['fecha','date','fecha_comprobante','fechadecomprobante','fecha_factura','fechafactura','fechapago','fecha_pago'],
-  tipo_comprobante: ['tipo','tipo_comprobante','tipodecomprobante','tipo_ncf','tipocomprobante','tipo_bienes_servicios','tipobienesservicios'],
-  monto_servicios:  ['monto_servicios','servicios','montoenservicios','facturado_servicios','monto_serv','montoservicio','monto_facturado_servicios'],
-  monto_bienes:     ['monto_bienes','bienes','montoenbienes','facturado_bienes','monto_bien','montoenbien','monto_facturado_bienes'],
-  monto_total:      ['monto_total','total','montototal','montofacturado','importe_total','valor_total','monto_facturado','facturado_total','totalfacturado','total_monto_facturado'],
+  tipo_comprobante: ['tipo_bienes_y_servicios_comprados','tipobienesyservicioscomprados','tipo','tipo_comprobante','tipodecomprobante','tipo_ncf','tipocomprobante','tipo_bienes_servicios','tipobienesservicios'],
+  monto_servicios:  ['monto_facturado_en_servicios','monto_servicios','servicios','montoenservicios','facturado_servicios','monto_serv','montoservicio','monto_facturado_servicios'],
+  monto_bienes:     ['monto_facturado_en_bienes','monto_bienes','bienes','montoenbienes','facturado_bienes','monto_bien','montoenbien','monto_facturado_bienes'],
+  monto_total:      ['total_monto_facturado','monto_total','total','montototal','montofacturado','importe_total','valor_total','monto_facturado','facturado_total','totalfacturado'],
   itbis_facturado:  ['itbis_facturado','itbis','itbisfacturado','monto_itbis','impuesto','itbisfact'],
   itbis_retenido:   ['itbis_retenido','itbisretenido','retencion_itbis','itbis_ret','itbisretencion'],
-  itbis_adelantado: ['itbis_adelantado','itbis_por_adelantar','itbisporadelantar','credito_itbis','itbiscreditofiscal','itbis_credito','por_adelantar'],
-  itbis_costo:      ['itbis_costo','itbis_llevado_al_costo','itbisllevadoalcosto','itbis_al_costo','costo_itbis'],
+  itbis_adelantado: ['itbis_por_adelantar','itbis_adelantado','itbisporadelantar','credito_itbis','itbiscreditofiscal','itbis_credito','por_adelantar'],
+  itbis_costo:      ['itbis_llevado_al_costo','itbis_costo','itbisllevadoalcosto','itbis_al_costo','costo_itbis'],
   pct_retencion:    ['porcentaje_retencion','pct_retencion','porc_retencion','retencion_pct','porcentajeretencion'],
 };
 
 // ── Aliases 607 ──────────────────────────────────────────────────────────────
 const AL607 = {
-  rnc:              ['rnc','cedula','rncocedula','identificacion','rnc_cedula','rncocliente','cliente_rnc'],
+  rnc:              ['rnc','cedula','rncocedula','rnc_o_cedula','identificacion','rnc_cedula','rncocliente','cliente_rnc'],
   ncf:              ['ncf','comprobante','numero_comprobante','numerodecomprobante','no_comprobante','nfc'],
   fecha:            ['fecha','date','fecha_comprobante','fechadecomprobante','fecha_factura','fechafactura','fechacobro','fecha_cobro'],
-  tipo_comprobante: ['tipo','tipo_comprobante','tipodecomprobante','tipo_ncf','tipocomprobante','tipo_ingreso','tipoingreso'],
-  monto_servicios:  ['monto_servicios','servicios','montoenservicios','facturado_servicios','monto_serv'],
-  monto_bienes:     ['monto_bienes','bienes','montoenbienes','facturado_bienes','monto_bien'],
-  monto_total:      ['monto_total','total','montototal','montofacturado','importe_total','valor_total','monto_facturado','facturado_total','totalfacturado','total_monto_facturado'],
+  tipo_comprobante: ['tipo_bienes_y_servicios_vendidos','tipobienesyserviciosvendidos','tipo','tipo_comprobante','tipodecomprobante','tipo_ncf','tipocomprobante','tipo_ingreso','tipoingreso'],
+  monto_servicios:  ['monto_facturado_en_servicios','monto_servicios','servicios','montoenservicios','facturado_servicios','monto_serv'],
+  monto_bienes:     ['monto_facturado_en_bienes','monto_bienes','bienes','montoenbienes','facturado_bienes','monto_bien'],
+  monto_total:      ['total_monto_facturado','monto_total','total','montototal','montofacturado','importe_total','valor_total','monto_facturado','facturado_total','totalfacturado'],
   monto_gravado:    ['monto_gravado','gravado','valor_gravado','importe_gravado','montogravado'],
   monto_exento:     ['monto_exento','exento','valor_exento','importe_exento','montoexento','no_gravado','montonogravado'],
   itbis_facturado:  ['itbis_facturado','itbis','itbisfacturado','monto_itbis','impuesto','itbisfact'],
@@ -473,21 +473,55 @@ function cleanNum(val) {
 function sum(arr, key) { return arr.reduce((s,r) => s + (r[key]||0), 0); }
 
 // ── File loading ─────────────────────────────────────────────────────────────
-function readExcel(buf) {
+function readExcel(buf, sheetHint) {
   const wb = XLSX.read(new Uint8Array(buf), { type:'array', raw:false });
-  const ws = wb.Sheets[wb.SheetNames[0]];
-  return XLSX.utils.sheet_to_json(ws, { defval:null, raw:true });
+
+  // Pick the sheet whose name contains sheetHint (e.g. "606" or "607"), else first sheet
+  let sheetName = wb.SheetNames[0];
+  if (sheetHint) {
+    const hint = sheetHint.toLowerCase();
+    const match = wb.SheetNames.find(n => n.toLowerCase().includes(hint));
+    if (match) sheetName = match;
+  }
+  const ws = wb.Sheets[sheetName];
+
+  // Get raw arrays so we can auto-detect the header row
+  const raw = XLSX.utils.sheet_to_json(ws, { header:1, defval:'', raw:false });
+
+  // Find the row with most non-empty cells among the first 20 rows — that's the header
+  let bestRow = 0, bestScore = 0;
+  for (let i = 0; i < Math.min(20, raw.length); i++) {
+    const score = raw[i].filter(c => c && String(c).trim()).length;
+    if (score > bestScore) { bestScore = score; bestRow = i; }
+  }
+
+  const headers = raw[bestRow].map((h, i) =>
+    (h && String(h).trim()) ? String(h).trim() : `col_${i}`
+  );
+  // Data rows after the header, skip blank rows
+  const dataRows = raw.slice(bestRow + 1).filter(row =>
+    row.some(c => c !== '' && c != null)
+  );
+
+  return dataRows.map(row => {
+    const obj = {};
+    headers.forEach((h, i) => {
+      const v = row[i];
+      obj[h] = (v !== undefined && v !== '') ? v : null;
+    });
+    return obj;
+  });
 }
 function readCSV(text) {
   return (Papa.parse(text, { header:true, skipEmptyLines:true, dynamicTyping:false }).data) || [];
 }
-function loadFile(file) {
+function loadFile(file, sheetHint) {
   return new Promise((ok, fail) => {
     const ext = file.name.split('.').pop().toLowerCase();
     const rd  = new FileReader();
     rd.onerror = () => fail(new Error('Error leyendo el archivo'));
     if (['xlsx','xls'].includes(ext)) {
-      rd.onload = e => { try { ok(readExcel(e.target.result)); } catch(err) { fail(err); } };
+      rd.onload = e => { try { ok(readExcel(e.target.result, sheetHint)); } catch(err) { fail(err); } };
       rd.readAsArrayBuffer(file);
     } else {
       rd.onload = e => { try { ok(readCSV(e.target.result)); } catch(err) { fail(err); } };
@@ -502,7 +536,13 @@ function process606(rows) {
   const headers = Object.keys(rows[0]);
   const cm = detectCols(headers, AL606);
 
-  const data = rows.map(r => {
+  // Filter out summary/blank rows: keep only rows that have a non-zero monto OR an NCF-like value
+  const keyField = cm.monto_total || cm.monto_servicios || cm.monto_bienes || cm.itbis_facturado || cm.ncf;
+  const validRows = keyField
+    ? rows.filter(r => r[keyField] != null && String(r[keyField]).trim() !== '' && String(r[keyField]).trim() !== '0')
+    : rows;
+
+  const data = validRows.map(r => {
     const p = {...r};
     p._serv  = cm.monto_servicios ? cleanNum(r[cm.monto_servicios]) : 0;
     p._bien  = cm.monto_bienes    ? cleanNum(r[cm.monto_bienes])    : 0;
@@ -558,7 +598,12 @@ function process607(rows) {
   const headers = Object.keys(rows[0]);
   const cm = detectCols(headers, AL607);
 
-  const data = rows.map(r => {
+  const keyField = cm.monto_total || cm.monto_servicios || cm.monto_bienes || cm.itbis_facturado || cm.ncf;
+  const validRows = keyField
+    ? rows.filter(r => r[keyField] != null && String(r[keyField]).trim() !== '' && String(r[keyField]).trim() !== '0')
+    : rows;
+
+  const data = validRows.map(r => {
     const p = {...r};
     p._serv  = cm.monto_servicios ? cleanNum(r[cm.monto_servicios]) : 0;
     p._bien  = cm.monto_bienes    ? cleanNum(r[cm.monto_bienes])    : 0;
@@ -914,7 +959,7 @@ async function handleFile(file, mod) {
   }
   $('loader').hidden = false;
   try {
-    const rows = await loadFile(file);
+    const rows = await loadFile(file, mod);
     if (mod === '606') {
       STATE['606'] = process606(rows);
       render606(STATE['606'], file.name);
