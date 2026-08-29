@@ -882,9 +882,9 @@ function process606(rows) {
   const headers = Object.keys(rows[0]);
   const cm = detectCols(headers, AL606);
   const keyField = cm.monto_total || cm.monto_servicios || cm.monto_bienes || cm.itbis_facturado || cm.ncf;
-  const validRows = keyField
-    ? rows.filter(r => r[keyField] != null && String(r[keyField]).trim() !== '' && String(r[keyField]).trim() !== '0')
-    : rows;
+  if (!keyField) throw new Error('No se reconocieron las columnas del 606. Verifica que el archivo tenga encabezados como NCF, Total Monto Facturado o ITBIS Facturado.');
+  const validRows = rows.filter(r => r[keyField] != null && String(r[keyField]).trim() !== '' && String(r[keyField]).trim() !== '0');
+  if (!validRows.length) throw new Error('El archivo no contiene filas de compras con datos.');
   const data = validRows.map(r => {
     const p = {...r};
     p._serv  = cm.monto_servicios  ? cleanNum(r[cm.monto_servicios])  : 0;
@@ -915,9 +915,9 @@ function process607(rows) {
   const headers = Object.keys(rows[0]);
   const cm = detectCols(headers, AL607);
   const keyField = cm.monto_total || cm.monto_servicios || cm.monto_bienes || cm.itbis_facturado || cm.ncf;
-  const validRows = keyField
-    ? rows.filter(r => r[keyField] != null && String(r[keyField]).trim() !== '' && String(r[keyField]).trim() !== '0')
-    : rows;
+  if (!keyField) throw new Error('No se reconocieron las columnas del 607. Verifica que el archivo tenga encabezados como NCF, Total Monto Facturado o ITBIS Facturado.');
+  const validRows = rows.filter(r => r[keyField] != null && String(r[keyField]).trim() !== '' && String(r[keyField]).trim() !== '0');
+  if (!validRows.length) throw new Error('El archivo no contiene filas de ventas con datos.');
   const data = validRows.map(r => {
     const p = {...r};
     p._serv  = cm.monto_servicios ? cleanNum(r[cm.monto_servicios]) : 0;
