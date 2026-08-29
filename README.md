@@ -18,8 +18,8 @@ Luego abre <http://localhost:8000>.
 
 ## Publicación
 
-Cada cambio enviado a `main` se publica automáticamente en GitHub Pages por
-medio del workflow `.github/workflows/pages.yml`.
+La aplicación se despliega como un sitio estático en Vercel. El contenido de
+`frontend/` es el artefacto de producción y no requiere variables de entorno.
 
 ## Formatos admitidos
 

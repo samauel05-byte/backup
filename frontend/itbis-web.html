@@ -89,7 +89,7 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
 
 /* ── Sidebar ── */
 .sidebar{
-  background:var(--sid-bg);
+  background:linear-gradient(180deg,#0B1730 0%,#13284D 62%,#0C3B43 100%);
   display:flex;flex-direction:column;
   position:sticky;top:0;height:100vh;overflow-y:auto;
   box-shadow:4px 0 24px rgba(0,0,0,.18);
@@ -122,7 +122,7 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
 }
 .nav-item:hover{background:rgba(255,255,255,.07);color:var(--sid-text-bright);}
 .nav-item.active{
-  background:linear-gradient(135deg,var(--sid-active-from),var(--sid-active-to));
+  background:linear-gradient(135deg,#315BE8,#6647D9);
   color:#fff;font-weight:600;
   box-shadow:0 3px 14px rgba(59,91,219,.4);
 }
@@ -164,7 +164,8 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
   padding:14px 28px;
   display:flex;align-items:center;gap:14px;
   flex-shrink:0;
-  box-shadow:var(--shadow);
+  box-shadow:0 3px 18px rgba(14,27,54,.08);
+  border-top:4px solid var(--blue);
 }
 .tb-stripe{
   width:4px;height:36px;border-radius:3px;flex-shrink:0;
@@ -205,7 +206,7 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
   background:var(--surface);
   border:2px dashed var(--border);border-radius:20px;
   padding:60px 36px;text-align:center;cursor:pointer;overflow:hidden;
-  transition:border-color .2s,background .2s,box-shadow .2s;
+  border-top:6px solid var(--blue);
 }
 .dropzone:hover,.dropzone.drag-over{
   border-color:var(--blue);
@@ -249,7 +250,8 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
   border-radius:var(--radius);
   padding:16px 18px 14px;
   box-shadow:var(--shadow);
-  border-left:4px solid var(--blue);
+  border:1px solid var(--border);
+  border-top:5px solid var(--blue);
   position:relative;overflow:hidden;
 }
 .kpi::after{
@@ -258,13 +260,13 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
   background:currentColor;opacity:.04;
   pointer-events:none;
 }
-.kpi.g{border-color:var(--green);background:var(--green-lt);}
-.kpi.a{border-color:var(--amber);background:var(--amber-lt);}
-.kpi.r{border-color:var(--red);background:var(--red-lt);}
-.kpi.c{border-color:var(--sky);background:var(--sky-lt);}
-.kpi.v{border-color:var(--violet);background:var(--violet-lt);}
-.kpi.t{border-color:var(--teal);background:var(--teal-lt);}
-.kpi.m{border-color:var(--muted);background:var(--surface-2);}
+.kpi.g{border-top-color:var(--green);background:var(--green-lt);}
+.kpi.a{border-top-color:var(--amber);background:var(--amber-lt);}
+.kpi.r{border-top-color:var(--red);background:var(--red-lt);}
+.kpi.c{border-top-color:var(--sky);background:var(--sky-lt);}
+.kpi.v{border-top-color:var(--violet);background:var(--violet-lt);}
+.kpi.t{border-top-color:var(--teal);background:var(--teal-lt);}
+.kpi.m{border-top-color:var(--muted);background:var(--surface-2);}
 .kpi-lbl{font-size:.64rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
 .kpi-val{font-family:var(--f-display);font-size:1.25rem;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.1;}
 .kpi.g .kpi-val{color:var(--green);}
@@ -426,12 +428,9 @@ tbody tr:hover{background:var(--blue-lt);}
   align-items:center;gap:14px;
 }
 .spinner{
-  width:36px;height:36px;border:3px solid rgba(255,255,255,.12);
-  border-top-color:#6185F5;border-radius:50%;
-  animation:spin .7s linear infinite;
+  width:44px;height:8px;border-radius:8px;
+  background:linear-gradient(90deg,#38BDF8 0 33%,#7C3AED 33% 66%,#34D399 66%);
 }
-@keyframes spin{to{transform:rotate(360deg);}}
-@media (prefers-reduced-motion:reduce){.spinner{animation:none;}}
 .loader-txt{font-size:.85rem;color:rgba(255,255,255,.75);}
 
 #toast{
@@ -446,6 +445,29 @@ tbody tr:hover{background:var(--blue-lt);}
 }
 #toast.show{transform:translateY(0);opacity:1;}
 #toast.err{background:var(--red);}
+
+/* ── Professional module color system (no decorative motion) ── */
+*,*::before,*::after{animation:none!important;transition:none!important;}
+#mod-606{background:linear-gradient(135deg,rgba(2,132,199,.055),transparent 42%),var(--bg);}
+#mod-607{background:linear-gradient(135deg,rgba(124,58,237,.06),transparent 42%),var(--bg);}
+#mod-it1{background:linear-gradient(135deg,rgba(5,150,105,.065),transparent 42%),var(--bg);}
+#mod-606 .topbar{border-top-color:#0284C7;}
+#mod-607 .topbar{border-top-color:#7C3AED;}
+#mod-it1 .topbar{border-top-color:#059669;}
+#mod-607 .dropzone{border-top-color:#7C3AED;}
+#mod-606 thead th{background:linear-gradient(90deg,#075985,#0284C7);}
+#mod-607 thead th{background:linear-gradient(90deg,#5B21B6,#7C3AED);}
+#mod-606 .slabel::before{background:#0284C7;}
+#mod-607 .slabel::before{background:#7C3AED;}
+#mod-it1 .slabel::before{background:#059669;}
+.sid-logo-icon{border:1px solid rgba(255,255,255,.28);}
+.drop-icon{font-family:var(--f-display);font-size:1rem;font-weight:800;color:#fff;letter-spacing:.4px;}
+.btn{border:1px solid rgba(255,255,255,.16);}
+.ret-card:first-child{border-top:4px solid var(--blue);}
+.ret-card:last-child{border-top:4px solid var(--red);}
+.manual-card{border-top:5px solid var(--teal);}
+.prereq-card{border-top:5px solid var(--violet);}
+.cuadre-card{border-top:6px solid var(--green);}
 
 /* ── Mobile ── */
 @media (max-width:720px){
@@ -491,18 +513,18 @@ tbody tr:hover{background:var(--blue-lt);}
   <div class="nav-section">
     <div class="nav-label">Módulos</div>
     <div class="nav-item active" data-nav="606">
-      <div class="ni-icon">📥</div>
+      <div class="ni-icon">606</div>
       <span>606 — Compras</span>
       <span class="nav-badge" id="badge-606">○</span>
     </div>
     <div class="nav-item" data-nav="607">
-      <div class="ni-icon">📤</div>
+      <div class="ni-icon">607</div>
       <span>607 — Ventas</span>
       <span class="nav-badge" id="badge-607">○</span>
     </div>
     <div class="sid-divider"></div>
     <div class="nav-item" data-nav="it1">
-      <div class="ni-icon">📋</div>
+      <div class="ni-icon">IT1</div>
       <span>IT-1 Declaración</span>
       <span class="nav-badge" id="badge-it1">○</span>
     </div>
@@ -527,15 +549,15 @@ tbody tr:hover{background:var(--blue-lt);}
     </div>
     <div class="tb-right">
       <span class="tb-file" id="tf-606" hidden></span>
-      <button class="btn btn-xl" id="btn-xls-606" hidden>⬇ Excel</button>
-      <button class="btn btn-ghost" id="btn-rst-606" hidden>↩ Limpiar</button>
+      <button class="btn btn-xl" id="btn-xls-606" hidden>Exportar Excel</button>
+      <button class="btn btn-ghost" id="btn-rst-606" hidden>Limpiar</button>
     </div>
   </div>
 
   <div class="upload-stage" id="up-606">
     <div class="dropzone" id="dz-606" tabindex="0" role="button" aria-label="Cargar archivo 606">
       <div class="drop-inner">
-        <div class="drop-icon-wrap"><span class="drop-icon">📥</span></div>
+        <div class="drop-icon-wrap"><span class="drop-icon">606</span></div>
         <div class="drop-title">Arrastra el archivo 606 aquí</div>
         <div class="drop-sub">Suelta cualquier archivo de compras del período<br><strong>CSV · XLSX · XLS</strong> — cualquier formato</div>
         <div class="drop-tags">
@@ -544,7 +566,7 @@ tbody tr:hover{background:var(--blue-lt);}
           <span class="drop-tag">CSV Exportado</span>
         </div>
         <input type="file" id="fi-606" accept=".csv,.xlsx,.xls">
-        <button class="btn btn-primary" id="bs-606">📁 Seleccionar archivo</button>
+        <button class="btn btn-primary" id="bs-606">Seleccionar archivo</button>
       </div>
     </div>
   </div>
@@ -575,15 +597,15 @@ tbody tr:hover{background:var(--blue-lt);}
     </div>
     <div class="tb-right">
       <span class="tb-file" id="tf-607" hidden></span>
-      <button class="btn btn-xl" id="btn-xls-607" hidden>⬇ Excel</button>
-      <button class="btn btn-ghost" id="btn-rst-607" hidden>↩ Limpiar</button>
+      <button class="btn btn-xl" id="btn-xls-607" hidden>Exportar Excel</button>
+      <button class="btn btn-ghost" id="btn-rst-607" hidden>Limpiar</button>
     </div>
   </div>
 
   <div class="upload-stage" id="up-607">
     <div class="dropzone" id="dz-607" tabindex="0" role="button" aria-label="Cargar archivo 607">
       <div class="drop-inner">
-        <div class="drop-icon-wrap" style="background:linear-gradient(135deg,#7C3AED,#06B6D4);"><span class="drop-icon">📤</span></div>
+        <div class="drop-icon-wrap" style="background:linear-gradient(135deg,#7C3AED,#06B6D4);"><span class="drop-icon">607</span></div>
         <div class="drop-title">Arrastra el archivo 607 aquí</div>
         <div class="drop-sub">Suelta cualquier archivo de ventas del período<br><strong>CSV · XLSX · XLS</strong> — cualquier formato</div>
         <div class="drop-tags">
@@ -592,7 +614,7 @@ tbody tr:hover{background:var(--blue-lt);}
           <span class="drop-tag">CSV Exportado</span>
         </div>
         <input type="file" id="fi-607" accept=".csv,.xlsx,.xls">
-        <button class="btn btn-primary" id="bs-607" style="background:var(--violet);box-shadow:0 2px 8px rgba(124,58,237,.3);">📁 Seleccionar archivo</button>
+        <button class="btn btn-primary" id="bs-607" style="background:var(--violet);box-shadow:0 2px 8px rgba(124,58,237,.3);">Seleccionar archivo</button>
       </div>
     </div>
   </div>
@@ -622,7 +644,7 @@ tbody tr:hover{background:var(--blue-lt);}
       <div class="tb-sub">Cuadre automático para presentar a la DGII</div>
     </div>
     <div class="tb-right">
-      <button class="btn btn-pdf" onclick="window.print()">🖨 Imprimir</button>
+      <button class="btn btn-pdf" onclick="window.print()">Imprimir / PDF</button>
     </div>
   </div>
 
@@ -663,7 +685,7 @@ tbody tr:hover{background:var(--blue-lt);}
 
     <div class="cuadre-card" id="it1-cuadre" hidden>
       <div class="cuadre-hd">
-        <div class="cuadre-hd-icon">📋</div>
+        <div class="cuadre-hd-icon"><span class="drop-icon">IT1</span></div>
         <div>
           <div class="cuadre-hd-title">Cuadre IT-1</div>
           <div class="cuadre-hd-sub">Cálculo automático basado en 606 y 607</div>
@@ -945,7 +967,7 @@ function render606(data, filename) {
       <div class="ret-info"><div class="ret-lbl">Retención del 100%</div><div class="ret-val">${fmtM(s.ret100.monto)}</div><div class="ret-cnt">${fmtI(s.ret100.count)} comprobante${s.ret100.count!==1?'s':''}</div></div>
     </div>`;
   renderTable('th-606','tb-606','tn-606',data.columns,data.preview,data.summary.registros);
-  $('tf-606').textContent='📄 '+filename; $('tf-606').hidden=false;
+  $('tf-606').textContent=filename; $('tf-606').hidden=false;
   $('btn-xls-606').hidden=false; $('btn-rst-606').hidden=false;
   $('up-606').hidden=true; $('da-606').hidden=false;
   $('badge-606').textContent='✓'; $('badge-606').className='nav-badge ok';
@@ -976,7 +998,7 @@ function render607(data, filename) {
       <div class="ret-info"><div class="ret-lbl">Clientes retuvieron 100%</div><div class="ret-val">${fmtM(s.ret100.monto)}</div><div class="ret-cnt">${fmtI(s.ret100.count)} comprobante${s.ret100.count!==1?'s':''}</div></div>
     </div>`;
   renderTable('th-607','tb-607','tn-607',data.columns,data.preview,data.summary.registros);
-  $('tf-607').textContent='📄 '+filename; $('tf-607').hidden=false;
+  $('tf-607').textContent=filename; $('tf-607').hidden=false;
   $('btn-xls-607').hidden=false; $('btn-rst-607').hidden=false;
   $('up-607').hidden=true; $('da-607').hidden=false;
   $('badge-607').textContent='✓'; $('badge-607').className='nav-badge ok';
@@ -994,7 +1016,7 @@ function updateIT1() {
   const alertEl=$('it1-alert'),cuadreEl=$('it1-cuadre');
   if (!has606||!has607){
     alertEl.hidden=false;
-    alertEl.innerHTML=`<div class="alert warn">⚠ Carga el archivo <strong>606 (Compras)</strong> y el <strong>607 (Ventas)</strong> para generar el cuadre IT-1.</div>`;
+    alertEl.innerHTML=`<div class="alert warn"><strong>Datos requeridos:</strong> carga el archivo 606 (Compras) y el 607 (Ventas) para generar el cuadre IT-1.</div>`;
     cuadreEl.hidden=true;return;
   }
   const s6=STATE['606'].summary,s7=STATE['607'].summary;
@@ -1003,7 +1025,7 @@ function updateIT1() {
   const resultado=r2(debito-credito-itbisRetVentas-saldo+aduana);
   if (saldo===0&&credito+itbisRetVentas>=debito){
     alertEl.hidden=false;
-    alertEl.innerHTML=`<div class="alert warn">⚠ Hay un posible <strong>saldo a favor</strong>. Verifica el saldo anterior en la DGI e ingrésalo.</div>`;
+    alertEl.innerHTML=`<div class="alert warn">Hay un posible <strong>saldo a favor</strong>. Verifica el saldo anterior en la DGII e ingrésalo.</div>`;
   }else{alertEl.hidden=true;}
   const rows=[
     {lbl:'ITBIS Débito (ventas facturadas)',sign:'+',amt:debito},
@@ -1022,7 +1044,7 @@ function updateIT1() {
   cuadreEl.hidden=false;
   if (s6.totRet>0){
     const nota=document.createElement('div');nota.className='alert ok';nota.style.marginTop='14px';
-    nota.innerHTML=`<span>ℹ</span> <span>ITBIS Retenido en Compras (606): <strong>${fmtM(s6.totRet)}</strong> — se declara como agente de retención (Form. 11 o Anexo), no en el IT-1.</span>`;
+    nota.innerHTML=`<span>Nota:</span> <span>ITBIS Retenido en Compras (606): <strong>${fmtM(s6.totRet)}</strong> — se declara como agente de retención (Form. 11 o Anexo), no en el IT-1.</span>`;
     const existing=cuadreEl.querySelector('.alert.ok');if(existing)existing.remove();cuadreEl.appendChild(nota);
   }
 }
@@ -1044,7 +1066,7 @@ function exportXLS(mod) {
   ds['!cols']=d.columns.map(()=>({wch:18}));
   XLSX.utils.book_append_sheet(wb,ds,'Datos');
   XLSX.writeFile(wb,`${mod}_analisis.xlsx`);
-  showToast(`✓ Excel exportado: ${mod}_analisis.xlsx`);
+  showToast(`Excel exportado: ${mod}_analisis.xlsx`);
 }
 
 async function handleFile(file, mod) {
