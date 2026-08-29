@@ -473,35 +473,51 @@ function cleanNum(val) {
 function sum(arr, key) { return arr.reduce((s,r) => s + (r[key]||0), 0); }
 
 // ── File loading ─────────────────────────────────────────────────────────────
-function readExcel(buf, sheetHint) {
-  const wb = XLSX.read(new Uint8Array(buf), { type:'array', raw:false });
-
-  // Pick the sheet whose name contains sheetHint (e.g. "606" or "607"), else first sheet
-  let sheetName = wb.SheetNames[0];
-  if (sheetHint) {
-    const hint = sheetHint.toLowerCase();
-    const match = wb.SheetNames.find(n => n.toLowerCase().includes(hint));
-    if (match) sheetName = match;
-  }
-  const ws = wb.Sheets[sheetName];
-
-  // Get raw arrays so we can auto-detect the header row
+function parseSheet(ws) {
+  // Get all rows as raw arrays
   const raw = XLSX.utils.sheet_to_json(ws, { header:1, defval:'', raw:false });
 
-  // Find the row with most non-empty cells among the first 20 rows — that's the header
-  let bestRow = 0, bestScore = 0;
+  // Find the best header row among first 20 rows:
+  // must have at least one alphabetic cell AND the most non-empty cells overall
+  let bestRow = -1, bestScore = 0;
   for (let i = 0; i < Math.min(20, raw.length); i++) {
-    const score = raw[i].filter(c => c && String(c).trim()).length;
-    if (score > bestScore) { bestScore = score; bestRow = i; }
+    const cells = raw[i].map(c => String(c).trim()).filter(Boolean);
+    const score = cells.length;
+    // A header row must contain at least one cell with a letter (not pure numbers/dates)
+    const hasText = cells.some(c => /[A-Za-zÀ-ɏ]/.test(c));
+    if (score > bestScore && hasText) { bestScore = score; bestRow = i; }
   }
+  if (bestRow < 0) bestRow = 0; // fallback: use first row
 
   const headers = raw[bestRow].map((h, i) =>
-    (h && String(h).trim()) ? String(h).trim() : `col_${i}`
+    (h && String(h).trim()) ? String(h).trim() : 'col_' + i
   );
-  // Data rows after the header, skip blank rows
   const dataRows = raw.slice(bestRow + 1).filter(row =>
     row.some(c => c !== '' && c != null)
   );
+  return { headers, dataRows, rowCount: dataRows.length };
+}
+
+function readExcel(buf, sheetHint) {
+  const wb = XLSX.read(new Uint8Array(buf), { type:'array', raw:false });
+
+  // Candidate sheets: sheet matching sheetHint first, then all others
+  const hinted = sheetHint
+    ? wb.SheetNames.filter(n => n.toLowerCase().includes(sheetHint.toLowerCase()))
+    : [];
+  const rest = wb.SheetNames.filter(n => !hinted.includes(n));
+  const ordered = [...hinted, ...rest];
+
+  // Pick the sheet that yields the most data rows (≥1); fall back to first
+  let bestSheet = ordered[0];
+  let bestCount = -1;
+  for (const name of ordered) {
+    const { rowCount } = parseSheet(wb.Sheets[name]);
+    if (rowCount > bestCount) { bestCount = rowCount; bestSheet = name; }
+    if (hinted.includes(name) && rowCount >= 5) break; // hinted sheet has enough data — use it
+  }
+
+  const { headers, dataRows } = parseSheet(wb.Sheets[bestSheet]);
 
   return dataRows.map(row => {
     const obj = {};
