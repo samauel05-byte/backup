@@ -244,7 +244,7 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
 .slabel::before{content:'';display:block;width:3px;height:14px;border-radius:2px;background:linear-gradient(180deg,var(--blue),var(--violet));flex-shrink:0;}
 
 /* ── KPI ── */
-.kpi-row{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));margin-bottom:22px;}
+.kpi-row{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));margin-bottom:22px;}
 .kpi{
   background:var(--surface);
   border-radius:var(--radius);
@@ -253,6 +253,7 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
   border:1px solid var(--border);
   border-top:5px solid var(--blue);
   position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-width:0;
 }
 .kpi::after{
   content:'';position:absolute;top:-20px;right:-20px;
@@ -267,15 +268,15 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
 .kpi.v{border-top-color:var(--violet);background:var(--violet-lt);}
 .kpi.t{border-top-color:var(--teal);background:var(--teal-lt);}
 .kpi.m{border-top-color:var(--muted);background:var(--surface-2);}
-.kpi-lbl{font-size:.64rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
-.kpi-val{font-family:var(--f-display);font-size:1.25rem;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.1;}
+.kpi-lbl{font-size:.64rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;text-align:center;width:100%;}
+.kpi-val{font-family:var(--f-display);font-size:clamp(.92rem,1.5vw,1.25rem);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.1;white-space:nowrap;letter-spacing:-.015em;max-width:100%;}
 .kpi.g .kpi-val{color:var(--green);}
 .kpi.r .kpi-val{color:var(--red);}
 .kpi.a .kpi-val{color:var(--amber);}
 .kpi.c .kpi-val{color:var(--sky);}
 .kpi.v .kpi-val{color:var(--violet);}
 .kpi.t .kpi-val{color:var(--teal);}
-.kpi-sub{font-size:.67rem;color:var(--muted);margin-top:4px;}
+.kpi-sub{font-size:.67rem;color:var(--muted);margin-top:4px;text-align:center;}
 
 /* ── Retention cards ── */
 .ret-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;}
@@ -295,9 +296,9 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
 .ret-pct{font-family:var(--f-display);font-size:1.35rem;font-weight:800;line-height:1;}
 .ret-badge.blue .ret-pct{color:var(--blue);}
 .ret-badge.red  .ret-pct{color:var(--red);}
-.ret-info{}
+.ret-info{text-align:center;flex:1;min-width:0;}
 .ret-lbl{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px;}
-.ret-val{font-family:var(--f-display);font-size:1rem;font-weight:700;color:var(--text);}
+.ret-val{font-family:var(--f-display);font-size:1rem;font-weight:700;color:var(--text);white-space:nowrap;font-variant-numeric:tabular-nums;}
 .ret-cnt{font-size:.7rem;color:var(--muted);margin-top:2px;}
 
 /* ── Card processor reports ── */
@@ -312,10 +313,10 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
 .processor-upload input{display:none;}
 .processor-hint{font-size:.7rem;color:var(--muted);line-height:1.45;}
 .processor-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
-.processor-metric{background:var(--surface-2);border-radius:8px;padding:10px 11px;border-left:3px solid var(--blue);}
+.processor-metric{background:var(--surface-2);border-radius:8px;padding:10px 11px;border-left:3px solid var(--blue);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-width:0;}
 .processor-card.azul .processor-metric{border-left-color:#00A6D6;}
-.processor-metric span{display:block;font-size:.59rem;font-weight:700;letter-spacing:.35px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
-.processor-metric strong{font-size:.88rem;color:var(--text);font-variant-numeric:tabular-nums;}
+.processor-metric span{display:block;font-size:.59rem;font-weight:700;letter-spacing:.35px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;text-align:center;}
+.processor-metric strong{display:block;font-size:clamp(.76rem,1.2vw,.9rem);color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap;letter-spacing:-.01em;max-width:100%;}
 .processor-total{background:var(--surface);border:1px solid var(--border);border-top:5px solid var(--teal);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);margin-bottom:22px;}
 
 /* ── Table ── */
@@ -420,7 +421,7 @@ tbody tr:hover{background:var(--blue-lt);}
   font-size:.7rem;color:var(--muted);margin-right:5px;font-weight:700;
   width:14px;text-align:center;display:inline-block;
 }
-.cuadre-amt{font-family:var(--f-display);font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;}
+.cuadre-amt{font-family:var(--f-display);font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap;}
 .cuadre-sep{height:2px;background:var(--border);border-radius:2px;margin:14px 0 10px;}
 .cuadre-total{
   display:flex;align-items:center;justify-content:space-between;
@@ -428,7 +429,7 @@ tbody tr:hover{background:var(--blue-lt);}
   background:var(--surface-2);border:1px solid var(--border);
 }
 .cuadre-total-lbl{font-family:var(--f-display);font-weight:800;font-size:.9rem;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
-.cuadre-total-val{font-family:var(--f-display);font-weight:800;font-size:1.7rem;font-variant-numeric:tabular-nums;}
+.cuadre-total-val{font-family:var(--f-display);font-weight:800;font-size:1.7rem;font-variant-numeric:tabular-nums;white-space:nowrap;}
 .cuadre-total-val.pagar{color:var(--red);}
 .cuadre-total-val.favor{color:var(--green);}
 
@@ -530,7 +531,12 @@ tbody tr:hover{background:var(--blue-lt);}
   .kpi-row{grid-template-columns:1fr 1fr;gap:9px;}
   .processor-kpis{grid-template-columns:1fr 1fr;}
   .kpi{padding:13px 12px;}
-  .kpi-val{font-size:1.02rem;}
+  .kpi-val{font-size:clamp(.82rem,3.4vw,1rem);}
+  .processor-metric strong{font-size:clamp(.72rem,3vw,.86rem);}
+}
+
+@media (max-width:360px){
+  .kpi-row{grid-template-columns:1fr;}
 }
 
 /* ── Print ── */
@@ -905,7 +911,7 @@ const ALCARD = {
 };
 
 const $  = id => document.getElementById(id);
-const fmtM = n => 'RD$ ' + new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n||0);
+const fmtM = n => 'RD$\u00A0' + new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n||0);
 const fmtI = n => new Intl.NumberFormat('en-US').format(Math.round(n||0));
 const r2  = n => Math.round((n||0)*100)/100;
 
