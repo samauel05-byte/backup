@@ -145,6 +145,11 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
 .nav-badge.ok{background:#059669;color:#fff;}
 
 .sid-divider{height:1px;background:rgba(255,255,255,.06);margin:6px 14px;}
+.currency-box{margin:8px 14px 12px;padding:11px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:rgba(255,255,255,.045);}
+.currency-lbl{display:block;font-size:.56rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--sid-text);margin-bottom:6px;}
+.currency-select{width:100%;border:1px solid rgba(255,255,255,.14);border-radius:7px;background:#162B4D;color:#fff;padding:7px 9px;font:600 .72rem var(--f-body);outline:none;cursor:pointer;}
+.currency-select:focus{border-color:#6185F5;box-shadow:0 0 0 3px rgba(97,133,245,.18);}
+.currency-note{display:block;color:var(--sid-text);font-size:.55rem;line-height:1.35;margin-top:5px;}
 
 .sid-bottom{
   margin-top:auto;padding:14px 18px;
@@ -276,7 +281,9 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
 .kpi.t{border-top-color:var(--teal);background:var(--teal-lt);}
 .kpi.m{border-top-color:var(--muted);background:var(--surface-2);}
 .kpi-lbl{font-size:.64rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;text-align:center;width:100%;}
-.kpi-val{font-family:var(--f-display);font-size:clamp(.92rem,1.5vw,1.25rem);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.1;white-space:nowrap;letter-spacing:-.015em;max-width:100%;}
+.kpi-val{font-family:var(--f-display);font-size:clamp(.92rem,1.5vw,1.25rem);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.1;white-space:nowrap;letter-spacing:-.015em;max-width:100%;display:inline-flex;align-items:baseline;justify-content:center;width:max-content;}
+.kpi-val.compact{font-size:clamp(.78rem,1.25vw,1.05rem);letter-spacing:-.035em;}
+.kpi-val.xcompact{font-size:clamp(.7rem,1.05vw,.9rem);letter-spacing:-.045em;}
 .kpi.g .kpi-val{color:var(--green);}
 .kpi.r .kpi-val{color:var(--red);}
 .kpi.a .kpi-val{color:var(--amber);}
@@ -538,6 +545,10 @@ tbody tr:hover{background:var(--blue-lt);}
   .nav-item .ni-icon{display:none;}
   .nav-badge{display:none;}
   .sid-divider,.sid-bottom{display:none;}
+  .currency-box{display:flex;align-items:center;gap:8px;margin:0 8px 8px;padding:7px 8px;}
+  .currency-lbl{margin:0;white-space:nowrap;}
+  .currency-select{width:auto;min-width:142px;padding:5px 7px;}
+  .currency-note{margin:0;}
   .ret-grid{grid-template-columns:1fr;}
   .card-reports{padding:18px 14px 0;}
   .processor-grid{grid-template-columns:1fr;}
@@ -566,6 +577,7 @@ tbody tr:hover{background:var(--blue-lt);}
   .kpi{padding:13px 12px;}
   .kpi-val{font-size:clamp(.82rem,3.4vw,1rem);}
   .processor-metric strong{font-size:clamp(.72rem,3vw,.86rem);}
+  .kpi-val.compact,.kpi-val.xcompact{font-size:clamp(.68rem,3vw,.84rem);}
 }
 
 @media (max-width:360px){
@@ -620,6 +632,16 @@ tbody tr:hover{background:var(--blue-lt);}
       <span>IR-2 Declaración</span>
       <span class="nav-badge">—</span>
     </div>
+  </div>
+
+  <div class="currency-box">
+    <label class="currency-lbl" for="currency-select">Moneda del reporte</label>
+    <select class="currency-select" id="currency-select">
+      <option value="DOP">Peso dominicano · RD$</option>
+      <option value="USD">Dólar estadounidense · US$</option>
+      <option value="EUR">Euro · €</option>
+    </select>
+    <small class="currency-note">Cambia el símbolo; no convierte los montos.</small>
   </div>
 
   <div class="sid-bottom">
@@ -944,7 +966,10 @@ const ALCARD = {
 };
 
 const $  = id => document.getElementById(id);
-const fmtM = n => 'RD$\u00A0' + new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n||0);
+const CURRENCIES={DOP:{symbol:'RD$',locale:'es-DO'},USD:{symbol:'US$',locale:'en-US'},EUR:{symbol:'€',locale:'es-ES'}};
+let DISPLAY_CURRENCY=localStorage.getItem('cami-currency')||'DOP';
+if(!CURRENCIES[DISPLAY_CURRENCY]) DISPLAY_CURRENCY='DOP';
+const fmtM = n => CURRENCIES[DISPLAY_CURRENCY].symbol+'\u00A0'+new Intl.NumberFormat(CURRENCIES[DISPLAY_CURRENCY].locale,{minimumFractionDigits:2,maximumFractionDigits:2}).format(n||0);
 const fmtI = n => new Intl.NumberFormat('en-US').format(Math.round(n||0));
 const r2  = n => Math.round((n||0)*100)/100;
 
@@ -977,7 +1002,7 @@ function detectCols(headers, aliases) {
 
 function cleanNum(val) {
   if (val == null || val === '') return 0;
-  let s = String(val).replace(/[RD$\s]/gi, '').trim();
+  let s = String(val).replace(/RD\$|DOP|US\$|USD|EUR|€|\$/gi,'').replace(/\s/g,'').trim();
   const neg = /^\(.*\)$/.test(s) || s.startsWith('-');
   s = s.replace(/[()]/g, '').replace(/^-/, '');
   // Detect decimal separator: whichever of , or . appears last is the decimal
@@ -1374,7 +1399,8 @@ function processCardReport(rows, provider) {
 }
 
 function kpiCard(lbl, val, cls='', sub='') {
-  return `<div class="kpi ${cls}"><div class="kpi-lbl">${lbl}</div><div class="kpi-val">${val}</div>${sub?`<div class="kpi-sub">${sub}</div>`:''}</div>`;
+  const value=String(val),size=value.length>19?' xcompact':value.length>14?' compact':'';
+  return `<div class="kpi ${cls}"><div class="kpi-lbl">${lbl}</div><div class="kpi-val${size}" title="${value}">${value}</div>${sub?`<div class="kpi-sub">${sub}</div>`:''}</div>`;
 }
 
 function renderTable(thId, tbId, tnId, columns, rows, total) {
@@ -1561,6 +1587,24 @@ function updateIT1() {
 
 const STATE={'606':null,'607':null};
 const CARD_STATE={cardnet:null,azul:null};
+
+function refreshCurrencyDisplay(){
+  if(STATE['606']) render606(STATE['606'],$('tf-606').textContent||'Archivo 606');
+  if(STATE['607']) render607(STATE['607'],$('tf-607').textContent||'Archivo 607');
+  if(CARD_STATE.cardnet) renderCardReport('CardNET',CARD_STATE.cardnet,$('cardnet-file').textContent||'Reporte CardNET');
+  if(CARD_STATE.azul) renderCardReport('Azul',CARD_STATE.azul,$('azul-file').textContent||'Reporte Azul');
+  renderCardTotal();
+  renderSalesConsolidated();
+  updateIT1();
+}
+
+$('currency-select').value=DISPLAY_CURRENCY;
+$('currency-select').addEventListener('change',e=>{
+  DISPLAY_CURRENCY=e.target.value;
+  localStorage.setItem('cami-currency',DISPLAY_CURRENCY);
+  refreshCurrencyDisplay();
+  showToast(`Moneda de presentación: ${CURRENCIES[DISPLAY_CURRENCY].symbol}. Los montos no fueron convertidos.`);
+});
 
 function xmlEscape(value) {
   return String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
