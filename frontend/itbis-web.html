@@ -612,13 +612,13 @@ tbody tr:hover{background:var(--blue-lt);}
       <div class="drop-inner">
         <div class="drop-icon-wrap"><span class="drop-icon">606</span></div>
         <div class="drop-title">Arrastra el archivo 606 aquí</div>
-        <div class="drop-sub">Suelta el archivo de compras del período<br><strong>CSV · XLSX · XLS · XLSM · XLSB</strong></div>
+        <div class="drop-sub">Suelta el archivo de compras del período<br><strong>PDF · CSV · XLSX · XLS · XLSM · XLSB</strong></div>
         <div class="drop-tags">
           <span class="drop-tag">DGI Plantilla</span>
           <span class="drop-tag">Excel Propio</span>
           <span class="drop-tag">CSV Exportado</span>
         </div>
-        <input type="file" id="fi-606" accept=".csv,.xlsx,.xls,.xlsm,.xlsb,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+        <input type="file" id="fi-606" accept=".pdf,.csv,.xlsx,.xls,.xlsm,.xlsb,application/pdf,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
         <button class="btn btn-primary" id="bs-606">Seleccionar archivo</button>
       </div>
     </div>
@@ -660,13 +660,13 @@ tbody tr:hover{background:var(--blue-lt);}
       <div class="drop-inner">
         <div class="drop-icon-wrap" style="background:linear-gradient(135deg,#7C3AED,#06B6D4);"><span class="drop-icon">607</span></div>
         <div class="drop-title">Arrastra el archivo 607 aquí</div>
-        <div class="drop-sub">Suelta el archivo de ventas del período<br><strong>CSV · XLSX · XLS · XLSM · XLSB</strong></div>
+        <div class="drop-sub">Suelta el archivo de ventas del período<br><strong>PDF · CSV · XLSX · XLS · XLSM · XLSB</strong></div>
         <div class="drop-tags">
           <span class="drop-tag">DGI Plantilla</span>
           <span class="drop-tag">Excel Propio</span>
           <span class="drop-tag">CSV Exportado</span>
         </div>
-        <input type="file" id="fi-607" accept=".csv,.xlsx,.xls,.xlsm,.xlsb,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+        <input type="file" id="fi-607" accept=".pdf,.csv,.xlsx,.xls,.xlsm,.xlsb,application/pdf,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
         <button class="btn btn-primary" id="bs-607" style="background:var(--violet);box-shadow:0 2px 8px rgba(124,58,237,.3);">Seleccionar archivo</button>
       </div>
     </div>
@@ -682,7 +682,7 @@ tbody tr:hover{background:var(--blue-lt);}
         </div>
         <div class="processor-upload">
           <div class="processor-hint">Carga el reporte de transacciones o retenciones.</div>
-          <input type="file" id="fi-cardnet" accept=".csv,.xlsx,.xls,.xlsm,.xlsb,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          <input type="file" id="fi-cardnet" accept=".pdf,.csv,.xlsx,.xls,.xlsm,.xlsb,application/pdf,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
           <button class="btn btn-primary" id="bs-cardnet">Cargar CardNET</button>
         </div>
         <div class="processor-kpis" id="kpis-cardnet">
@@ -699,7 +699,7 @@ tbody tr:hover{background:var(--blue-lt);}
         </div>
         <div class="processor-upload">
           <div class="processor-hint">Carga el reporte de transacciones o retenciones.</div>
-          <input type="file" id="fi-azul" accept=".csv,.xlsx,.xls,.xlsm,.xlsb,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          <input type="file" id="fi-azul" accept=".pdf,.csv,.xlsx,.xls,.xlsm,.xlsb,application/pdf,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
           <button class="btn btn-primary" id="bs-azul" style="background:#007FA8;">Cargar Azul</button>
         </div>
         <div class="processor-kpis" id="kpis-azul">
@@ -836,8 +836,11 @@ tbody tr:hover{background:var(--blue-lt);}
 
 <script src="vendor/xlsx.full.min.js"></script>
 <script src="vendor/papaparse.min.js"></script>
+<script src="vendor/pdf.min.js"></script>
 <script>
 'use strict';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc='vendor/pdf.worker.min.js';
 
 const AL606 = {
   rnc:              ['rnc','cedula','rncocedula','rnc_o_cedula','identificacion','rnc_cedula','rncoproveedor','proveedor_rnc'],
@@ -975,6 +978,73 @@ function readCSV(text) {
   return (Papa.parse(text, { header:true, skipEmptyLines:true, dynamicTyping:false }).data) || [];
 }
 
+function groupPDFItems(items) {
+  const lines=[];
+  [...items].filter(i=>String(i.str||'').trim()).sort((a,b)=>b.transform[5]-a.transform[5]||a.transform[4]-b.transform[4]).forEach(item=>{
+    const y=item.transform[5],x=item.transform[4],text=String(item.str).trim();
+    let line=lines.find(l=>Math.abs(l.y-y)<=3);
+    if (!line){line={y,cells:[]};lines.push(line);}
+    const last=line.cells[line.cells.length-1],width=Number(item.width)||0;
+    if (last&&x-(last.x+last.width)<=12) {
+      last.text+=' '+text;last.width=Math.max(last.width,x+width-last.x);
+    } else line.cells.push({x,width,text});
+  });
+  return lines.sort((a,b)=>b.y-a.y).map(l=>({cells:l.cells.sort((a,b)=>a.x-b.x)}));
+}
+
+function pdfLinesToRows(lines) {
+  const allAliases=[...Object.values(AL606),...Object.values(AL607),...Object.values(ALCARD)].flat();
+  const known=new Set(allAliases.map(normKey));
+  let headerIndex=-1,headerScore=-1;
+  lines.forEach((line,i)=>{
+    const score=line.cells.reduce((n,c)=>n+(known.has(normKey(c.text))?1:0),0);
+    if(score>headerScore||(score===headerScore&&line.cells.length>(lines[headerIndex]?.cells.length||0))){headerIndex=i;headerScore=score;}
+  });
+
+  const summary={};
+  lines.forEach(line=>{
+    if(line.cells.length<2)return;
+    const last=line.cells[line.cells.length-1],raw=last.text.replace(/[RD$%\s]/gi,'');
+    if(!/^[\d.,()\-]+$/.test(raw))return;
+    const label=line.cells.slice(0,-1).map(c=>c.text).join(' ').trim();
+    if(label)summary[label]=last.text;
+  });
+  const summaryMap=detectCols(Object.keys(summary),ALCARD);
+  if(Object.keys(summaryMap).length>=2)return [summary];
+
+  if(headerIndex<0||!lines[headerIndex]?.cells.length)throw new Error('No se pudo identificar la tabla dentro del PDF.');
+  const headerCells=lines[headerIndex].cells;
+  const headers=headerCells.map((c,i)=>c.text||`col_${i}`);
+  const objects=[];
+  lines.slice(headerIndex+1).forEach(line=>{
+    const obj={};headers.forEach(h=>{obj[h]=null;});
+    line.cells.forEach(cell=>{
+      let best=0,distance=Infinity;
+      headerCells.forEach((h,i)=>{const d=Math.abs(cell.x-h.x);if(d<distance){distance=d;best=i;}});
+      obj[headers[best]]=obj[headers[best]]==null?cell.text:`${obj[headers[best]]} ${cell.text}`;
+    });
+    if(Object.values(obj).some(v=>v!=null&&String(v).trim()!==''))objects.push(obj);
+  });
+  return objects;
+}
+
+async function readPDF(buf) {
+  try {
+    const pdf=await pdfjsLib.getDocument({data:new Uint8Array(buf)}).promise;
+    const lines=[];
+    for(let pageNumber=1;pageNumber<=pdf.numPages;pageNumber++){
+      const page=await pdf.getPage(pageNumber),content=await page.getTextContent();
+      lines.push(...groupPDFItems(content.items));
+    }
+    const rows=pdfLinesToRows(lines);
+    if(!rows.length)throw new Error('El PDF no contiene registros reconocibles.');
+    return rows;
+  } catch(e) {
+    if(e.message&&/tabla|registros|PDF/.test(e.message))throw e;
+    throw new Error('No se pudo leer el PDF. Verifica que contenga texto seleccionable y no sea una imagen escaneada o un documento protegido.');
+  }
+}
+
 const EXCEL_EXTENSIONS = new Set(['xlsx','xls','xlsm','xlsb']);
 const CSV_MIME_TYPES = new Set(['text/csv','application/csv','text/comma-separated-values']);
 const EXCEL_MIME_TYPES = new Set([
@@ -993,6 +1063,7 @@ function fileExtension(file) {
 
 function fileKind(file) {
   const ext=fileExtension(file),mime=String(file?.type||'').toLowerCase();
+  if (ext==='pdf'||mime==='application/pdf') return 'pdf';
   if (ext==='csv'||CSV_MIME_TYPES.has(mime)) return 'csv';
   if (EXCEL_EXTENSIONS.has(ext)||EXCEL_MIME_TYPES.has(mime)) return 'excel';
   return null;
@@ -1003,8 +1074,8 @@ function loadFile(file, sheetHint) {
     const kind = fileKind(file);
     const rd  = new FileReader();
     rd.onerror = () => fail(new Error('Error leyendo el archivo'));
-    if (kind==='excel') {
-      rd.onload = e => { try { ok(readExcel(e.target.result, sheetHint)); } catch(err) { fail(err); } };
+    if (kind==='excel'||kind==='pdf') {
+      rd.onload = async e => { try { ok(kind==='pdf'?await readPDF(e.target.result):readExcel(e.target.result,sheetHint)); } catch(err) { fail(err); } };
       rd.readAsArrayBuffer(file);
     } else {
       rd.onload = e => { try { ok(readCSV(e.target.result)); } catch(err) { fail(err); } };
@@ -1290,7 +1361,7 @@ function exportXLS(mod) {
 
 async function handleFile(file, mod) {
   const ext=fileExtension(file),kind=fileKind(file);
-  if (!kind){showToast(`Formato ${ext?'.'+ext:'sin extensión'} no soportado. Use CSV, XLSX, XLS, XLSM o XLSB.`,'err');return;}
+  if (!kind){showToast(`Formato ${ext?'.'+ext:'sin extensión'} no soportado. Use PDF, CSV, XLSX, XLS, XLSM o XLSB.`,'err');return;}
   if (file.size>20*1024*1024){showToast('El archivo supera el límite de 20 MB.','err');return;}
   $('loader').hidden=false;
   try {
@@ -1306,7 +1377,7 @@ async function handleFile(file, mod) {
 
 async function handleCardFile(file, provider) {
   const ext=fileExtension(file),kind=fileKind(file),id=provider.toLowerCase();
-  if (!kind){showToast(`Formato ${ext?'.'+ext:'sin extensión'} no soportado. Use CSV, XLSX, XLS, XLSM o XLSB.`,'err');return;}
+  if (!kind){showToast(`Formato ${ext?'.'+ext:'sin extensión'} no soportado. Use PDF, CSV, XLSX, XLS, XLSM o XLSB.`,'err');return;}
   if (file.size>20*1024*1024){showToast('El archivo supera el límite de 20 MB.','err');return;}
   $('loader').hidden=false;
   try {
