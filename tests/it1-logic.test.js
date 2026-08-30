@@ -10,6 +10,7 @@ const document={getElementById(id){if(!elements.has(id))elements.set(id,element(
 const context={console,document,window:{print(){}},localStorage:{getItem(){return null;},setItem(){}},pdfjsLib:{GlobalWorkerOptions:{}},Intl,URL:{createObjectURL(){return'';},revokeObjectURL(){}},setTimeout(){return 0;},clearTimeout(){},fetch(){throw new Error('fetch inesperado');},FileReader:function(){},XLSX:{},JSZip:{},Papa:{}};
 vm.createContext(context);
 vm.runInContext(code,context);
+elements.get('in-confirm-overlap').checked=true;
 
 const explicit=vm.runInContext(`process607(${JSON.stringify([
   {'NCF o E-NCF':' B-01 000000001','Total Monto Facturado':1180,'ITBIS Facturado':180,'Monto Facturado en Tarjeta Debito Credito':0,'Monto Facturado en Efectivo':1180},
@@ -32,7 +33,7 @@ const explicitNCF=JSON.parse(vm.runInContext(`JSON.stringify(getIT1NCFBreakdown(
 const explicitConsolidated=JSON.parse(vm.runInContext(`JSON.stringify(getCardConsolidation(explicit.summary))`,context));
 assert.strictEqual(explicitNCF.cardBase,750);
 assert.strictEqual(explicitNCF.groups.credito.monto,1000);
-assert.strictEqual(explicitNCF.groups.consumo.monto,750);
+assert.strictEqual(explicitNCF.groups.consumo.monto,700);
 assert.strictEqual(explicitConsolidated.overlapGross,826);
 assert.strictEqual(explicitConsolidated.additionalGross,59);
 assert.strictEqual(explicitConsolidated.consolidatedTotal,2065);
@@ -50,7 +51,7 @@ assert.strictEqual(inferred.total,2370);
 assert.strictEqual(inferred.discrepancy,0);
 vm.runInContext(`CARD_STATE.azul={baseGravable:600,totalSujetoRetencion:708,retenido:12};`,context);
 const inferredNCF=JSON.parse(vm.runInContext(`JSON.stringify(getIT1NCFBreakdown(withoutPayment.summary))`,context));
-assert.strictEqual(inferredNCF.groups.consumo.monto,1100);
+assert.strictEqual(inferredNCF.groups.consumo.monto,500);
 
 const inconsistent=vm.runInContext(`process607(${JSON.stringify([
   {NCF:'B01000000001','Total Monto Facturado':1000,'ITBIS Facturado':0,'Monto Facturado en Efectivo':700,'Monto Facturado en Tarjeta Debito Credito':500},
@@ -74,6 +75,16 @@ const unknown=vm.runInContext(`process607(${JSON.stringify([
 ])})`,context);
 assert.strictEqual(unknown.summary.ncfGroups.otros.count,0);
 assert.strictEqual(unknown.summary.ncfGroups.sinClasificar.count,1);
+
+const credits=vm.runInContext(`process607(${JSON.stringify([
+  {NCF:'B01000000001','Total Monto Facturado':1180,'Monto Gravado':1000,'ITBIS Facturado':180,'Monto Facturado en Efectivo':1180},
+  {NCF:'B04000000001','Total Monto Facturado':236,'Monto Gravado':200,'ITBIS Facturado':36,'Monto Facturado en Efectivo':236},
+])})`,context);
+assert.strictEqual(credits.summary.totTotal,944);
+assert.strictEqual(credits.summary.totGrav,800);
+assert.strictEqual(credits.summary.totItbis,144);
+assert.strictEqual(credits.summary.paymentSummary.cash,1180);
+assert.strictEqual(credits.summary.ncfGroups.notaCredito.monto,200);
 
 assert.match(code,/W28:pay\.cash,W29:pay\.transfer,W30:pay\.card,W31:pay\.credit,W32:pay\.bonds,W33:pay\.swap,W34:pay\.other/);
 console.log('IT-1 logic: OK');
