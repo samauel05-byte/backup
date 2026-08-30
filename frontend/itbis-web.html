@@ -432,6 +432,13 @@ tbody tr:hover{background:var(--blue-lt);}
 .cuadre-total-val.pagar{color:var(--red);}
 .cuadre-total-val.favor{color:var(--green);}
 
+/* ── Coming soon modules ── */
+.coming-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px;}
+.coming-card{width:100%;max-width:560px;background:var(--surface);border:1px solid var(--border);border-top:6px solid var(--amber);border-radius:16px;padding:48px 36px;text-align:center;box-shadow:var(--shadow-md);}
+.coming-code{display:inline-flex;align-items:center;justify-content:center;min-width:76px;height:52px;padding:0 18px;border-radius:12px;background:var(--amber-lt);color:var(--amber);font-size:1.15rem;font-weight:800;margin-bottom:18px;}
+.coming-title{font-size:1.45rem;font-weight:800;color:var(--text);margin-bottom:8px;}
+.coming-text{font-size:.85rem;color:var(--muted);line-height:1.65;max-width:410px;margin:0 auto;}
+
 /* ── Loader / Toast ── */
 #loader{
   position:fixed;inset:0;z-index:500;
@@ -491,7 +498,7 @@ tbody tr:hover{background:var(--blue-lt);}
   .sid-logo{border-bottom:1px solid rgba(255,255,255,.08);padding:10px 14px;width:100%;}
   .sid-logo-icon{width:32px;height:32px;border-radius:8px;}
   .sid-logo-sub{display:none;}
-  .nav-section{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px;width:100%;overflow:visible;}
+  .nav-section{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:8px;width:100%;overflow:visible;}
   .nav-label{display:none;}
   .nav-item{font-size:.68rem;padding:8px 6px;white-space:normal;justify-content:center;text-align:center;margin:0;gap:5px;}
   .nav-item .ni-icon{display:none;}
@@ -510,6 +517,8 @@ tbody tr:hover{background:var(--blue-lt);}
   .upload-stage{padding:28px 14px;align-items:flex-start;}
   .dropzone{padding:36px 20px;border-radius:14px;}
   .drop-icon-wrap{width:56px;height:56px;margin-bottom:16px;}
+  .coming-stage{padding:28px 14px;align-items:flex-start;}
+  .coming-card{padding:38px 22px;}
   .dash,.it1-body{padding:16px 14px 60px;}
 }
 
@@ -530,7 +539,7 @@ tbody tr:hover{background:var(--blue-lt);}
   .topbar .tb-right{display:none!important;}
   .shell{display:block;}
   .module{display:block!important;}
-  #mod-606,#mod-607{display:none!important;}
+  #mod-606,#mod-607,#mod-ir2{display:none!important;}
   #mod-it1{display:block!important;}
   body{background:#fff!important;color:#000!important;}
   .cuadre-card,.prereq-card,.manual-card{box-shadow:none!important;border:1px solid #ddd!important;}
@@ -566,6 +575,11 @@ tbody tr:hover{background:var(--blue-lt);}
       <div class="ni-icon">IT1</div>
       <span>IT-1 Declaración</span>
       <span class="nav-badge" id="badge-it1">○</span>
+    </div>
+    <div class="nav-item" data-nav="ir2">
+      <div class="ni-icon">IR2</div>
+      <span>IR-2 Declaración</span>
+      <span class="nav-badge">—</span>
     </div>
   </div>
 
@@ -787,6 +801,24 @@ tbody tr:hover{background:var(--blue-lt);}
         <div class="cuadre-total-lbl" id="ct-lbl">RESULTADO</div>
         <div class="cuadre-total-val" id="ct-val">—</div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ IR-2 MODULE ════ -->
+<div id="mod-ir2" class="module">
+  <div class="topbar" style="border-top-color:var(--amber);">
+    <div class="tb-stripe" style="background:var(--amber);"></div>
+    <div class="tb-left">
+      <div class="tb-title">IR-2 — Declaración Jurada Anual</div>
+      <div class="tb-sub">Módulo independiente del análisis de ITBIS</div>
+    </div>
+  </div>
+  <div class="coming-stage">
+    <div class="coming-card">
+      <div class="coming-code">IR-2</div>
+      <div class="coming-title">Próximamente</div>
+      <p class="coming-text">Este módulo estará disponible en una próxima actualización. Su procesamiento y cálculos serán independientes de los formularios 606, 607 e IT-1.</p>
     </div>
   </div>
 </div>
