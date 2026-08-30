@@ -390,19 +390,6 @@ tbody tr:hover{background:var(--blue-lt);}
   margin-bottom:18px;
 }
 .manual-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:16px;}
-.compliance-body{padding:22px 24px 48px;max-width:1320px;margin:0 auto;}
-.compliance-toolbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:end;}
-.compliance-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:20px 0;}
-.compliance-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--shadow);text-align:center;}
-.compliance-card strong{display:block;font:800 1.65rem var(--f-display);color:var(--ink);margin-top:5px;}
-.compliance-card span{font-size:.66rem;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:800;}
-.compliance-list{display:grid;gap:10px;}
-.compliance-item{display:grid;grid-template-columns:minmax(180px,1.3fr) minmax(145px,.8fr) minmax(120px,.7fr) minmax(150px,.8fr);align-items:center;gap:14px;background:#fff;border:1px solid var(--border);border-left:5px solid #94A3B8;border-radius:12px;padding:14px 16px;box-shadow:0 4px 14px rgba(15,23,42,.045);}
-.compliance-item.overdue{border-left-color:#DC2626;background:#FFF8F8}.compliance-item.soon{border-left-color:#D97706}.compliance-item.done{border-left-color:#059669;background:#F8FFFC}.compliance-item.na{opacity:.62}
-.compliance-name{font-weight:800;color:var(--ink);font-size:.87rem}.compliance-help{font-size:.66rem;color:var(--muted);margin-top:3px;line-height:1.35}
-.compliance-date{font-weight:750;color:var(--ink);font-size:.8rem}.compliance-days{font-size:.68rem;color:var(--muted);margin-top:3px}
-.compliance-status{width:100%;border:1px solid var(--border);border-radius:8px;background:#fff;padding:8px;font:700 .7rem var(--f-body);color:var(--ink)}
-.compliance-pill{justify-self:end;padding:6px 9px;border-radius:999px;background:#EEF2F7;color:#475569;font-size:.62rem;font-weight:850;text-transform:uppercase;letter-spacing:.5px}.compliance-pill.overdue{background:#FEE2E2;color:#B91C1C}.compliance-pill.soon{background:#FEF3C7;color:#92400E}.compliance-pill.done{background:#D1FAE5;color:#047857}
 .field-grp{display:flex;flex-direction:column;gap:6px;}
 .field-lbl{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
 .field-help{font-size:.65rem;color:var(--muted);line-height:1.35;}
@@ -563,7 +550,7 @@ tbody tr:hover{background:var(--blue-lt);}
   .sid-logo{border-bottom:1px solid rgba(255,255,255,.08);padding:10px 14px;width:100%;}
   .sid-logo-icon{width:36px;height:36px;border-radius:9px;}
   .sid-logo-sub{display:none;}
-  .nav-section{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;padding:8px;width:100%;overflow:visible;}
+  .nav-section{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:8px;width:100%;overflow:visible;}
   .nav-label{display:none;}
   .nav-item{font-size:.68rem;padding:8px 6px;white-space:normal;justify-content:center;text-align:center;margin:0;gap:5px;}
   .nav-item .ni-icon{display:none;}
@@ -577,7 +564,6 @@ tbody tr:hover{background:var(--blue-lt);}
   .card-reports{padding:18px 14px 0;}
   .processor-grid{grid-template-columns:1fr;}
   .manual-grid{grid-template-columns:1fr;}
-  .compliance-toolbar,.compliance-summary{grid-template-columns:1fr 1fr}.compliance-item{grid-template-columns:1fr 1fr}.compliance-pill{justify-self:start}
   .topbar{padding:12px 14px;min-height:76px;}
   .tb-stripe{height:32px;}
   .tb-title{font-size:.96rem;}
@@ -591,7 +577,6 @@ tbody tr:hover{background:var(--blue-lt);}
   .coming-card{padding:38px 22px;}
   .dash,.it1-body{padding:16px 14px 60px;}
 }
-@media(max-width:620px){.compliance-toolbar,.compliance-summary,.compliance-item{grid-template-columns:1fr}.compliance-body{padding:14px 12px 36px}}
 
 @media (max-width:460px){
   .sid-logo-mark{font-size:.84rem;}
@@ -657,12 +642,6 @@ tbody tr:hover{background:var(--blue-lt);}
       <div class="ni-icon">IR2</div>
       <span>IR-2 Declaración</span>
       <span class="nav-badge" id="badge-ir2">○</span>
-    </div>
-    <div class="sid-divider"></div>
-    <div class="nav-item" data-nav="compliance">
-      <div class="ni-icon">CAL</div>
-      <span>Cumplimiento</span>
-      <span class="nav-badge" id="badge-compliance">0</span>
     </div>
   </div>
 
@@ -999,39 +978,6 @@ tbody tr:hover{background:var(--blue-lt);}
       <div class="table-wrap"><table><thead id="th-ir2"></thead><tbody id="tb-ir2"></tbody></table></div>
       <p class="tnote" id="tn-ir2"></p>
     </div>
-  </div>
-</div>
-
-<!-- ════ FISCAL COMPLIANCE MODULE ════ -->
-<div id="mod-compliance" class="module">
-  <div class="topbar">
-    <div class="tb-stripe" style="background:linear-gradient(180deg,#0F766E,#2563EB);"></div>
-    <div class="tb-left">
-      <div class="tb-title">Calendario fiscal y cumplimiento</div>
-      <div class="tb-sub">Control mensual y anual de obligaciones ante la DGII</div>
-    </div>
-    <div class="tb-right"><button class="btn btn-ghost" id="btn-compliance-reset">Restablecer período</button></div>
-  </div>
-  <div class="compliance-body">
-    <div class="manual-card">
-      <div class="slabel" style="margin-bottom:12px;">Configuración del calendario</div>
-      <div class="compliance-toolbar">
-        <div class="field-grp"><label class="field-lbl" for="compliance-period">Período mensual</label><input class="field-inp" id="compliance-period" type="month"></div>
-        <div class="field-grp"><label class="field-lbl" for="compliance-close">Cierre fiscal anual</label><input class="field-inp" id="compliance-close" type="date"></div>
-        <div class="field-grp"><label class="field-lbl" for="compliance-filter">Mostrar</label><select class="field-inp" id="compliance-filter"><option value="all">Todas las obligaciones</option><option value="open">Solo pendientes</option><option value="urgent">Vencidas y próximas</option><option value="done">Completadas</option></select></div>
-        <div class="field-grp"><label class="field-lbl">Obligaciones condicionadas</label><label class="field-help"><input type="checkbox" id="compliance-payroll"> Tiene empleados (IR-3)</label><label class="field-help"><input type="checkbox" id="compliance-withholdings" checked> Realiza retenciones (IR-17)</label></div>
-      </div>
-      <div class="field-help" style="margin-top:12px;">Las fechas mostradas son fechas base. Si coinciden con día feriado o no laborable, valida el calendario oficial de la DGII.</div>
-    </div>
-    <div class="compliance-summary">
-      <div class="compliance-card"><span>Total aplicable</span><strong id="compliance-total">0</strong></div>
-      <div class="compliance-card"><span>Pendientes</span><strong id="compliance-pending">0</strong></div>
-      <div class="compliance-card"><span>Vencidas</span><strong id="compliance-overdue">0</strong></div>
-      <div class="compliance-card"><span>Completadas</span><strong id="compliance-done">0</strong></div>
-    </div>
-    <div id="compliance-alert"></div>
-    <div class="slabel">Obligaciones del período</div>
-    <div class="compliance-list" id="compliance-list"></div>
   </div>
 </div>
 
@@ -2002,81 +1948,6 @@ function exportIR2Draft(){
   XLSX.writeFile(wb,`IR-2_Borrador_${fin.slice(0,4)}_${rnc}.xlsx`);showToast('Borrador de trabajo IR-2 exportado.');
 }
 
-const COMPLIANCE_STORAGE='cami-fiscal-compliance-v1';
-const COMPLIANCE_STATUSES=['Pendiente','Preparando','Revisado','Presentado','No aplica'];
-
-function dateISO(date){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;}
-function addDaysISO(dateValue,days){const d=new Date(`${dateValue}T12:00:00`);d.setDate(d.getDate()+days);return dateISO(d);}
-function monthlyDeadline(period,day){
-  if(!/^\d{4}-\d{2}$/.test(period||''))return '';
-  const [year,month]=period.split('-').map(Number);return dateISO(new Date(year,month,day,12));
-}
-function formatFiscalDate(value){if(!value)return '—';return new Intl.DateTimeFormat('es-DO',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(`${value}T12:00:00`));}
-function complianceDays(value,today=new Date()){if(!value)return 0;const target=new Date(`${value}T12:00:00`),base=new Date(today.getFullYear(),today.getMonth(),today.getDate(),12);return Math.ceil((target-base)/86400000);}
-
-function loadComplianceState(){try{return JSON.parse(localStorage.getItem(COMPLIANCE_STORAGE)||'{}')||{};}catch{return {};}}
-function saveComplianceState(state){localStorage.setItem(COMPLIANCE_STORAGE,JSON.stringify(state));}
-
-function getComplianceObligations(period,closeDate,options={payroll:false,withholdings:true}){
-  const annualDue=closeDate?addDaysISO(closeDate,120):'';
-  return [
-    {code:'606',name:'606 — Compras',help:'Compras, gastos y créditos de ITBIS',due:monthlyDeadline(period,15),applies:true},
-    {code:'607',name:'607 — Ventas',help:'Ventas, comprobantes y formas de pago',due:monthlyDeadline(period,15),applies:true},
-    {code:'608',name:'608 — Comprobantes anulados',help:'NCF/e-NCF anulados durante el período',due:monthlyDeadline(period,15),applies:true},
-    {code:'IT1',name:'IT-1 — ITBIS',help:'Declaración mensual y pago del ITBIS',due:monthlyDeadline(period,20),applies:true},
-    {code:'IR3',name:'IR-3 — Retenciones asalariados',help:'Aplica cuando existen empleados sujetos a nómina',due:monthlyDeadline(period,10),applies:!!options.payroll},
-    {code:'IR17',name:'IR-17 — Otras retenciones',help:'Retenciones a terceros y retribuciones complementarias',due:monthlyDeadline(period,10),applies:!!options.withholdings},
-    {code:'IR2',name:'IR-2 — Renta de sociedades',help:'Declaración anual de sociedades',due:annualDue,applies:!!closeDate,annual:true},
-    {code:'ACT',name:'ACT — Impuesto a los activos',help:'Declaración anual vinculada al IR-2',due:annualDue,applies:!!closeDate,annual:true},
-  ];
-}
-
-function complianceKey(item,period,closeDate){return `${item.annual?closeDate:period}|${item.code}`;}
-function complianceVisual(item,status,today=new Date()){
-  if(status==='Presentado')return {cls:'done',label:'Completada',days:0};
-  if(status==='No aplica'||!item.applies)return {cls:'na',label:'No aplica',days:0};
-  const days=complianceDays(item.due,today);
-  if(days<0)return {cls:'overdue',label:'Vencida',days};
-  if(days<=7)return {cls:'soon',label:days===0?'Vence hoy':'Próxima',days};
-  return {cls:'',label:'En plazo',days};
-}
-
-function renderCompliance(){
-  const period=$('compliance-period').value,closeDate=$('compliance-close').value,filter=$('compliance-filter').value;
-  const options={payroll:$('compliance-payroll').checked,withholdings:$('compliance-withholdings').checked};
-  const state=loadComplianceState(),items=getComplianceObligations(period,closeDate,options),today=new Date();
-  const enriched=items.map(item=>{
-    const key=complianceKey(item,period,closeDate),status=item.applies?(state[key]||'Pendiente'):'No aplica';
-    return {...item,key,status,visual:complianceVisual(item,status,today)};
-  });
-  const applicable=enriched.filter(i=>i.applies&&i.status!=='No aplica'),done=applicable.filter(i=>i.status==='Presentado'),overdue=applicable.filter(i=>i.visual.cls==='overdue');
-  $('compliance-total').textContent=fmtI(applicable.length);$('compliance-pending').textContent=fmtI(applicable.length-done.length);$('compliance-overdue').textContent=fmtI(overdue.length);$('compliance-done').textContent=fmtI(done.length);
-  $('badge-compliance').textContent=String(applicable.length-done.length);$('badge-compliance').className=`nav-badge ${applicable.length&&applicable.length===done.length?'ok':''}`;
-  let shown=enriched;
-  if(filter==='open')shown=shown.filter(i=>i.applies&&i.status!=='Presentado');
-  if(filter==='urgent')shown=shown.filter(i=>i.visual.cls==='overdue'||i.visual.cls==='soon');
-  if(filter==='done')shown=shown.filter(i=>i.status==='Presentado');
-  $('compliance-list').innerHTML=shown.map(item=>{
-    const days=item.visual.days,daysText=item.visual.cls==='done'||item.visual.cls==='na'?'':days<0?`${Math.abs(days)} día(s) de atraso`:days===0?'Vence hoy':`Faltan ${days} día(s)`;
-    const optionsHtml=COMPLIANCE_STATUSES.map(s=>`<option value="${s}" ${s===item.status?'selected':''}>${s}</option>`).join('');
-    return `<div class="compliance-item ${item.visual.cls}"><div><div class="compliance-name">${item.name}</div><div class="compliance-help">${item.help}</div></div><div><div class="compliance-date">${formatFiscalDate(item.due)}</div><div class="compliance-days">${daysText}</div></div><select class="compliance-status" data-compliance-key="${item.key}" ${!item.applies?'disabled':''}>${optionsHtml}</select><span class="compliance-pill ${item.visual.cls}">${item.visual.label}</span></div>`;
-  }).join('')||'<div class="alert ok"><span>No hay obligaciones en este filtro.</span></div>';
-  const statusControls=$('compliance-list').querySelectorAll?.('[data-compliance-key]')||[];
-  statusControls.forEach(select=>select.addEventListener('change',()=>{const next=loadComplianceState();next[select.dataset.complianceKey]=select.value;saveComplianceState(next);renderCompliance();}));
-  if(overdue.length)$('compliance-alert').innerHTML=`<div class="alert warn"><strong>Atención:</strong> ${overdue.length} obligación(es) aparecen vencidas. Confirma si fueron presentadas y actualiza su estado.</div>`;
-  else if(applicable.length&&applicable.length===done.length)$('compliance-alert').innerHTML='<div class="alert ok"><span>Período completamente presentado según tus estados guardados.</span></div>';
-  else $('compliance-alert').innerHTML='';
-}
-
-function initializeCompliance(){
-  const today=new Date(),previous=new Date(today.getFullYear(),today.getMonth()-1,1),period=`${previous.getFullYear()}-${String(previous.getMonth()+1).padStart(2,'0')}`;
-  $('compliance-period').value=localStorage.getItem('cami-compliance-period')||period;
-  $('compliance-close').value=localStorage.getItem('cami-compliance-close')||`${today.getFullYear()-1}-12-31`;
-  $('compliance-payroll').checked=localStorage.getItem('cami-compliance-payroll')==='1';
-  const savedWithholdings=localStorage.getItem('cami-compliance-withholdings');$('compliance-withholdings').checked=savedWithholdings===null?true:savedWithholdings==='1';
-  renderCompliance();
-}
-
 function refreshCurrencyDisplay(){
   if(STATE['606']) render606(STATE['606'],$('tf-606').textContent||'Archivo 606');
   if(STATE['607']) render607(STATE['607'],$('tf-607').textContent||'Archivo 607');
@@ -2258,7 +2129,6 @@ document.querySelectorAll('.nav-item').forEach(el=>{
     const target=el.dataset.nav;
     $('mod-'+(target==='it1'?'it1':target)).classList.add('active');
     if (target==='it1') updateIT1();
-    if (target==='compliance') renderCompliance();
   });
 });
 
@@ -2297,12 +2167,6 @@ $('btn-xls-ir2').addEventListener('click',exportIR2Draft);$('btn-rst-ir2').addEv
 $('in-tipo-declaracion').addEventListener('change',e=>{if(e.target.value==='IR-2'){document.querySelector('[data-nav="ir2"]').click();showToast('IR-2 anual: carga el balance de comprobación del ejercicio.');}});
 $('btn-it1-dgii').addEventListener('click',exportIT1DGII);
 renderCardTotal();
-['compliance-period','compliance-close','compliance-filter','compliance-payroll','compliance-withholdings'].forEach(id=>$(id).addEventListener('change',()=>{
-  localStorage.setItem('cami-compliance-period',$('compliance-period').value);localStorage.setItem('cami-compliance-close',$('compliance-close').value);
-  localStorage.setItem('cami-compliance-payroll',$('compliance-payroll').checked?'1':'0');localStorage.setItem('cami-compliance-withholdings',$('compliance-withholdings').checked?'1':'0');renderCompliance();
-}));
-$('btn-compliance-reset').addEventListener('click',()=>{localStorage.removeItem('cami-compliance-period');localStorage.removeItem('cami-compliance-close');localStorage.removeItem('cami-compliance-payroll');localStorage.removeItem('cami-compliance-withholdings');initializeCompliance();showToast('Calendario restablecido al período anterior.');});
-initializeCompliance();
 </script>
 </body>
 </html>

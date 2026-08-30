@@ -112,18 +112,5 @@ assert.strictEqual(ir2Calc.rentaImponible,850);
 assert.strictEqual(ir2Calc.impuestoLiquidado,229.5);
 assert.strictEqual(ir2Calc.resultado,129.5);
 
-assert.strictEqual(vm.runInContext(`monthlyDeadline('2026-07',10)`,context),'2026-08-10');
-assert.strictEqual(vm.runInContext(`monthlyDeadline('2026-12',20)`,context),'2027-01-20');
-assert.strictEqual(vm.runInContext(`addDaysISO('2025-12-31',120)`,context),'2026-04-30');
-const obligations=JSON.parse(vm.runInContext(`JSON.stringify(getComplianceObligations('2026-07','2025-12-31',{payroll:false,withholdings:true}))`,context));
-assert.strictEqual(obligations.find(o=>o.code==='IR3').applies,false);
-assert.strictEqual(obligations.find(o=>o.code==='IR17').due,'2026-08-10');
-assert.strictEqual(obligations.find(o=>o.code==='IR2').due,'2026-04-30');
-context.testObligation=obligations.find(o=>o.code==='IT1');
-const overdue=JSON.parse(vm.runInContext(`JSON.stringify(complianceVisual(testObligation,'Pendiente',new Date('2026-08-30T12:00:00')))`,context));
-assert.strictEqual(overdue.cls,'overdue');
-const completed=JSON.parse(vm.runInContext(`JSON.stringify(complianceVisual(testObligation,'Presentado',new Date('2026-08-30T12:00:00')))`,context));
-assert.strictEqual(completed.cls,'done');
-
 assert.match(code,/W28:pay\.cash,W29:pay\.transfer,W30:pay\.card,W31:pay\.credit,W32:pay\.bonds,W33:pay\.swap,W34:pay\.other/);
 console.log('IT-1 logic: OK');
