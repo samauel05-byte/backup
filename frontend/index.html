@@ -641,7 +641,7 @@ tbody tr:hover{background:var(--blue-lt);}
     <div class="nav-item" data-nav="ir2">
       <div class="ni-icon">IR2</div>
       <span>IR-2 Declaración</span>
-      <span class="nav-badge">—</span>
+      <span class="nav-badge" id="badge-ir2">○</span>
     </div>
   </div>
 
@@ -831,7 +831,7 @@ tbody tr:hover{background:var(--blue-lt);}
         <div class="field-grp"><label class="field-lbl" for="in-rnc">RNC / Cédula</label><input class="field-inp" id="in-rnc" autocomplete="off" placeholder="131000000"></div>
         <div class="field-grp"><label class="field-lbl" for="in-razon">Razón social / Nombre</label><input class="field-inp" id="in-razon" autocomplete="organization" placeholder="Nombre del contribuyente"></div>
         <div class="field-grp"><label class="field-lbl" for="in-periodo">Período</label><input class="field-inp" id="in-periodo" type="month"></div>
-        <div class="field-grp"><label class="field-lbl" for="in-tipo-declaracion">Formulario</label><select class="field-inp" id="in-tipo-declaracion"><option value="IT-1">IT-1</option><option value="IR-2">IR-2 · Próximamente</option></select></div>
+        <div class="field-grp"><label class="field-lbl" for="in-tipo-declaracion">Formulario</label><select class="field-inp" id="in-tipo-declaracion"><option value="IT-1">IT-1 mensual</option><option value="IR-2">IR-2 anual</option></select></div>
       </div>
       <div class="field-help" style="margin-top:10px;">RNC, razón social y período se colocarán automáticamente en el Anexo A y en el IT-1 oficial.</div>
     </div>
@@ -916,14 +916,67 @@ tbody tr:hover{background:var(--blue-lt);}
     <div class="tb-stripe" style="background:var(--amber);"></div>
     <div class="tb-left">
       <div class="tb-title">IR-2 — Declaración Jurada Anual</div>
-      <div class="tb-sub">Módulo independiente del análisis de ITBIS</div>
+      <div class="tb-sub">Análisis anual de renta para sociedades · tasa general 27%</div>
+    </div>
+    <div class="tb-right">
+      <span class="tb-file" id="tf-ir2" hidden></span>
+      <button class="btn btn-xl" id="btn-xls-ir2" hidden>Exportar borrador IR-2</button>
+      <button class="btn btn-ghost" id="btn-rst-ir2" hidden>Limpiar</button>
     </div>
   </div>
-  <div class="coming-stage">
-    <div class="coming-card">
-      <div class="coming-code">IR-2</div>
-      <div class="coming-title">Próximamente</div>
-      <p class="coming-text">Este módulo estará disponible en una próxima actualización. Su procesamiento y cálculos serán independientes de los formularios 606, 607 e IT-1.</p>
+
+  <div class="it1-body">
+    <div class="manual-card">
+      <div class="slabel" style="margin-bottom:6px;">Datos de la sociedad y ejercicio fiscal</div>
+      <div class="manual-grid">
+        <div class="field-grp"><label class="field-lbl" for="ir2-rnc">RNC</label><input class="field-inp" id="ir2-rnc" placeholder="131000000"></div>
+        <div class="field-grp"><label class="field-lbl" for="ir2-razon">Razón social</label><input class="field-inp" id="ir2-razon" placeholder="Nombre de la sociedad"></div>
+        <div class="field-grp"><label class="field-lbl" for="ir2-inicio">Inicio del ejercicio</label><input class="field-inp" id="ir2-inicio" type="date"></div>
+        <div class="field-grp"><label class="field-lbl" for="ir2-fin">Cierre del ejercicio</label><input class="field-inp" id="ir2-fin" type="date"></div>
+      </div>
+      <div class="field-help" style="margin-top:10px;">El IR-2 es anual. CAMI valida que el ejercicio no exceda doce meses y calcula la fecha límite estimada a 120 días del cierre.</div>
+    </div>
+
+    <div class="upload-stage" id="up-ir2" style="padding:0;min-height:0;">
+      <div class="dropzone" id="dz-ir2" tabindex="0" role="button" aria-label="Cargar balance de comprobación anual">
+        <div class="drop-inner">
+          <div class="drop-icon-wrap" style="background:linear-gradient(135deg,#D97706,#F59E0B);"><span class="drop-icon">IR2</span></div>
+          <div class="drop-title">Carga el balance de comprobación anual</div>
+          <div class="drop-sub">Debe incluir cuenta, descripción y saldo o débitos/créditos<br><strong>CSV · XLSX · XLS · XLSM · XLSB</strong></div>
+          <div class="drop-tags"><span class="drop-tag">Balance anual</span><span class="drop-tag">Catálogo contable</span><span class="drop-tag">Excel propio</span></div>
+          <input type="file" id="fi-ir2" accept=".csv,.xlsx,.xls,.xlsm,.xlsb,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          <button class="btn btn-primary" id="bs-ir2" style="background:#D97706;">Seleccionar balance</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="manual-card">
+      <div class="slabel" style="margin-bottom:6px;">Ajustes fiscales y créditos</div>
+      <div class="manual-grid">
+        <div class="field-grp"><label class="field-lbl" for="ir2-adiciones">Adiciones fiscales</label><input class="field-inp ir2-input" id="ir2-adiciones" type="number" min="0" step="0.01" value="0"><div class="field-help">Gastos no admitidos y otras partidas que aumentan la renta.</div></div>
+        <div class="field-grp"><label class="field-lbl" for="ir2-deducciones">Deducciones fiscales</label><input class="field-inp ir2-input" id="ir2-deducciones" type="number" min="0" step="0.01" value="0"><div class="field-help">Partidas autorizadas que reducen la renta.</div></div>
+        <div class="field-grp"><label class="field-lbl" for="ir2-perdidas">Pérdidas fiscales compensables</label><input class="field-inp ir2-input" id="ir2-perdidas" type="number" min="0" step="0.01" value="0"><div class="field-help">Solo pérdidas autorizadas y pendientes de compensar.</div></div>
+        <div class="field-grp"><label class="field-lbl" for="ir2-anticipos">Anticipos pagados</label><input class="field-inp ir2-input" id="ir2-anticipos" type="number" min="0" step="0.01" value="0"></div>
+        <div class="field-grp"><label class="field-lbl" for="ir2-retenciones">Retenciones de ISR</label><input class="field-inp ir2-input" id="ir2-retenciones" type="number" min="0" step="0.01" value="0"></div>
+        <div class="field-grp"><label class="field-lbl" for="ir2-saldo">Saldo a favor anterior</label><input class="field-inp ir2-input" id="ir2-saldo" type="number" min="0" step="0.01" value="0"></div>
+        <div class="field-grp"><label class="field-lbl" for="ir2-activos">Crédito por impuesto a los activos</label><input class="field-inp ir2-input" id="ir2-activos" type="number" min="0" step="0.01" value="0"></div>
+      </div>
+    </div>
+
+    <div id="ir2-alert"><div class="alert warn"><strong>Datos requeridos:</strong> carga el balance de comprobación anual para iniciar el IR-2.</div></div>
+
+    <div id="ir2-results" hidden>
+      <div class="slabel">Estados financieros resumidos</div>
+      <div class="kpi-row" id="kpis-ir2-financial"></div>
+      <div class="slabel">Determinación de la renta imponible</div>
+      <div class="cuadre-card">
+        <div id="ir2-calc"></div>
+        <div class="cuadre-sep"></div>
+        <div class="cuadre-total"><div class="cuadre-total-lbl" id="ir2-result-label">RESULTADO IR-2</div><div class="cuadre-total-val" id="ir2-result-value">—</div></div>
+      </div>
+      <div class="slabel">Cuentas que requieren revisión</div>
+      <div class="table-wrap"><table><thead id="th-ir2"></thead><tbody id="tb-ir2"></tbody></table></div>
+      <p class="tnote" id="tn-ir2"></p>
     </div>
   </div>
 </div>
@@ -992,6 +1045,15 @@ const ALCARD = {
   monto:            ['monto','monto_total','monto_transaccion','monto_venta','total','total_venta','importe','importe_total','valor_transaccion','valor_venta','monto_bruto','venta_bruta','consumo'],
   retenido:         ['itbis_retenido','retencion_itbis','monto_retenido','retencion','retencion_tarjeta','retencion_ley_253_12','itbis_retenido_ley_253_12','retencion_2_por_ciento','retencion_2'],
   itbis_reportado:  ['itbis_reportado','itbis','monto_itbis','impuesto','itbis_transaccion','itbis_facturado','total_itbis'],
+};
+
+const ALIR2 = {
+  cuenta:['cuenta','codigo_cuenta','codigo','no_cuenta','numero_cuenta','account','account_code'],
+  descripcion:['descripcion','nombre_cuenta','cuenta_contable','detalle','concepto','account_name','nombre'],
+  clasificacion:['clasificacion','tipo_cuenta','grupo','categoria','rubro','naturaleza','account_type'],
+  debito:['debito','debitos','movimiento_debito','saldo_deudor','debe','debit'],
+  credito:['credito','creditos','movimiento_credito','saldo_acreedor','haber','credit'],
+  saldo:['saldo','saldo_final','balance','balance_final','monto','importe','ending_balance'],
 };
 
 const $  = id => document.getElementById(id);
@@ -1474,6 +1536,45 @@ function processCardReport(rows, provider) {
   };
 }
 
+function classifyIR2Account(codeValue,descriptionValue,typeValue) {
+  const code=String(codeValue||'').trim(),text=normKey(`${typeValue||''} ${descriptionValue||''}`);
+  if(/costo|cost_of_sales|coste|compras_para_venta|mercancia_vendida/.test(text))return 'costos';
+  if(/gasto|expense|nomina|sueldo|alquiler|depreciacion|combustible|honorario|mantenimiento/.test(text))return 'gastos';
+  if(/ingreso|venta|revenue|otros_ingresos|ganancia/.test(text))return 'ingresos';
+  if(/pasivo|liabilit|cuenta_por_pagar|proveedor|prestamo|impuesto_por_pagar|retencion_por_pagar/.test(text))return 'pasivos';
+  if(/patrimonio|capital|equity|resultado_acumulado|utilidad_retenida|reserva_legal/.test(text))return 'patrimonio';
+  if(/activo|asset|caja|banco|cuenta_por_cobrar|inventario|propiedad|mobiliario|equipo|vehiculo/.test(text))return 'activos';
+  const first=code.replace(/\D/g,'').charAt(0);
+  return first==='1'?'activos':first==='2'?'pasivos':first==='3'?'patrimonio':first==='4'?'ingresos':first==='5'?'costos':first==='6'?'gastos':'';
+}
+
+function processIR2(rows) {
+  if(!rows.length)throw new Error('El balance de comprobación está vacío.');
+  const headers=Object.keys(rows[0]),cm=detectCols(headers,ALIR2);
+  if(!cm.descripcion&&!cm.cuenta)throw new Error('No se reconocieron las columnas de cuenta o descripción.');
+  if(!cm.saldo&&!cm.debito&&!cm.credito)throw new Error('El balance debe incluir saldo o columnas de débito y crédito.');
+  const data=rows.filter(r=>Object.values(r).some(v=>v!=null&&String(v).trim()!=='')).map(r=>{
+    const cuenta=cm.cuenta?String(r[cm.cuenta]??'').trim():'',descripcion=cm.descripcion?String(r[cm.descripcion]??'').trim():cuenta;
+    const debito=cm.debito?Math.abs(cleanNum(r[cm.debito])):0,credito=cm.credito?Math.abs(cleanNum(r[cm.credito])):0;
+    const saldo=cm.saldo?cleanNum(r[cm.saldo]):r2(debito-credito);
+    const categoria=classifyIR2Account(cuenta,descripcion,cm.clasificacion?r[cm.clasificacion]:'');
+    const natural=categoria==='ingresos'||categoria==='pasivos'||categoria==='patrimonio'?credito-debito:debito-credito;
+    const monto=r2(Math.abs(cm.saldo?saldo:natural));
+    return {cuenta,descripcion,categoria,debito,credito,saldo,monto};
+  }).filter(r=>r.monto!==0&&!(/^total(?:_|\s)/i.test(normKey(r.descripcion))&&!r.cuenta));
+  const total=cat=>r2(data.filter(r=>r.categoria===cat).reduce((n,r)=>n+r.monto,0));
+  const unclassified=data.filter(r=>!r.categoria);
+  const debitos=r2(data.reduce((n,r)=>n+r.debito,0)),creditos=r2(data.reduce((n,r)=>n+r.credito,0));
+  const summary={
+    registros:data.length,ingresos:total('ingresos'),costos:total('costos'),gastos:total('gastos'),
+    activos:total('activos'),pasivos:total('pasivos'),patrimonio:total('patrimonio'),
+    utilidad:r2(total('ingresos')-total('costos')-total('gastos')),debitos,creditos,
+    diferenciaBalance:r2(debitos-creditos),diferenciaEcuacion:r2(total('activos')-total('pasivos')-total('patrimonio')-(total('ingresos')-total('costos')-total('gastos'))),
+    sinClasificar:unclassified.length,montoSinClasificar:r2(unclassified.reduce((n,r)=>n+r.monto,0)),hasMovements:!!(cm.debito&&cm.credito),
+  };
+  return {summary,rows,accounts:data,unclassified,columns:headers};
+}
+
 function kpiCard(lbl, val, cls='', sub='') {
   const value=String(val),size=value.length>19?' xcompact':value.length>14?' compact':'';
   return `<div class="kpi ${cls}"><div class="kpi-lbl">${lbl}</div><div class="kpi-val${size}" title="${value}">${value}</div>${sub?`<div class="kpi-sub">${sub}</div>`:''}</div>`;
@@ -1746,6 +1847,106 @@ function updateIT1() {
 
 const STATE={'606':null,'607':null};
 const CARD_STATE={cardnet:null,azul:null};
+let IR2_STATE=null;
+
+function ir2Input(id){return Math.max(parseFloat($(id)?.value)||0,0);}
+
+function getIR2Calculation(summary=IR2_STATE?.summary) {
+  if(!summary)return null;
+  const adiciones=ir2Input('ir2-adiciones'),deducciones=ir2Input('ir2-deducciones'),perdidas=ir2Input('ir2-perdidas');
+  const anticipos=ir2Input('ir2-anticipos'),retenciones=ir2Input('ir2-retenciones'),saldo=ir2Input('ir2-saldo'),activos=ir2Input('ir2-activos');
+  const rentaAntesPerdidas=r2(summary.utilidad+adiciones-deducciones);
+  const perdidaAplicada=r2(Math.min(perdidas,Math.max(rentaAntesPerdidas,0)));
+  const rentaImponible=r2(Math.max(rentaAntesPerdidas-perdidaAplicada,0));
+  const impuestoLiquidado=r2(rentaImponible*.27),creditos=r2(anticipos+retenciones+saldo+activos),resultado=r2(impuestoLiquidado-creditos);
+  return {adiciones,deducciones,perdidas,perdidaAplicada,anticipos,retenciones,saldo,activos,rentaAntesPerdidas,rentaImponible,impuestoLiquidado,creditos,resultado};
+}
+
+function ir2Deadline(dateValue){
+  if(!dateValue)return '';
+  const date=new Date(`${dateValue}T12:00:00`);date.setDate(date.getDate()+120);
+  return new Intl.DateTimeFormat('es-DO',{day:'2-digit',month:'2-digit',year:'numeric'}).format(date);
+}
+
+function updateIR2(){
+  if(!IR2_STATE)return;
+  const s=IR2_STATE.summary,c=getIR2Calculation(s),alertEl=$('ir2-alert');
+  $('ir2-results').hidden=false;
+  $('kpis-ir2-financial').innerHTML=
+    kpiCard('Ingresos',fmtM(s.ingresos),'g')+kpiCard('Costos',fmtM(s.costos),'a')+kpiCard('Gastos',fmtM(s.gastos),'r')+
+    kpiCard(s.utilidad>=0?'Utilidad contable':'Pérdida contable',fmtM(Math.abs(s.utilidad)),s.utilidad>=0?'t':'r')+
+    kpiCard('Activos',fmtM(s.activos),'v')+kpiCard('Pasivos',fmtM(s.pasivos),'m')+kpiCard('Patrimonio',fmtM(s.patrimonio),'c');
+  const rows=[
+    {lbl:'Utilidad o pérdida contable',sign:s.utilidad>=0?'+':'−',amt:Math.abs(s.utilidad)},
+    {lbl:'Adiciones fiscales',sign:'+',amt:c.adiciones},{lbl:'Deducciones fiscales',sign:'−',amt:c.deducciones},
+    {lbl:'Pérdidas fiscales aplicadas',sign:'−',amt:c.perdidaAplicada},{lbl:'Renta neta imponible',amt:c.rentaImponible},
+    {lbl:'ISR liquidado · 27%',amt:c.impuestoLiquidado},{lbl:'Anticipos pagados',sign:'−',amt:c.anticipos},
+    {lbl:'Retenciones de ISR',sign:'−',amt:c.retenciones},{lbl:'Saldo a favor anterior',sign:'−',amt:c.saldo},
+    {lbl:'Crédito por impuesto a los activos',sign:'−',amt:c.activos},
+  ];
+  $('ir2-calc').innerHTML=cuadreRows(rows);
+  $('ir2-result-label').textContent=c.resultado>0?'ISR A PAGAR':c.resultado<0?'SALDO A FAVOR':'CUADRE EXACTO';
+  $('ir2-result-value').textContent=fmtM(Math.abs(c.resultado));
+  $('ir2-result-value').className=`cuadre-total-val ${c.resultado>0?'pagar':'favor'}`;
+  const issues=[];
+  if(s.sinClasificar)issues.push(`${fmtI(s.sinClasificar)} cuenta(s) sin clasificar por ${fmtM(s.montoSinClasificar)}`);
+  if(s.hasMovements&&Math.abs(s.diferenciaBalance)>.01)issues.push(`débitos y créditos difieren por ${fmtM(Math.abs(s.diferenciaBalance))}`);
+  if(Math.abs(s.diferenciaEcuacion)>.01)issues.push(`activos no cuadran con pasivos + patrimonio por ${fmtM(Math.abs(s.diferenciaEcuacion))}`);
+  if(DISPLAY_CURRENCY!=='DOP')issues.push('el IR-2 debe prepararse en pesos dominicanos');
+  const rnc=$('ir2-rnc').value.replace(/\D/g,''),inicio=$('ir2-inicio').value,fin=$('ir2-fin').value;
+  if(rnc&&!/^\d{9}$/.test(rnc))issues.push('el RNC debe tener 9 dígitos');
+  if(inicio&&fin&&new Date(inicio)>new Date(fin))issues.push('la fecha inicial es posterior al cierre');
+  if(issues.length){alertEl.innerHTML=`<div class="alert warn"><strong>Revisión obligatoria:</strong> ${issues.join('; ')}. El borrador no está listo para presentar.</div>`;}
+  else alertEl.innerHTML=`<div class="alert ok"><span>Controles básicos aprobados.</span><span>Fecha límite estimada: <strong>${ir2Deadline(fin)||'indique el cierre'}</strong>. Revisa anexos y ajustes con contabilidad antes de presentar.</span></div>`;
+  const cols=['Cuenta','Descripción','Clasificación','Monto'];
+  $('th-ir2').innerHTML='<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+  const review=IR2_STATE.unclassified.slice(0,100);
+  $('tb-ir2').innerHTML=review.length?review.map(r=>`<tr><td>${xmlEscape(r.cuenta)}</td><td>${xmlEscape(r.descripcion)}</td><td>Sin clasificar</td><td>${fmtM(r.monto)}</td></tr>`).join(''):'<tr><td colspan="4">No hay cuentas pendientes de clasificación.</td></tr>';
+  $('tn-ir2').textContent=review.length?`Mostrando ${review.length} de ${s.sinClasificar} cuentas pendientes.`:'Todas las cuentas fueron clasificadas por CAMI.';
+  $('badge-ir2').textContent=issues.length?'!':'✓';$('badge-ir2').className=`nav-badge ${issues.length?'':'ok'}`;
+}
+
+async function handleIR2File(file){
+  const kind=fileKind(file);
+  if(!kind||kind==='pdf'){showToast('El balance IR-2 debe cargarse en CSV, XLSX, XLS, XLSM o XLSB.','err');return;}
+  if(file.size>20*1024*1024){showToast('El archivo supera el límite de 20 MB.','err');return;}
+  $('loader').hidden=false;
+  try{
+    IR2_STATE=processIR2(await loadFile(file,'balance'));
+    $('up-ir2').hidden=true;$('tf-ir2').hidden=false;$('tf-ir2').textContent=file.name;
+    $('btn-xls-ir2').hidden=false;$('btn-rst-ir2').hidden=false;updateIR2();
+    showToast(`IR-2: ${fmtI(IR2_STATE.summary.registros)} cuentas procesadas.`);
+  }catch(error){showToast(error.message||'No se pudo procesar el balance anual.','err');}
+  finally{$('loader').hidden=true;}
+}
+
+function resetIR2(){
+  IR2_STATE=null;$('up-ir2').hidden=false;$('ir2-results').hidden=true;$('tf-ir2').hidden=true;$('btn-xls-ir2').hidden=true;$('btn-rst-ir2').hidden=true;$('fi-ir2').value='';
+  $('badge-ir2').textContent='○';$('badge-ir2').className='nav-badge';
+  $('ir2-alert').innerHTML='<div class="alert warn"><strong>Datos requeridos:</strong> carga el balance de comprobación anual para iniciar el IR-2.</div>';
+}
+
+function exportIR2Draft(){
+  if(!IR2_STATE)return;
+  updateIR2();
+  const s=IR2_STATE.summary,c=getIR2Calculation(s),rnc=$('ir2-rnc').value.replace(/\D/g,''),razon=$('ir2-razon').value.trim(),inicio=$('ir2-inicio').value,fin=$('ir2-fin').value;
+  if(!/^\d{9}$/.test(rnc)||!razon||!inicio||!fin){showToast('Completa RNC, razón social y fechas del ejercicio.','err');return;}
+  if(DISPLAY_CURRENCY!=='DOP'){showToast('El borrador IR-2 solo se exporta en pesos dominicanos.','err');return;}
+  if(s.sinClasificar||Math.abs(s.diferenciaBalance)>.01||Math.abs(s.diferenciaEcuacion)>.01){showToast('Corrige las cuentas sin clasificar y diferencias del balance antes de exportar.','err');return;}
+  const wb=XLSX.utils.book_new();
+  const summary=[
+    ['CAMI · BORRADOR DE TRABAJO IR-2',''],['No sustituye la presentación en la Oficina Virtual DGII',''],['RNC',rnc],['Razón social',razon],['Ejercicio',`${inicio} al ${fin}`],
+    ['Utilidad / pérdida contable',s.utilidad],['Adiciones fiscales',c.adiciones],['Deducciones fiscales',c.deducciones],['Pérdidas fiscales aplicadas',c.perdidaAplicada],
+    ['Renta neta imponible',c.rentaImponible],['Tasa ISR',.27],['ISR liquidado',c.impuestoLiquidado],['Anticipos',c.anticipos],['Retenciones ISR',c.retenciones],['Saldo anterior',c.saldo],['Crédito impuesto activos',c.activos],['Resultado',c.resultado],
+    ['Fecha límite estimada',ir2Deadline(fin)],['Fuente normativa','https://dgii.gov.do/herramientas/formularios/formularioDeclaraciones/Paginas/ISR.aspx']
+  ];
+  const ss=XLSX.utils.aoa_to_sheet(summary);ss['!cols']=[{wch:38},{wch:26}];
+  ['B6','B7','B8','B9','B10','B12','B13','B14','B15','B16','B17'].forEach(ref=>{if(ss[ref])ss[ref].z='RD$ #,##0.00;[Red](RD$ #,##0.00)';});if(ss.B11)ss.B11.z='0%';
+  XLSX.utils.book_append_sheet(wb,ss,'Resumen IR-2');
+  const accounts=XLSX.utils.json_to_sheet(IR2_STATE.accounts.map(r=>({Cuenta:r.cuenta,Descripcion:r.descripcion,Clasificacion:r.categoria,Debito:r.debito,Credito:r.credito,Saldo:r.saldo,Monto_clasificado:r.monto})));
+  accounts['!cols']=[{wch:18},{wch:42},{wch:18},{wch:16},{wch:16},{wch:16},{wch:18}];XLSX.utils.book_append_sheet(wb,accounts,'Balance clasificado');
+  XLSX.writeFile(wb,`IR-2_Borrador_${fin.slice(0,4)}_${rnc}.xlsx`);showToast('Borrador de trabajo IR-2 exportado.');
+}
 
 function refreshCurrencyDisplay(){
   if(STATE['606']) render606(STATE['606'],$('tf-606').textContent||'Archivo 606');
@@ -1950,8 +2151,20 @@ document.querySelectorAll('.nav-item').forEach(el=>{
   fi.addEventListener('change',()=>{if(fi.files[0])handleCardFile(fi.files[0],provider);});
 });
 
+{
+  const dz=$('dz-ir2'),fi=$('fi-ir2'),bs=$('bs-ir2');
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+  dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over');if(e.dataTransfer.files[0])handleIR2File(e.dataTransfer.files[0]);});
+  dz.addEventListener('click',()=>fi.click());dz.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fi.click();}});
+  fi.addEventListener('change',()=>{if(fi.files[0])handleIR2File(fi.files[0]);});bs.addEventListener('click',e=>{e.stopPropagation();fi.click();});
+}
+
+document.querySelectorAll('.ir2-input,#ir2-rnc,#ir2-razon,#ir2-inicio,#ir2-fin').forEach(el=>el.addEventListener('input',updateIR2));
+$('btn-xls-ir2').addEventListener('click',exportIR2Draft);$('btn-rst-ir2').addEventListener('click',resetIR2);
+
 ['in-saldo','in-importaciones','in-abonos','in-confirm-overlap'].forEach(id=>{$(id).addEventListener('input',updateIT1);});
-$('in-tipo-declaracion').addEventListener('change',e=>{if(e.target.value==='IR-2')showToast('El formulario IR-2 estará disponible próximamente.');});
+$('in-tipo-declaracion').addEventListener('change',e=>{if(e.target.value==='IR-2'){document.querySelector('[data-nav="ir2"]').click();showToast('IR-2 anual: carga el balance de comprobación del ejercicio.');}});
 $('btn-it1-dgii').addEventListener('click',exportIT1DGII);
 renderCardTotal();
 </script>

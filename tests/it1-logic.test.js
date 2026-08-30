@@ -86,5 +86,31 @@ assert.strictEqual(credits.summary.totItbis,144);
 assert.strictEqual(credits.summary.paymentSummary.cash,1180);
 assert.strictEqual(credits.summary.ncfGroups.notaCredito.monto,200);
 
+const ir2=vm.runInContext(`processIR2(${JSON.stringify([
+  {Cuenta:'1001',Descripcion:'Caja','Débito':1000,'Crédito':0},
+  {Cuenta:'1101',Descripcion:'Cuentas por cobrar','Débito':1000,'Crédito':0},
+  {Cuenta:'2001',Descripcion:'Cuentas por pagar','Débito':0,'Crédito':400},
+  {Cuenta:'3001',Descripcion:'Capital social','Débito':0,'Crédito':600},
+  {Cuenta:'4001',Descripcion:'Ventas','Débito':0,'Crédito':2000},
+  {Cuenta:'5001',Descripcion:'Costo de ventas','Débito':800,'Crédito':0},
+  {Cuenta:'6001',Descripcion:'Gastos administrativos','Débito':200,'Crédito':0},
+])})`,context);
+assert.strictEqual(ir2.summary.ingresos,2000);
+assert.strictEqual(ir2.summary.costos,800);
+assert.strictEqual(ir2.summary.gastos,200);
+assert.strictEqual(ir2.summary.utilidad,1000);
+assert.strictEqual(ir2.summary.diferenciaBalance,0);
+assert.strictEqual(ir2.summary.diferenciaEcuacion,0);
+assert.strictEqual(ir2.summary.sinClasificar,0);
+context.ir2=ir2;
+document.getElementById('ir2-adiciones').value='100';
+document.getElementById('ir2-deducciones').value='50';
+document.getElementById('ir2-perdidas').value='200';
+document.getElementById('ir2-anticipos').value='100';
+const ir2Calc=JSON.parse(vm.runInContext(`JSON.stringify(getIR2Calculation(ir2.summary))`,context));
+assert.strictEqual(ir2Calc.rentaImponible,850);
+assert.strictEqual(ir2Calc.impuestoLiquidado,229.5);
+assert.strictEqual(ir2Calc.resultado,129.5);
+
 assert.match(code,/W28:pay\.cash,W29:pay\.transfer,W30:pay\.card,W31:pay\.credit,W32:pay\.bonds,W33:pay\.swap,W34:pay\.other/);
 console.log('IT-1 logic: OK');
