@@ -1394,12 +1394,16 @@ function process607(rows) {
   const ret30={monto:r2(sum(ret30rows,'_ret')),count:ret30rows.length},ret100={monto:r2(sum(ret100rows,'_ret')),count:ret100rows.length};
   const paymentColumns={cash:!!cm.pago_efectivo,transfer:!!cm.pago_cheque,card:!!cm.pago_tarjeta,credit:!!cm.pago_credito,bonds:!!cm.pago_bonos,swap:!!cm.pago_permuta,other:!!cm.pago_otras};
   const paymentSummary={cash:r2(sum(data,'_payCash')),transfer:r2(sum(data,'_payTransfer')),card:r2(sum(data,'_payCard')),credit:r2(sum(data,'_payCredit')),bonds:r2(sum(data,'_payBonds')),swap:r2(sum(data,'_paySwap')),other:r2(sum(data,'_payOther')),columns:paymentColumns};
-  const ncfGroups={credito:{count:0,monto:0},consumo:{count:0,monto:0},debito:{count:0,monto:0},notaCredito:{count:0,monto:0},unico:{count:0,monto:0},especial:{count:0,monto:0},gobierno:{count:0,monto:0},exportacion:{count:0,monto:0},otros:{count:0,monto:0},sinClasificar:{count:0,monto:0}};
+  const ncfGroups={credito:{count:0,monto:0},consumo:{count:0,monto:0,cardMonto:0},debito:{count:0,monto:0},notaCredito:{count:0,monto:0},unico:{count:0,monto:0},especial:{count:0,monto:0},gobierno:{count:0,monto:0},exportacion:{count:0,monto:0},otros:{count:0,monto:0},sinClasificar:{count:0,monto:0}};
   data.forEach((r,index)=>{
     const code=detectNCFCode(cm.ncf?r[cm.ncf]:'',cm.tipo_comprobante?r[cm.tipo_comprobante]:'');
     const key=code==='01'||code==='31'?'credito':code==='02'||code==='32'?'consumo':code==='03'||code==='33'?'debito':code==='04'||code==='34'?'notaCredito':code==='12'?'unico':code==='14'||code==='44'?'especial':code==='15'||code==='45'?'gobierno':code==='16'||code==='46'?'exportacion':code==='OTROS'?'otros':'sinClasificar';
     const netOperation=r2(Math.abs(r._gravado||0)+Math.abs(r._exento||0));
     ncfGroups[key].count+=1;ncfGroups[key].monto=r2(ncfGroups[key].monto+netOperation);
+    if(key==='consumo'&&r._payCard>0){
+      const cardRatio=r._total>0?Math.min(r._payCard/r._total,1):1;
+      ncfGroups.consumo.cardMonto=r2(ncfGroups.consumo.cardMonto+netOperation*cardRatio);
+    }
   });
   const cleanRow = r => { const o={}; headers.forEach(h=>{o[h]=r[h];}); return o; };
   return { summary:{registros:data.length,totTotal,totGrav,totExento,totItbis,totRet,byTasa,ncfGroups,paymentSummary,ret30,ret100}, columns:headers, preview:data.slice(0,200).map(cleanRow), allRows:data.map(cleanRow) };
@@ -1600,6 +1604,21 @@ function getIT1SalesBreakdown(s7) {
   return {payments,total:s7.totTotal,reportedCard,discrepancy:r2(s7.totTotal-classified),source:hasExplicit?'607':'607 + reportes de tarjetas'};
 }
 
+function getIT1NCFBreakdown(s7) {
+  const groups={};
+  Object.entries(s7.ncfGroups).forEach(([key,value])=>{groups[key]={...value};});
+  const cardBase=r2(Object.values(CARD_STATE).filter(Boolean).reduce((n,r)=>n+(r.baseGravable||0),0));
+  let adjustment=0;
+  if(cardBase>0){
+    const explicitCardBase=groups.consumo.cardMonto||0;
+    const hasCardColumn=!!s7.paymentSummary?.columns?.card;
+    const adjusted=hasCardColumn?r2(Math.max(groups.consumo.monto-explicitCardBase,0)+cardBase):r2(Math.max(groups.consumo.monto,cardBase));
+    adjustment=r2(adjusted-groups.consumo.monto);
+    groups.consumo.monto=adjusted;
+  }
+  return {groups,cardBase,adjustment};
+}
+
 function cuadreRows(rows){
   return rows.map(r=>`<div class="cuadre-row${r.muted?' muted':''}"><span class="cuadre-lbl">${r.lbl}${r.source?`<span class="cuadre-source">${r.source}</span>`:''}</span><span><span class="cuadre-sign">${r.sign||''}</span><span class="cuadre-amt">${fmtM(r.amt)}</span></span></div>`).join('');
 }
@@ -1648,10 +1667,10 @@ function updateIT1() {
     {lbl:'Saldo a Favor Anterior (DGII)',   always:false,sign:'−',amt:saldo},
     {lbl:'Otros Pagos / Abonos a Cuenta',  always:false,sign:'−',amt:abonos},
   ].filter(r=>r.always||r.amt!==0);
-  const ncf=s7.ncfGroups;
+  const ncfData=getIT1NCFBreakdown(s7),ncf=ncfData.groups;
   const ncfRows=[
     {lbl:'B01 / E31 — Crédito fiscal',amt:ncf.credito.monto},
-    {lbl:'B02 / E32 — Consumo',amt:ncf.consumo.monto},
+    {lbl:'B02 / E32 — Consumo',amt:ncf.consumo.monto,source:ncfData.cardBase>0?`incluye base CardNET + Azul: ${fmtM(ncfData.cardBase)}`:''},
     {lbl:'Notas de débito',amt:ncf.debito.monto},
     {lbl:'Notas de crédito',sign:'−',amt:ncf.notaCredito.monto},
     {lbl:'Otros comprobantes',amt:r2(ncf.unico.monto+ncf.especial.monto+ncf.gobierno.monto+ncf.exportacion.monto+ncf.otros.monto)},
@@ -1739,7 +1758,7 @@ async function exportIT1DGII() {
     const zip=await JSZip.loadAsync(await response.arrayBuffer());
     let anexo=await zip.file('xl/worksheets/sheet1.xml').async('string');
     let it1=await zip.file('xl/worksheets/sheet2.xml').async('string');
-    const s6=STATE['606'].summary,s7=STATE['607'].summary,bt=s7.byTasa,ncf=s7.ncfGroups;
+    const s6=STATE['606'].summary,s7=STATE['607'].summary,bt=s7.byTasa,ncf=getIT1NCFBreakdown(s7).groups;
     const imports=parseFloat($('in-importaciones').value)||0;
     const saldo=parseFloat($('in-saldo').value)||0;
     const abonos=parseFloat($('in-abonos').value)||0;

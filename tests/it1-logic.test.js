@@ -26,6 +26,12 @@ assert.strictEqual(explicitBreakdown.discrepancy,0);
 assert.strictEqual(explicit.summary.ncfGroups.credito.monto,1000);
 assert.strictEqual(explicit.summary.ncfGroups.consumo.monto,700);
 assert.strictEqual(explicit.summary.ncfGroups.sinClasificar.count,0);
+context.explicit=explicit;
+vm.runInContext(`CARD_STATE.azul={baseGravable:750,totalSujetoRetencion:885,retenido:17.7};`,context);
+const explicitNCF=JSON.parse(vm.runInContext(`JSON.stringify(getIT1NCFBreakdown(explicit.summary))`,context));
+assert.strictEqual(explicitNCF.cardBase,750);
+assert.strictEqual(explicitNCF.groups.credito.monto,1000);
+assert.strictEqual(explicitNCF.groups.consumo.monto,750);
 
 const withoutPayment=vm.runInContext(`process607(${JSON.stringify([
   {NCF:'E310000000001','Total Monto Facturado':1180,'ITBIS Facturado':180},
@@ -37,6 +43,9 @@ const inferred=JSON.parse(vm.runInContext(`JSON.stringify(getIT1SalesBreakdown(w
 assert.strictEqual(inferred.payments.card,600);
 assert.strictEqual(inferred.payments.cash,1170);
 assert.strictEqual(inferred.discrepancy,0);
+vm.runInContext(`CARD_STATE.azul={baseGravable:600,totalSujetoRetencion:708,retenido:12};`,context);
+const inferredNCF=JSON.parse(vm.runInContext(`JSON.stringify(getIT1NCFBreakdown(withoutPayment.summary))`,context));
+assert.strictEqual(inferredNCF.groups.consumo.monto,600);
 
 const inconsistent=vm.runInContext(`process607(${JSON.stringify([
   {NCF:'B01000000001','Total Monto Facturado':1000,'ITBIS Facturado':0,'Monto Facturado en Efectivo':700,'Monto Facturado en Tarjeta Debito Credito':500},
