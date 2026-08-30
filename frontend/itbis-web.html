@@ -726,6 +726,9 @@ tbody tr:hover{background:var(--blue-lt);}
     <div class="slabel">ITBIS Retenido por Clientes</div>
     <div class="ret-grid" id="ret-607"></div>
 
+    <div class="slabel">ITBIS Retenido por Tarjeta</div>
+    <div class="kpi-row" id="ret-card-607"></div>
+
     <div class="slabel">Vista previa de datos</div>
     <div class="table-wrap" id="tw-607"><table><thead id="th-607"></thead><tbody id="tb-607"></tbody></table></div>
     <p class="tnote" id="tn-607"></p>
@@ -892,7 +895,7 @@ const AL607 = {
 
 const ALCARD = {
   factura:          ['factura','numero_factura','no_factura','nro_factura','ncf','comprobante','referencia','numero_referencia','no_referencia','transaccion','numero_transaccion','no_transaccion','autorizacion','codigo_autorizacion'],
-  cantidad:         ['cantidad_facturas','cantidad_transacciones','numero_facturas','numero_transacciones','cant_transacciones','total_transacciones','conteo'],
+  cantidad:         ['cantidad_movimientos','total_movimientos','numero_movimientos','cantidad_facturas','cantidad_transacciones','numero_facturas','numero_transacciones','cant_transacciones','total_transacciones','conteo'],
   monto:            ['monto','monto_total','monto_transaccion','monto_venta','total','total_venta','importe','importe_total','valor_transaccion','valor_venta','monto_bruto','venta_bruta','consumo'],
   retenido:         ['itbis_retenido','retencion_itbis','monto_retenido','retencion','retencion_tarjeta','retencion_ley_253_12','itbis_retenido_ley_253_12','retencion_2_por_ciento','retencion_2'],
   itbis_reportado:  ['itbis_reportado','itbis','monto_itbis','impuesto','itbis_transaccion','itbis_facturado','total_itbis'],
@@ -1045,7 +1048,73 @@ function pdfLinesToRows(lines) {
   return objects;
 }
 
-async function readPDF(buf) {
+function lastNumericPDFCell(line,{integer=false}={}) {
+  for(let i=line.cells.length-1;i>=0;i--){
+    const text=String(line.cells[i].text||'').trim();
+    if(!text||text.includes('%')||!/[0-9]/.test(text))continue;
+    const raw=text.replace(/[RD$\s]/gi,'');
+    if(!/^[\d.,()\-]+$/.test(raw))continue;
+    const value=Math.abs(cleanNum(text));
+    if(Number.isFinite(value)&&(!integer||Number.isInteger(value)))return value;
+  }
+  return null;
+}
+
+function bestPDFSummaryValue(lines,patterns,{integer=false,exclude=[]}={}) {
+  for(const pattern of patterns){
+    const values=[];
+    lines.forEach(line=>{
+      const label=normKey(line.cells.map(c=>c.text).join(' '));
+      if(!pattern.test(label)||exclude.some(rx=>rx.test(label)))return;
+      const value=lastNumericPDFCell(line,{integer});
+      if(value!=null)values.push(value);
+    });
+    if(values.length)return Math.max(...values);
+  }
+  return null;
+}
+
+function countPDFMovements(lines) {
+  const unique=new Set();
+  lines.forEach(line=>{
+    const text=line.cells.map(c=>c.text).join(' ').replace(/\s+/g,' ').trim();
+    const normalized=normKey(text);
+    if(!text||/(total|subtotal|resumen|balance|pagina|fecha.*monto|movimiento.*monto|transaccion.*monto)/.test(normalized))return;
+    const hasDate=/\b(?:0?[1-9]|[12]\d|3[01])[\/\-](?:0?[1-9]|1[0-2])[\/\-](?:20)?\d{2}\b/.test(text);
+    if(!hasDate)return;
+    const reference=(text.match(/\b[A-Z0-9]{6,20}\b/gi)||[]).filter(t=>!/^20\d{2}$/.test(t)).pop();
+    const amounts=(text.match(/(?:RD\$?|\$)?\s*\(?\d[\d,.]*\)?/gi)||[]).length;
+    if(amounts>=2)unique.add(reference?reference.toUpperCase():normalized);
+  });
+  return unique.size;
+}
+
+function cardPDFToRows(lines,provider) {
+  const countPatterns=[
+    /(?:cantidad|total|numero)(?:_de)?_movimientos(?:_procesados)?/,
+    /(?:^|_)cant(?:idad)?(?:_de)?_(?:mov|movimientos)(?:_|$)/,
+    /(?:^|_)(?:total_mov|no_de_movimientos)(?:_|$)/,
+    /movimientos_(?:procesados|presentados|realizados)/,
+    /(?:cantidad|total|numero)(?:_de)?_transacciones/,
+    /(?:cant|total|numero)(?:_de)?_registros/,
+    /transacciones_(?:procesadas|presentadas|realizadas)/,
+    /(?:cantidad|total|numero)(?:_de)?_facturas/,
+  ];
+  const summaryCount=bestPDFSummaryValue(lines,countPatterns,{integer:true,exclude:[/rechazad|declinad|anulad|cancelad|devolucion|subtotal/]});
+  const movementCount=countPDFMovements(lines);
+  const facturas=summaryCount||movementCount;
+  if(!facturas)throw new Error(`No se pudo determinar la cantidad de movimientos del reporte de ${provider}.`);
+  const monto=bestPDFSummaryValue(lines,[/monto_total_(?:procesado|transacciones|ventas)/,/total_(?:procesado|transacciones|ventas|depositado)/,/monto_bruto/,/importe_total/],{exclude:[/reten|itbis|subtotal/]})||0;
+  const retenido=bestPDFSummaryValue(lines,[/itbis_retenido/,/monto_retenido/,/retencion_(?:itbis_)?(?:del_)?2/,/retencion_ley_253_12/],{exclude:[/subtotal/]})||0;
+  const itbis=bestPDFSummaryValue(lines,[/itbis_reportado/,/total_itbis/,/monto_itbis/],{exclude:[/reten/]})||0;
+  return [{
+    cantidad_movimientos:facturas,monto_total:monto,itbis_retenido:retenido,itbis_reportado:itbis,
+    __pdf_report:true,__metodo_conteo:summaryCount?'total de control del PDF':'movimientos únicos detectados',
+    __movimientos_detectados:movementCount,
+  }];
+}
+
+async function readPDF(buf,sheetHint) {
   try {
     const pdf=await pdfjsLib.getDocument({data:new Uint8Array(buf)}).promise;
     const lines=[];
@@ -1053,7 +1122,7 @@ async function readPDF(buf) {
       const page=await pdf.getPage(pageNumber),content=await page.getTextContent();
       lines.push(...groupPDFItems(content.items));
     }
-    const rows=pdfLinesToRows(lines);
+    const rows=/cardnet|azul/i.test(String(sheetHint||''))?cardPDFToRows(lines,sheetHint):pdfLinesToRows(lines);
     if(!rows.length)throw new Error('El PDF no contiene registros reconocibles.');
     return rows;
   } catch(e) {
@@ -1092,7 +1161,7 @@ function loadFile(file, sheetHint) {
     const rd  = new FileReader();
     rd.onerror = () => fail(new Error('Error leyendo el archivo'));
     if (kind==='excel'||kind==='pdf') {
-      rd.onload = async e => { try { ok(kind==='pdf'?await readPDF(e.target.result):readExcel(e.target.result,sheetHint)); } catch(err) { fail(err); } };
+      rd.onload = async e => { try { ok(kind==='pdf'?await readPDF(e.target.result,sheetHint):readExcel(e.target.result,sheetHint)); } catch(err) { fail(err); } };
       rd.readAsArrayBuffer(file);
     } else {
       rd.onload = e => { try { ok(readCSV(e.target.result)); } catch(err) { fail(err); } };
@@ -1197,17 +1266,27 @@ function processCardReport(rows, provider) {
     throw new Error(`No se reconocieron las columnas del reporte de ${provider}.`);
   }
   const useful=rows.filter(r => Object.values(r).some(v => v!=null&&String(v).trim()!==''));
+  const pdfSummary=useful.find(r=>r.__pdf_report);
   let facturas;
-  if (cm.cantidad) facturas=Math.round(useful.reduce((n,r)=>n+Math.abs(cleanNum(r[cm.cantidad])),0));
+  if (pdfSummary&&cm.cantidad) facturas=Math.round(Math.abs(cleanNum(pdfSummary[cm.cantidad])));
+  else if (cm.cantidad) facturas=Math.round(useful.reduce((n,r)=>n+Math.abs(cleanNum(r[cm.cantidad])),0));
   else if (cm.factura) facturas=new Set(useful.map(r=>String(r[cm.factura]||'').trim()).filter(Boolean)).size;
   else facturas=useful.length;
-  const total = key => key ? r2(useful.reduce((n,r)=>n+Math.abs(cleanNum(r[key])),0)) : 0;
+  const total = key => key ? r2(pdfSummary?Math.abs(cleanNum(pdfSummary[key])):useful.reduce((n,r)=>n+Math.abs(cleanNum(r[key])),0)) : 0;
+  const retenido=total(cm.retenido);
+  const totalSujetoRetencion=r2(retenido/0.02);
+  const baseGravable=r2(totalSujetoRetencion/1.18);
+  const itbisTarjeta=r2(totalSujetoRetencion-baseGravable);
   return {
     provider,
     facturas,
     monto:total(cm.monto),
-    retenido:total(cm.retenido),
+    retenido,
     itbis:total(cm.itbis_reportado),
+    totalSujetoRetencion,
+    baseGravable,
+    itbisTarjeta,
+    metodoConteo:pdfSummary?.__metodo_conteo||'registros del archivo',
     registros:useful.length,
     columns:headers,
   };
@@ -1294,23 +1373,33 @@ function renderCardReport(provider, data, filename) {
   const id=provider.toLowerCase();
   $(`${id}-file`).textContent=filename;
   $(`kpis-${id}`).innerHTML=`
-    <div class="processor-metric"><span>Facturas</span><strong>${fmtI(data.facturas)}</strong></div>
+    <div class="processor-metric"><span>Movimientos</span><strong>${fmtI(data.facturas)}</strong></div>
     <div class="processor-metric"><span>Monto procesado</span><strong>${fmtM(data.monto)}</strong></div>
     <div class="processor-metric"><span>Retenido por tarjeta</span><strong>${fmtM(data.retenido)}</strong></div>
-    <div class="processor-metric"><span>ITBIS reportado</span><strong>${fmtM(data.itbis)}</strong></div>`;
+    <div class="processor-metric"><span>Base gravable estimada</span><strong>${fmtM(data.baseGravable)}</strong></div>
+    <div class="processor-metric"><span>ITBIS según retención 2%</span><strong>${fmtM(data.itbisTarjeta)}</strong></div>
+    <div class="processor-metric"><span>ITBIS del reporte</span><strong>${fmtM(data.itbis)}</strong></div>`;
+  $(`${id}-file`).title=`Conteo: ${data.metodoConteo}`;
   renderCardTotal();
 }
 
 function renderCardTotal() {
   const reports=Object.values(CARD_STATE).filter(Boolean);
   $('card-total').hidden=reports.length===0;
-  if (!reports.length) return;
+  if (!reports.length) {$('ret-card-607').innerHTML=kpiCard('Pendiente','Carga CardNET o Azul','m','Aquí se separará de la retención de clientes.');return;}
   const total=key=>r2(reports.reduce((n,r)=>n+(r[key]||0),0));
   $('kpis-card-total').innerHTML=
-    kpiCard('Facturas / Transacciones',fmtI(total('facturas')),'c')+
+    kpiCard('Movimientos',fmtI(total('facturas')),'c')+
     kpiCard('Monto procesado',fmtM(total('monto')),'g')+
     kpiCard('Retenido por tarjeta',fmtM(total('retenido')),'r')+
-    kpiCard('ITBIS reportado',fmtM(total('itbis')),'a');
+    kpiCard('Base gravable tarjetas',fmtM(total('baseGravable')),'v','Calculada desde la retención del 2%')+
+    kpiCard('ITBIS según retención 2%',fmtM(total('itbisTarjeta')),'a')+
+    kpiCard('ITBIS del reporte',fmtM(total('itbis')),'t');
+  $('ret-card-607').innerHTML=
+    kpiCard('Retención por tarjeta (2%)',fmtM(total('retenido')),'r')+
+    kpiCard('Total sujeto a retención',fmtM(total('totalSujetoRetencion')),'g','Retención ÷ 2%')+
+    kpiCard('Base gravable',fmtM(total('baseGravable')),'v','Total sujeto ÷ 1.18')+
+    kpiCard('ITBIS calculado',fmtM(total('itbisTarjeta')),'a','Total sujeto − base gravable');
 }
 
 function calculateIT1({debito,credito,importaciones,retenciones,saldo,abonos}) {
@@ -1548,6 +1637,7 @@ document.querySelectorAll('.nav-item').forEach(el=>{
 
 ['in-saldo','in-importaciones','in-abonos'].forEach(id=>{$(id).addEventListener('input',updateIT1);});
 $('btn-it1-dgii').addEventListener('click',exportIT1DGII);
+renderCardTotal();
 </script>
 </body>
 </html>
