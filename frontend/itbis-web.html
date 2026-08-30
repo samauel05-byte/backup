@@ -641,7 +641,7 @@ tbody tr{transition:background .12s ease;}
         <div class="drop-title">Arrastra el archivo 606 aquí</div>
         <div class="drop-sub">Suelta cualquier archivo de compras del período<br><strong>CSV · XLSX · XLS</strong> — cualquier formato</div>
         <div class="drop-tags">
-          <span class="drop-tag">DGI Plantilla</span>
+          <span class="drop-tag">DGII Plantilla</span>
           <span class="drop-tag">Excel Propio</span>
           <span class="drop-tag">CSV Exportado</span>
         </div>
@@ -689,7 +689,7 @@ tbody tr{transition:background .12s ease;}
         <div class="drop-title">Arrastra el archivo 607 aquí</div>
         <div class="drop-sub">Suelta cualquier archivo de ventas del período<br><strong>CSV · XLSX · XLS</strong> — cualquier formato</div>
         <div class="drop-tags">
-          <span class="drop-tag">DGI Plantilla</span>
+          <span class="drop-tag">DGII Plantilla</span>
           <span class="drop-tag">Excel Propio</span>
           <span class="drop-tag">CSV Exportado</span>
         </div>
@@ -751,7 +751,7 @@ tbody tr{transition:background .12s ease;}
       <div class="slabel" style="margin-bottom:6px;">Datos adicionales (manuales)</div>
       <div class="manual-grid">
         <div class="field-grp">
-          <label class="field-lbl" for="in-saldo">Saldo a favor anterior (DGI)</label>
+          <label class="field-lbl" for="in-saldo">Saldo a favor anterior (DGII)</label>
           <input class="field-inp" id="in-saldo" type="number" min="0" step="0.01" placeholder="0.00" value="0">
         </div>
         <div class="field-grp">
@@ -1150,7 +1150,7 @@ function updateIT1() {
     {lbl:'ITBIS Débito (ventas facturadas)',always:true, sign:'+',amt:debito},
     {lbl:'ITBIS Crédito (compras)',          always:false,sign:'−',amt:credito},
     {lbl:'ITBIS Ret. en Ventas (clientes)', always:false,sign:'−',amt:itbisRetVentas},
-    {lbl:'Saldo a Favor Anterior (DGI)',    always:false,sign:'−',amt:saldo},
+    {lbl:'Saldo a Favor Anterior (DGII)',    always:false,sign:'−',amt:saldo},
     {lbl:'ITBIS Aduana',                    always:false,sign:'+',amt:aduana},
   ].filter(r=>r.always||r.amt!==0);
   $('cuadre-body').innerHTML=rows.map(r=>
