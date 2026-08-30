@@ -300,6 +300,24 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
 .ret-val{font-family:var(--f-display);font-size:1rem;font-weight:700;color:var(--text);}
 .ret-cnt{font-size:.7rem;color:var(--muted);margin-top:2px;}
 
+/* ── Card processor reports ── */
+.card-reports{padding:24px 28px 0;}
+.processor-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+.processor-card{background:var(--surface);border:1px solid var(--border);border-top:5px solid #1769AA;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);}
+.processor-card.azul{border-top-color:#00A6D6;}
+.processor-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.processor-name{font-size:.88rem;font-weight:800;color:var(--text);}
+.processor-file{font-size:.68rem;color:var(--muted);max-width:210px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;}
+.processor-upload{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface-2);border:1px dashed var(--border);border-radius:9px;padding:12px;}
+.processor-upload input{display:none;}
+.processor-hint{font-size:.7rem;color:var(--muted);line-height:1.45;}
+.processor-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+.processor-metric{background:var(--surface-2);border-radius:8px;padding:10px 11px;border-left:3px solid var(--blue);}
+.processor-card.azul .processor-metric{border-left-color:#00A6D6;}
+.processor-metric span{display:block;font-size:.59rem;font-weight:700;letter-spacing:.35px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.processor-metric strong{font-size:.88rem;color:var(--text);font-variant-numeric:tabular-nums;}
+.processor-total{background:var(--surface);border:1px solid var(--border);border-top:5px solid var(--teal);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);margin-bottom:22px;}
+
 /* ── Table ── */
 .table-wrap{
   background:var(--surface);border-radius:var(--radius);
@@ -479,6 +497,8 @@ tbody tr:hover{background:var(--blue-lt);}
   .nav-badge{display:none;}
   .sid-divider,.sid-bottom{display:none;}
   .ret-grid{grid-template-columns:1fr;}
+  .card-reports{padding:18px 14px 0;}
+  .processor-grid{grid-template-columns:1fr;}
   .manual-grid{grid-template-columns:1fr;}
   .topbar{padding:12px 14px;min-height:76px;}
   .tb-stripe{height:32px;}
@@ -498,6 +518,7 @@ tbody tr:hover{background:var(--blue-lt);}
   .topbar .tb-right{flex-wrap:wrap;justify-content:flex-end;}
   .tb-file{max-width:130px;}
   .kpi-row{grid-template-columns:1fr 1fr;gap:9px;}
+  .processor-kpis{grid-template-columns:1fr 1fr;}
   .kpi{padding:13px 12px;}
   .kpi-val{font-size:1.02rem;}
 }
@@ -636,6 +657,50 @@ tbody tr:hover{background:var(--blue-lt);}
     </div>
   </div>
 
+  <section class="card-reports" aria-labelledby="card-reports-title">
+    <div class="slabel" id="card-reports-title">Reportes de ventas con tarjeta</div>
+    <div class="processor-grid">
+      <article class="processor-card">
+        <div class="processor-head">
+          <div class="processor-name">CardNET</div>
+          <div class="processor-file" id="cardnet-file">Pendiente</div>
+        </div>
+        <div class="processor-upload">
+          <div class="processor-hint">Carga el reporte de transacciones o retenciones.</div>
+          <input type="file" id="fi-cardnet" accept=".csv,.xlsx,.xls,.xlsm,.xlsb,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          <button class="btn btn-primary" id="bs-cardnet">Cargar CardNET</button>
+        </div>
+        <div class="processor-kpis" id="kpis-cardnet">
+          <div class="processor-metric"><span>Facturas</span><strong>—</strong></div>
+          <div class="processor-metric"><span>Monto procesado</span><strong>—</strong></div>
+          <div class="processor-metric"><span>Retenido por tarjeta</span><strong>—</strong></div>
+          <div class="processor-metric"><span>ITBIS reportado</span><strong>—</strong></div>
+        </div>
+      </article>
+      <article class="processor-card azul">
+        <div class="processor-head">
+          <div class="processor-name">Azul</div>
+          <div class="processor-file" id="azul-file">Pendiente</div>
+        </div>
+        <div class="processor-upload">
+          <div class="processor-hint">Carga el reporte de transacciones o retenciones.</div>
+          <input type="file" id="fi-azul" accept=".csv,.xlsx,.xls,.xlsm,.xlsb,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          <button class="btn btn-primary" id="bs-azul" style="background:#007FA8;">Cargar Azul</button>
+        </div>
+        <div class="processor-kpis" id="kpis-azul">
+          <div class="processor-metric"><span>Facturas</span><strong>—</strong></div>
+          <div class="processor-metric"><span>Monto procesado</span><strong>—</strong></div>
+          <div class="processor-metric"><span>Retenido por tarjeta</span><strong>—</strong></div>
+          <div class="processor-metric"><span>ITBIS reportado</span><strong>—</strong></div>
+        </div>
+      </article>
+    </div>
+    <div class="processor-total" id="card-total" hidden>
+      <div class="slabel">Consolidado CardNET + Azul</div>
+      <div class="kpi-row" id="kpis-card-total" style="margin-bottom:0;"></div>
+    </div>
+  </section>
+
   <div class="dash" id="da-607" hidden>
     <div class="slabel">Totales del período</div>
     <div class="kpi-row" id="kpis-607"></div>
@@ -763,6 +828,14 @@ const AL607 = {
   itbis_retenido:   ['itbis_retenido','itbisretenido','retencion_itbis','itbis_ret','itbis_retenido_terceros','itbis_ret_terceros'],
   tasa_itbis:       ['tasa_itbis','tasa','porcentaje_itbis','pct_itbis','tasa_impuesto','tasaimpuesto','tasa_gravamen'],
   construccion:     ['construccion','es_construccion','tipo_operacion','operacion_construccion'],
+};
+
+const ALCARD = {
+  factura:          ['factura','numero_factura','no_factura','nro_factura','ncf','comprobante','referencia','numero_referencia','no_referencia','transaccion','numero_transaccion','no_transaccion','autorizacion','codigo_autorizacion'],
+  cantidad:         ['cantidad_facturas','cantidad_transacciones','numero_facturas','numero_transacciones','cant_transacciones','total_transacciones','conteo'],
+  monto:            ['monto','monto_total','monto_transaccion','monto_venta','total','total_venta','importe','importe_total','valor_transaccion','valor_venta','monto_bruto','venta_bruta','consumo'],
+  retenido:         ['itbis_retenido','retencion_itbis','monto_retenido','retencion','retencion_tarjeta','retencion_ley_253_12','itbis_retenido_ley_253_12','retencion_2_por_ciento','retencion_2'],
+  itbis_reportado:  ['itbis_reportado','itbis','monto_itbis','impuesto','itbis_transaccion','itbis_facturado','total_itbis'],
 };
 
 const $  = id => document.getElementById(id);
@@ -980,6 +1053,29 @@ function process607(rows) {
   return { summary:{registros:data.length,totTotal,totGrav,totExento,totItbis,totRet,byTasa,ret30,ret100}, columns:headers, preview:data.slice(0,200).map(cleanRow), allRows:data.map(cleanRow) };
 }
 
+function processCardReport(rows, provider) {
+  if (!rows.length) throw new Error(`El reporte de ${provider} está vacío.`);
+  const headers=Object.keys(rows[0]),cm=detectCols(headers,ALCARD);
+  if (!cm.factura&&!cm.cantidad&&!cm.monto&&!cm.retenido&&!cm.itbis_reportado) {
+    throw new Error(`No se reconocieron las columnas del reporte de ${provider}.`);
+  }
+  const useful=rows.filter(r => Object.values(r).some(v => v!=null&&String(v).trim()!==''));
+  let facturas;
+  if (cm.cantidad) facturas=Math.round(useful.reduce((n,r)=>n+Math.abs(cleanNum(r[cm.cantidad])),0));
+  else if (cm.factura) facturas=new Set(useful.map(r=>String(r[cm.factura]||'').trim()).filter(Boolean)).size;
+  else facturas=useful.length;
+  const total = key => key ? r2(useful.reduce((n,r)=>n+Math.abs(cleanNum(r[key])),0)) : 0;
+  return {
+    provider,
+    facturas,
+    monto:total(cm.monto),
+    retenido:total(cm.retenido),
+    itbis:total(cm.itbis_reportado),
+    registros:useful.length,
+    columns:headers,
+  };
+}
+
 function kpiCard(lbl, val, cls='', sub='') {
   return `<div class="kpi ${cls}"><div class="kpi-lbl">${lbl}</div><div class="kpi-val">${val}</div>${sub?`<div class="kpi-sub">${sub}</div>`:''}</div>`;
 }
@@ -1057,6 +1153,29 @@ function render607(data, filename) {
   updateIT1();
 }
 
+function renderCardReport(provider, data, filename) {
+  const id=provider.toLowerCase();
+  $(`${id}-file`).textContent=filename;
+  $(`kpis-${id}`).innerHTML=`
+    <div class="processor-metric"><span>Facturas</span><strong>${fmtI(data.facturas)}</strong></div>
+    <div class="processor-metric"><span>Monto procesado</span><strong>${fmtM(data.monto)}</strong></div>
+    <div class="processor-metric"><span>Retenido por tarjeta</span><strong>${fmtM(data.retenido)}</strong></div>
+    <div class="processor-metric"><span>ITBIS reportado</span><strong>${fmtM(data.itbis)}</strong></div>`;
+  renderCardTotal();
+}
+
+function renderCardTotal() {
+  const reports=Object.values(CARD_STATE).filter(Boolean);
+  $('card-total').hidden=reports.length===0;
+  if (!reports.length) return;
+  const total=key=>r2(reports.reduce((n,r)=>n+(r[key]||0),0));
+  $('kpis-card-total').innerHTML=
+    kpiCard('Facturas / Transacciones',fmtI(total('facturas')),'c')+
+    kpiCard('Monto procesado',fmtM(total('monto')),'g')+
+    kpiCard('Retenido por tarjeta',fmtM(total('retenido')),'r')+
+    kpiCard('ITBIS reportado',fmtM(total('itbis')),'a');
+}
+
 function updateIT1() {
   const has606=!!STATE['606'],has607=!!STATE['607'];
   $('pi-606').className=`prereq-dot ${has606?'ok':'pending'}`;
@@ -1102,6 +1221,7 @@ function updateIT1() {
 }
 
 const STATE={'606':null,'607':null};
+const CARD_STATE={cardnet:null,azul:null};
 
 function exportXLS(mod) {
   const d=STATE[mod];if(!d)return;
@@ -1137,6 +1257,23 @@ async function handleFile(file, mod) {
   }
 }
 
+async function handleCardFile(file, provider) {
+  const ext=fileExtension(file),kind=fileKind(file),id=provider.toLowerCase();
+  if (!kind){showToast(`Formato ${ext?'.'+ext:'sin extensión'} no soportado. Use CSV, XLSX, XLS, XLSM o XLSB.`,'err');return;}
+  if (file.size>20*1024*1024){showToast('El archivo supera el límite de 20 MB.','err');return;}
+  $('loader').hidden=false;
+  try {
+    const rows=await loadFile(file,provider);
+    CARD_STATE[id]=processCardReport(rows,provider);
+    renderCardReport(provider,CARD_STATE[id],file.name);
+    showToast(`${provider}: ${fmtI(CARD_STATE[id].facturas)} facturas o transacciones procesadas.`);
+  } catch(e) {
+    showToast(e.message||`Error procesando el reporte de ${provider}.`,'err');
+  } finally {
+    $('loader').hidden=true;
+  }
+}
+
 function resetMod(mod) {
   STATE[mod]=null;
   if (mod==='606'){$('da-606').hidden=true;$('up-606').hidden=false;$('tf-606').hidden=true;$('btn-xls-606').hidden=true;$('btn-rst-606').hidden=true;$('th-606').innerHTML='';$('tb-606').innerHTML='';$('fi-606').value='';}
@@ -1167,6 +1304,12 @@ document.querySelectorAll('.nav-item').forEach(el=>{
   bs.addEventListener('click',e=>{e.stopPropagation();fi.click();});
   $(`btn-xls-${mod}`).addEventListener('click',()=>exportXLS(mod));
   $(`btn-rst-${mod}`).addEventListener('click',()=>resetMod(mod));
+});
+
+[['cardnet','CardNET'],['azul','Azul']].forEach(([id,provider])=>{
+  const fi=$(`fi-${id}`),bs=$(`bs-${id}`);
+  bs.addEventListener('click',()=>fi.click());
+  fi.addEventListener('change',()=>{if(fi.files[0])handleCardFile(fi.files[0],provider);});
 });
 
 ['in-saldo','in-aduana'].forEach(id=>{$(id).addEventListener('input',updateIT1);});
