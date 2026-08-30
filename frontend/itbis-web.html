@@ -85,7 +85,7 @@
 body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased;}
 
 /* ── Shell ── */
-.shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
+.shell{display:grid;grid-template-columns:246px 1fr;min-height:100vh;}
 
 /* ── Sidebar ── */
 .sidebar{
@@ -109,7 +109,7 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
 }
 .sid-logo-text{}
 .sid-logo-mark{font-family:var(--f-display);font-weight:800;font-size:.9rem;color:#fff;letter-spacing:-.3px;line-height:1;}
-.sid-logo-sub{font-size:.62rem;color:var(--sid-text);margin-top:2px;letter-spacing:.2px;}
+.sid-logo-sub{font-size:.62rem;color:var(--sid-text);margin-top:2px;letter-spacing:.2px;white-space:nowrap;}
 
 .nav-section{padding:16px 10px 8px;}
 .nav-label{font-size:.58rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--sid-text);padding:0 10px;margin-bottom:8px;}
@@ -118,7 +118,7 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
   padding:10px 12px;border-radius:10px;cursor:pointer;
   font-size:.8rem;font-weight:500;color:var(--sid-text);
   transition:background .15s,color .15s;margin-bottom:3px;user-select:none;
-  position:relative;
+  position:relative;white-space:nowrap;
 }
 .nav-item:hover{background:rgba(255,255,255,.07);color:var(--sid-text-bright);}
 .nav-item.active{
@@ -179,9 +179,11 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
   font-size:.74rem;color:var(--blue);
   background:var(--blue-lt);border:1px solid rgba(59,91,219,.2);
   border-radius:6px;padding:4px 10px;
-  max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  font-weight:500;
+  max-width:220px;font-weight:500;
+  display:inline-flex;align-items:center;gap:6px;
 }
+.tb-file .icon{width:14px;height:14px;}
+.tb-file span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
 /* ── Buttons ── */
 .btn{
@@ -223,7 +225,6 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
   margin:0 auto 20px;
   box-shadow:0 6px 20px rgba(59,91,219,.35);
 }
-.drop-icon{font-size:2rem;display:block;}
 .drop-title{font-family:var(--f-display);font-weight:800;font-size:1.15rem;color:var(--text);margin-bottom:8px;letter-spacing:-.3px;}
 .drop-sub{font-size:.79rem;color:var(--muted);margin-bottom:26px;line-height:1.6;}
 .drop-sub strong{color:var(--text);}
@@ -426,8 +427,13 @@ tbody tr:hover{background:var(--blue-lt);}
   align-items:center;gap:14px;
 }
 .spinner{
-  width:44px;height:8px;border-radius:8px;
-  background:linear-gradient(90deg,#38BDF8 0 33%,#7C3AED 33% 66%,#34D399 66%);
+  width:140px;height:6px;border-radius:6px;position:relative;overflow:hidden;
+  background:rgba(255,255,255,.12);
+}
+.spinner::after{
+  content:'';position:absolute;top:0;bottom:0;width:32%;border-radius:6px;
+  background:linear-gradient(90deg,#38BDF8,#7C3AED,#34D399);
+  animation:bar-slide 1.15s cubic-bezier(.5,0,.5,1) infinite;
 }
 .loader-txt{font-size:.85rem;color:rgba(255,255,255,.75);}
 
@@ -444,8 +450,51 @@ tbody tr:hover{background:var(--blue-lt);}
 #toast.show{transform:translateY(0);opacity:1;}
 #toast.err{background:var(--red);}
 
-/* ── Professional module color system (no decorative motion) ── */
-*,*::before,*::after{animation:none!important;transition:none!important;}
+/* ── Motion system ── */
+@keyframes fade-rise{from{opacity:0;transform:translateY(9px);}to{opacity:1;transform:none;}}
+@keyframes fade-in{from{opacity:0;}to{opacity:1;}}
+@keyframes bar-slide{0%{transform:translateX(-110%);}100%{transform:translateX(360%);}}
+@keyframes pop-in{0%{opacity:0;transform:scale(.82);}65%{transform:scale(1.06);}100%{opacity:1;transform:scale(1);}}
+
+.module.active{animation:fade-in .22s ease both;}
+.dash .slabel,.it1-body>*{animation:fade-rise .4s cubic-bezier(.2,.7,.3,1) both;}
+.it1-body>*:nth-child(2){animation-delay:.06s;}
+.it1-body>*:nth-child(3){animation-delay:.12s;}
+.it1-body>*:nth-child(4){animation-delay:.18s;}
+.kpi,.ret-card{animation:fade-rise .44s cubic-bezier(.2,.7,.3,1) both;}
+.kpi-row .kpi:nth-child(2),.ret-grid .ret-card:nth-child(2){animation-delay:.05s;}
+.kpi-row .kpi:nth-child(3){animation-delay:.1s;}
+.kpi-row .kpi:nth-child(4){animation-delay:.15s;}
+.kpi-row .kpi:nth-child(5){animation-delay:.2s;}
+.kpi-row .kpi:nth-child(6){animation-delay:.25s;}
+.table-wrap{animation:fade-rise .48s cubic-bezier(.2,.7,.3,1) .1s both;}
+.nav-badge.ok{animation:pop-in .34s cubic-bezier(.3,1.5,.5,1) both;}
+
+/* Micro-interactions */
+.kpi,.ret-card{transition:transform .18s ease,box-shadow .18s ease;}
+.kpi:hover,.ret-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+.dropzone{transition:border-color .2s ease,background .2s ease,box-shadow .2s ease,transform .2s ease;}
+.dropzone:hover,.dropzone.drag-over{transform:translateY(-2px);}
+.prereq-dot{transition:background .25s ease,color .25s ease,border-color .25s ease;}
+tbody tr{transition:background .12s ease;}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+  .kpi:hover,.ret-card:hover,.dropzone:hover{transform:none;}
+  .spinner::after{animation:none!important;width:100%;}
+}
+
+/* ── Icons ── */
+.icon{width:18px;height:18px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;}
+.ni-icon .icon{width:15px;height:15px;}
+.nav-badge .icon{width:13px;height:13px;stroke-width:2.4;}
+.drop-icon-wrap .icon{width:30px;height:30px;color:#fff;stroke-width:1.5;}
+.btn .icon{width:15px;height:15px;stroke-width:2;}
+.cuadre-hd-icon .icon{width:21px;height:21px;color:#fff;stroke-width:1.7;}
+.prereq-dot .icon{width:17px;height:17px;stroke-width:2;}
+.alert .icon{width:17px;height:17px;margin-top:1px;stroke-width:2;}
+
+/* ── Professional module color system ── */
 #mod-606,#mod-607,#mod-it1{background:var(--bg);}
 #mod-606 .topbar{border-top-color:#0284C7;}
 #mod-607 .topbar{border-top-color:#7C3AED;}
@@ -457,7 +506,6 @@ tbody tr:hover{background:var(--blue-lt);}
 #mod-607 .slabel::before{background:#7C3AED;}
 #mod-it1 .slabel::before{background:#059669;}
 .sid-logo-icon{border:1px solid rgba(255,255,255,.28);}
-.drop-icon{font-family:var(--f-display);font-size:1rem;font-weight:800;color:#fff;letter-spacing:.4px;}
 .btn{border:1px solid rgba(255,255,255,.16);}
 .ret-card:first-child{border-top:4px solid var(--blue);}
 .ret-card:last-child{border-top:4px solid var(--red);}
@@ -515,6 +563,21 @@ tbody tr:hover{background:var(--blue-lt);}
 }
 </style>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <symbol id="ic-606" viewBox="0 0 24 24"><path d="M12 3v10"/><path d="m8 9 4 4 4-4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+  <symbol id="ic-607" viewBox="0 0 24 24"><path d="M12 14V4"/><path d="m8 8 4-4 4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+  <symbol id="ic-it1" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5"/><path d="M9 13h6"/><path d="M9 17h4"/></symbol>
+  <symbol id="ic-balance" viewBox="0 0 24 24"><path d="M12 4v17"/><path d="M8 21h8"/><path d="m5 7 7-2 7 2"/><path d="M5 7 2 14a3 3 0 0 0 6 0L5 7Z"/><path d="m19 7-3 7a3 3 0 0 0 6 0l-3-7Z"/></symbol>
+  <symbol id="ic-excel" viewBox="0 0 24 24"><path d="M12 3v11"/><path d="m8 10 4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></symbol>
+  <symbol id="ic-reset" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></symbol>
+  <symbol id="ic-print" viewBox="0 0 24 24"><path d="M7 8V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v4"/><path d="M7 18H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="7" y="15" width="10" height="6" rx="1"/></symbol>
+  <symbol id="ic-check" viewBox="0 0 24 24"><path d="m5 13 4 4L19 7"/></symbol>
+  <symbol id="ic-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/></symbol>
+  <symbol id="ic-alert" viewBox="0 0 24 24"><path d="M10.3 4.3 2.5 18a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="ic-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+  <symbol id="ic-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5"/></symbol>
+</defs></svg>
+
 <div class="shell">
 
 <!-- ── Sidebar ── -->
@@ -530,20 +593,20 @@ tbody tr:hover{background:var(--blue-lt);}
   <div class="nav-section">
     <div class="nav-label">Módulos</div>
     <div class="nav-item active" data-nav="606">
-      <div class="ni-icon">606</div>
+      <div class="ni-icon"><svg class="icon" aria-hidden="true"><use href="#ic-606"></use></svg></div>
       <span>606 — Compras</span>
-      <span class="nav-badge" id="badge-606">○</span>
+      <span class="nav-badge" id="badge-606"><svg class="icon" aria-hidden="true"><use href="#ic-dot"></use></svg></span>
     </div>
     <div class="nav-item" data-nav="607">
-      <div class="ni-icon">607</div>
+      <div class="ni-icon"><svg class="icon" aria-hidden="true"><use href="#ic-607"></use></svg></div>
       <span>607 — Ventas</span>
-      <span class="nav-badge" id="badge-607">○</span>
+      <span class="nav-badge" id="badge-607"><svg class="icon" aria-hidden="true"><use href="#ic-dot"></use></svg></span>
     </div>
     <div class="sid-divider"></div>
     <div class="nav-item" data-nav="it1">
-      <div class="ni-icon">IT1</div>
+      <div class="ni-icon"><svg class="icon" aria-hidden="true"><use href="#ic-it1"></use></svg></div>
       <span>IT-1 Declaración</span>
-      <span class="nav-badge" id="badge-it1">○</span>
+      <span class="nav-badge" id="badge-it1"><svg class="icon" aria-hidden="true"><use href="#ic-dot"></use></svg></span>
     </div>
   </div>
 
@@ -566,15 +629,15 @@ tbody tr:hover{background:var(--blue-lt);}
     </div>
     <div class="tb-right">
       <span class="tb-file" id="tf-606" hidden></span>
-      <button class="btn btn-xl" id="btn-xls-606" hidden>Exportar Excel</button>
-      <button class="btn btn-ghost" id="btn-rst-606" hidden>Limpiar</button>
+      <button class="btn btn-xl" id="btn-xls-606" hidden><svg class="icon" aria-hidden="true"><use href="#ic-excel"></use></svg>Exportar Excel</button>
+      <button class="btn btn-ghost" id="btn-rst-606" hidden><svg class="icon" aria-hidden="true"><use href="#ic-reset"></use></svg>Limpiar</button>
     </div>
   </div>
 
   <div class="upload-stage" id="up-606">
     <div class="dropzone" id="dz-606" tabindex="0" role="button" aria-label="Cargar archivo 606">
       <div class="drop-inner">
-        <div class="drop-icon-wrap"><span class="drop-icon">606</span></div>
+        <div class="drop-icon-wrap"><svg class="icon" aria-hidden="true"><use href="#ic-606"></use></svg></div>
         <div class="drop-title">Arrastra el archivo 606 aquí</div>
         <div class="drop-sub">Suelta cualquier archivo de compras del período<br><strong>CSV · XLSX · XLS</strong> — cualquier formato</div>
         <div class="drop-tags">
@@ -614,15 +677,15 @@ tbody tr:hover{background:var(--blue-lt);}
     </div>
     <div class="tb-right">
       <span class="tb-file" id="tf-607" hidden></span>
-      <button class="btn btn-xl" id="btn-xls-607" hidden>Exportar Excel</button>
-      <button class="btn btn-ghost" id="btn-rst-607" hidden>Limpiar</button>
+      <button class="btn btn-xl" id="btn-xls-607" hidden><svg class="icon" aria-hidden="true"><use href="#ic-excel"></use></svg>Exportar Excel</button>
+      <button class="btn btn-ghost" id="btn-rst-607" hidden><svg class="icon" aria-hidden="true"><use href="#ic-reset"></use></svg>Limpiar</button>
     </div>
   </div>
 
   <div class="upload-stage" id="up-607">
     <div class="dropzone" id="dz-607" tabindex="0" role="button" aria-label="Cargar archivo 607">
       <div class="drop-inner">
-        <div class="drop-icon-wrap" style="background:linear-gradient(135deg,#7C3AED,#06B6D4);"><span class="drop-icon">607</span></div>
+        <div class="drop-icon-wrap" style="background:linear-gradient(135deg,#7C3AED,#06B6D4);"><svg class="icon" aria-hidden="true"><use href="#ic-607"></use></svg></div>
         <div class="drop-title">Arrastra el archivo 607 aquí</div>
         <div class="drop-sub">Suelta cualquier archivo de ventas del período<br><strong>CSV · XLSX · XLS</strong> — cualquier formato</div>
         <div class="drop-tags">
@@ -661,7 +724,7 @@ tbody tr:hover{background:var(--blue-lt);}
       <div class="tb-sub">Cuadre automático para presentar a la DGII</div>
     </div>
     <div class="tb-right">
-      <button class="btn btn-pdf" onclick="window.print()">Imprimir / PDF</button>
+      <button class="btn btn-pdf" onclick="window.print()"><svg class="icon" aria-hidden="true"><use href="#ic-print"></use></svg>Imprimir / PDF</button>
     </div>
   </div>
 
@@ -669,14 +732,14 @@ tbody tr:hover{background:var(--blue-lt);}
     <div class="prereq-card">
       <div class="slabel" style="margin-bottom:10px;">Estado de módulos</div>
       <div class="prereq-item">
-        <div class="prereq-dot pending" id="pi-606">606</div>
+        <div class="prereq-dot pending" id="pi-606"><svg class="icon" aria-hidden="true"><use href="#ic-606"></use></svg></div>
         <div class="prereq-text">
           <div class="prereq-name" id="pn-606">606 — Compras: pendiente</div>
           <div class="prereq-hint">Carga el archivo de compras en el módulo 606</div>
         </div>
       </div>
       <div class="prereq-item">
-        <div class="prereq-dot pending" id="pi-607">607</div>
+        <div class="prereq-dot pending" id="pi-607"><svg class="icon" aria-hidden="true"><use href="#ic-607"></use></svg></div>
         <div class="prereq-text">
           <div class="prereq-name" id="pn-607">607 — Ventas: pendiente</div>
           <div class="prereq-hint">Carga el archivo de ventas en el módulo 607</div>
@@ -702,7 +765,7 @@ tbody tr:hover{background:var(--blue-lt);}
 
     <div class="cuadre-card" id="it1-cuadre" hidden>
       <div class="cuadre-hd">
-        <div class="cuadre-hd-icon"><span class="drop-icon">IT1</span></div>
+        <div class="cuadre-hd-icon"><svg class="icon" aria-hidden="true"><use href="#ic-balance"></use></svg></div>
         <div>
           <div class="cuadre-hd-title">Cuadre IT-1</div>
           <div class="cuadre-hd-sub">Cálculo automático basado en 606 y 607</div>
@@ -769,6 +832,28 @@ const $  = id => document.getElementById(id);
 const fmtM = n => 'RD$ ' + new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n||0);
 const fmtI = n => new Intl.NumberFormat('en-US').format(Math.round(n||0));
 const r2  = n => Math.round((n||0)*100)/100;
+const ico = (id,cls='icon') => `<svg class="${cls}" aria-hidden="true"><use href="#${id}"></use></svg>`;
+const lessMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Cuenta ascendente para cifras; siempre termina en el texto exacto ya formateado.
+function animateNums(root) {
+  root.querySelectorAll('[data-num]').forEach((el,i) => {
+    const target = parseFloat(el.dataset.num), money = el.dataset.fmt !== 'i';
+    const finalTxt = el.textContent;
+    if (!isFinite(target) || target === 0 || lessMotion()) return;
+    const fmt = money ? fmtM : fmtI, dur = 560, delay = 90 + i*50;
+    el.textContent = fmt(0);
+    setTimeout(() => {
+      const t0 = performance.now();
+      const step = now => {
+        const p = Math.min(1,(now-t0)/dur);
+        if (p < 1) { el.textContent = fmt(target*(1-Math.pow(1-p,3))); requestAnimationFrame(step); }
+        else el.textContent = finalTxt;
+      };
+      requestAnimationFrame(step);
+    }, delay);
+  });
+}
 
 function showToast(msg, type) {
   const el = $('toast');
@@ -957,8 +1042,9 @@ function process607(rows) {
   return { summary:{registros:data.length,totTotal,totGrav,totExento,totItbis,totRet,byTasa,ret30,ret100}, columns:headers, preview:data.slice(0,200).map(cleanRow), allRows:data.map(cleanRow) };
 }
 
-function kpiCard(lbl, val, cls='', sub='') {
-  return `<div class="kpi ${cls}"><div class="kpi-lbl">${lbl}</div><div class="kpi-val">${val}</div>${sub?`<div class="kpi-sub">${sub}</div>`:''}</div>`;
+function kpiCard(lbl, val, cls='', sub='', num=null, fmt='m') {
+  const at = num===null ? '' : ` data-num="${num}" data-fmt="${fmt}"`;
+  return `<div class="kpi ${cls}"><div class="kpi-lbl">${lbl}</div><div class="kpi-val"${at}>${val}</div>${sub?`<div class="kpi-sub">${sub}</div>`:''}</div>`;
 }
 
 function renderTable(thId, tbId, tnId, columns, rows, total) {
@@ -977,15 +1063,15 @@ function renderTable(thId, tbId, tnId, columns, rows, total) {
 function render606(data, filename) {
   const s=data.summary;
   $('kpis-606').innerHTML=
-    kpiCard('Registros',fmtI(s.registros),'c')+
-    kpiCard('Total Servicios',fmtM(s.totServ),'v')+
-    kpiCard('Total Bienes',fmtM(s.totBien),'t')+
-    kpiCard('Total Facturado',fmtM(s.totTotal),'g');
+    kpiCard('Registros',fmtI(s.registros),'c','',s.registros,'i')+
+    kpiCard('Total Servicios',fmtM(s.totServ),'v','',s.totServ)+
+    kpiCard('Total Bienes',fmtM(s.totBien),'t','',s.totBien)+
+    kpiCard('Total Facturado',fmtM(s.totTotal),'g','',s.totTotal);
   $('kpis-itbis-606').innerHTML=
-    kpiCard('ITBIS Facturado',fmtM(s.totItbis),'')+
-    kpiCard('ITBIS Crédito Fiscal',fmtM(s.totAdel),'g','Disponible para deducir')+
-    kpiCard('ITBIS al Costo',fmtM(s.totCosto),'a','No recuperable')+
-    kpiCard('ITBIS Retenido',fmtM(s.totRet),'r');
+    kpiCard('ITBIS Facturado',fmtM(s.totItbis),'','',s.totItbis)+
+    kpiCard('ITBIS Crédito Fiscal',fmtM(s.totAdel),'g','Disponible para deducir',s.totAdel)+
+    kpiCard('ITBIS al Costo',fmtM(s.totCosto),'a','No recuperable',s.totCosto)+
+    kpiCard('ITBIS Retenido',fmtM(s.totRet),'r','',s.totRet);
   $('ret-606').innerHTML=`
     <div class="ret-card">
       <div class="ret-badge blue"><div class="ret-pct">30%</div></div>
@@ -996,22 +1082,23 @@ function render606(data, filename) {
       <div class="ret-info"><div class="ret-lbl">Retención del 100%</div><div class="ret-val">${fmtM(s.ret100.monto)}</div><div class="ret-cnt">${fmtI(s.ret100.count)} comprobante${s.ret100.count!==1?'s':''}</div></div>
     </div>`;
   renderTable('th-606','tb-606','tn-606',data.columns,data.preview,data.summary.registros);
-  $('tf-606').textContent=filename; $('tf-606').hidden=false;
+  animateNums($('kpis-606')); animateNums($('kpis-itbis-606'));
+  $('tf-606').innerHTML=ico('ic-file')+'<span>'+filename+'</span>'; $('tf-606').hidden=false;
   $('btn-xls-606').hidden=false; $('btn-rst-606').hidden=false;
   $('up-606').hidden=true; $('da-606').hidden=false;
-  $('badge-606').textContent='✓'; $('badge-606').className='nav-badge ok';
+  $('badge-606').innerHTML=ico('ic-check'); $('badge-606').className='nav-badge ok';
   updateIT1();
 }
 
 function render607(data, filename) {
   const s=data.summary,bt=s.byTasa;
   $('kpis-607').innerHTML=
-    kpiCard('Registros',fmtI(s.registros),'c')+
-    kpiCard('Total Facturado',fmtM(s.totTotal),'g')+
-    kpiCard('Total Gravado',fmtM(s.totGrav),'v')+
-    kpiCard('Total Exento',fmtM(s.totExento),'m')+
-    kpiCard('ITBIS Facturado',fmtM(s.totItbis),'a')+
-    kpiCard('ITBIS Ret. Clientes',fmtM(s.totRet),'r');
+    kpiCard('Registros',fmtI(s.registros),'c','',s.registros,'i')+
+    kpiCard('Total Facturado',fmtM(s.totTotal),'g','',s.totTotal)+
+    kpiCard('Total Gravado',fmtM(s.totGrav),'v','',s.totGrav)+
+    kpiCard('Total Exento',fmtM(s.totExento),'m','',s.totExento)+
+    kpiCard('ITBIS Facturado',fmtM(s.totItbis),'a','',s.totItbis)+
+    kpiCard('ITBIS Ret. Clientes',fmtM(s.totRet),'r','',s.totRet);
   $('kpis-tasa-607').innerHTML=
     kpiCard('ITBIS 18%',fmtM(bt.t18.itbis),'',`${fmtM(bt.t18.monto)} gravado · ${fmtI(bt.t18.count)} fact.`)+
     (bt.t16.count?kpiCard('ITBIS 16%',fmtM(bt.t16.itbis),'a',`${fmtM(bt.t16.monto)} gravado · ${fmtI(bt.t16.count)} fact.`):'')+
@@ -1027,25 +1114,28 @@ function render607(data, filename) {
       <div class="ret-info"><div class="ret-lbl">Clientes retuvieron 100%</div><div class="ret-val">${fmtM(s.ret100.monto)}</div><div class="ret-cnt">${fmtI(s.ret100.count)} comprobante${s.ret100.count!==1?'s':''}</div></div>
     </div>`;
   renderTable('th-607','tb-607','tn-607',data.columns,data.preview,data.summary.registros);
-  $('tf-607').textContent=filename; $('tf-607').hidden=false;
+  animateNums($('kpis-607')); animateNums($('kpis-tasa-607'));
+  $('tf-607').innerHTML=ico('ic-file')+'<span>'+filename+'</span>'; $('tf-607').hidden=false;
   $('btn-xls-607').hidden=false; $('btn-rst-607').hidden=false;
   $('up-607').hidden=true; $('da-607').hidden=false;
-  $('badge-607').textContent='✓'; $('badge-607').className='nav-badge ok';
+  $('badge-607').innerHTML=ico('ic-check'); $('badge-607').className='nav-badge ok';
   updateIT1();
 }
 
 function updateIT1() {
   const has606=!!STATE['606'],has607=!!STATE['607'];
   $('pi-606').className=`prereq-dot ${has606?'ok':'pending'}`;
-  $('pn-606').textContent=has606?'606 — Compras: cargado ✓':'606 — Compras: pendiente';
+  $('pi-606').innerHTML=ico(has606?'ic-check':'ic-606');
+  $('pn-606').textContent=has606?'606 — Compras: cargado':'606 — Compras: pendiente';
   $('pi-607').className=`prereq-dot ${has607?'ok':'pending'}`;
-  $('pn-607').textContent=has607?'607 — Ventas: cargado ✓':'607 — Ventas: pendiente';
-  if (has606&&has607){$('badge-it1').textContent='✓';$('badge-it1').className='nav-badge ok';}
-  else{$('badge-it1').textContent='○';$('badge-it1').className='nav-badge';}
+  $('pi-607').innerHTML=ico(has607?'ic-check':'ic-607');
+  $('pn-607').textContent=has607?'607 — Ventas: cargado':'607 — Ventas: pendiente';
+  if (has606&&has607){$('badge-it1').innerHTML=ico('ic-check');$('badge-it1').className='nav-badge ok';}
+  else{$('badge-it1').innerHTML=ico('ic-dot');$('badge-it1').className='nav-badge';}
   const alertEl=$('it1-alert'),cuadreEl=$('it1-cuadre');
   if (!has606||!has607){
     alertEl.hidden=false;
-    alertEl.innerHTML=`<div class="alert warn"><strong>Datos requeridos:</strong> carga el archivo 606 (Compras) y el 607 (Ventas) para generar el cuadre IT-1.</div>`;
+    alertEl.innerHTML=`<div class="alert warn">${ico('ic-alert')}<span><strong>Datos requeridos:</strong> carga el archivo 606 (Compras) y el 607 (Ventas) para generar el cuadre IT-1.</span></div>`;
     cuadreEl.hidden=true;return;
   }
   const s6=STATE['606'].summary,s7=STATE['607'].summary;
@@ -1054,7 +1144,7 @@ function updateIT1() {
   const resultado=r2(debito-credito-itbisRetVentas-saldo+aduana);
   if (saldo===0&&credito+itbisRetVentas>=debito){
     alertEl.hidden=false;
-    alertEl.innerHTML=`<div class="alert warn">Hay un posible <strong>saldo a favor</strong>. Verifica el saldo anterior en la DGII e ingrésalo.</div>`;
+    alertEl.innerHTML=`<div class="alert warn">${ico('ic-alert')}<span>Hay un posible <strong>saldo a favor</strong>. Verifica el saldo anterior en la DGII e ingrésalo.</span></div>`;
   }else{alertEl.hidden=true;}
   const rows=[
     {lbl:'ITBIS Débito (ventas facturadas)',always:true, sign:'+',amt:debito},
@@ -1070,10 +1160,12 @@ function updateIT1() {
   $('ct-lbl').textContent=isEven?'CUADRE EXACTO':isPagar?'ITBIS A PAGAR':'SALDO A FAVOR';
   $('ct-val').textContent=fmtM(Math.abs(resultado));
   $('ct-val').className=`cuadre-total-val ${isPagar&&!isEven?'pagar':'favor'}`;
+  const reaparece=cuadreEl.hidden;
+  if (reaparece){ $('ct-val').dataset.num=Math.abs(resultado); animateNums($('ct-val').parentElement); }
   cuadreEl.hidden=false;
   if (s6.totRet>0){
     const nota=document.createElement('div');nota.className='alert ok';nota.style.marginTop='14px';
-    nota.innerHTML=`<span>Nota:</span> <span>ITBIS Retenido en Compras (606): <strong>${fmtM(s6.totRet)}</strong> — se declara como agente de retención (Form. 11 o Anexo), no en el IT-1.</span>`;
+    nota.innerHTML=`${ico('ic-info')}<span>ITBIS Retenido en Compras (606): <strong>${fmtM(s6.totRet)}</strong> — se declara como agente de retención (Form. 11 o Anexo), no en el IT-1.</span>`;
     const existing=cuadreEl.querySelector('.alert.ok');if(existing)existing.remove();cuadreEl.appendChild(nota);
   }
 }
@@ -1118,7 +1210,7 @@ function resetMod(mod) {
   STATE[mod]=null;
   if (mod==='606'){$('da-606').hidden=true;$('up-606').hidden=false;$('tf-606').hidden=true;$('btn-xls-606').hidden=true;$('btn-rst-606').hidden=true;$('th-606').innerHTML='';$('tb-606').innerHTML='';$('fi-606').value='';}
   else{$('da-607').hidden=true;$('up-607').hidden=false;$('tf-607').hidden=true;$('btn-xls-607').hidden=true;$('btn-rst-607').hidden=true;$('th-607').innerHTML='';$('tb-607').innerHTML='';$('fi-607').value='';}
-  $(`badge-${mod}`).textContent='○';$(`badge-${mod}`).className='nav-badge';
+  $(`badge-${mod}`).innerHTML=ico('ic-dot');$(`badge-${mod}`).className='nav-badge';
   updateIT1();
 }
 
