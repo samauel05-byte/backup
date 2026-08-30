@@ -59,6 +59,16 @@ context.inconsistent=inconsistent;
 const inconsistentBreakdown=JSON.parse(vm.runInContext(`JSON.stringify(getIT1SalesBreakdown(inconsistent.summary))`,context));
 assert.strictEqual(inconsistentBreakdown.discrepancy,-200);
 
+const net607=vm.runInContext(`process607(${JSON.stringify([
+  {NCF:'B02000000001','Total Monto Facturado':1000,'ITBIS Facturado':180,'Monto Facturado en Tarjeta Debito Credito':1180},
+])})`,context);
+context.net607=net607;
+vm.runInContext(`CARD_STATE.azul=null;`,context);
+const netBreakdown=JSON.parse(vm.runInContext(`JSON.stringify(getIT1SalesBreakdown(net607.summary))`,context));
+assert.strictEqual(netBreakdown.total,1180);
+assert.strictEqual(netBreakdown.payments.card,1180);
+assert.strictEqual(netBreakdown.discrepancy,0);
+
 const unknown=vm.runInContext(`process607(${JSON.stringify([
   {'Número de Comprobante Fiscal':'XYZ-123','Total Monto Facturado':100,'ITBIS Facturado':0},
 ])})`,context);

@@ -1572,7 +1572,7 @@ function renderSalesConsolidated() {
     kpiCard('Ventas según 607',fmtM(s7.totTotal),'g')+
     kpiCard('Ventas por tarjeta',fmtM(card.uniqueGross),'c','607 + procesadores, sin duplicados')+
     kpiCard('Coincidencia descontada',fmtM(card.overlapGross),'m','Ya incluida en 607 y CardNET/Azul')+
-    kpiCard('Ventas consolidadas',fmtM(card.consolidatedTotal),'v','607 + CardNET + Azul − coincidencias')+
+    kpiCard('Ventas brutas consolidadas',fmtM(card.consolidatedTotal),'v','607 + ITBIS + CardNET + Azul − coincidencias')+
     kpiCard('ITBIS según 607',fmtM(s7.totItbis),'a')+
     kpiCard('ITBIS adicional tarjetas',fmtM(card.additionalItbis),'t')+
     kpiCard('ITBIS consolidado',fmtM(r2(s7.totItbis+card.additionalItbis)),'r')+
@@ -1582,6 +1582,12 @@ function renderSalesConsolidated() {
 
 function calculateIT1({debito,credito,importaciones,retenciones,saldo,abonos}) {
   return r2(debito-credito-importaciones-retenciones-saldo-abonos);
+}
+
+function get607GrossTotal(s7) {
+  const base=r2((s7.totGrav||0)+(s7.totExento||0));
+  const grossFromBase=r2(base+(s7.totItbis||0));
+  return Math.abs((s7.totTotal||0)-grossFromBase)<=Math.abs((s7.totTotal||0)-base)?r2(s7.totTotal):grossFromBase;
 }
 
 function getCardConsolidation(s7) {
@@ -1595,7 +1601,8 @@ function getCardConsolidation(s7) {
   const additionalRatio=reportGross>0?additionalGross/reportGross:0;
   const additionalBase=r2(reportBase*additionalRatio);
   const additionalItbis=r2(reportItbis*additionalRatio);
-  return {reportGross,reportBase,reportItbis,card607,overlapGross,additionalGross,additionalBase,additionalItbis,uniqueGross:r2(card607+additionalGross),consolidatedTotal:r2(s7.totTotal+additionalGross)};
+  const gross607=get607GrossTotal(s7);
+  return {reportGross,reportBase,reportItbis,card607,overlapGross,additionalGross,additionalBase,additionalItbis,gross607,uniqueGross:r2(card607+additionalGross),consolidatedTotal:r2(gross607+additionalGross)};
 }
 
 function getIT1SalesBreakdown(s7) {
@@ -1656,13 +1663,13 @@ function updateIT1() {
     alertEl.innerHTML=`<div class="alert warn"><strong>Revisión requerida:</strong> ${fmtI(s7.ncfGroups.sinClasificar.count)} comprobante(s) no tienen un NCF o tipo reconocible. No se enviarán a “otros”; corrige el 607 antes de exportar.</div>`;
   }else if(Math.abs(sales.discrepancy)>.01){
     alertEl.hidden=false;
-    alertEl.innerHTML=`<div class="alert warn"><strong>Revisión requerida:</strong> las formas de pago del 607 exceden el total facturado por ${fmtM(Math.abs(sales.discrepancy))}. Corrige el archivo antes de exportar.</div>`;
+    alertEl.innerHTML=`<div class="alert warn"><strong>Revisión requerida:</strong> las formas de pago no coinciden con las ventas brutas por ${fmtM(Math.abs(sales.discrepancy))}. Corrige el 607 antes de exportar.</div>`;
   }else if (saldo===0&&credito+importaciones+itbisRetVentas+abonos>=debito){
     alertEl.hidden=false;
     alertEl.innerHTML=`<div class="alert warn">Hay un posible <strong>saldo a favor</strong>. Verifica el saldo anterior en la DGII e ingrésalo.</div>`;
   }else{alertEl.hidden=true;}
   const taxRows=[
-    {lbl:'ITBIS Débito (ventas facturadas)',always:true, sign:'+',amt:debito},
+    {lbl:'ITBIS de ventas',always:true, sign:'+',amt:debito},
     {lbl:'ITBIS Crédito (compras)',          always:false,sign:'−',amt:credito},
     {lbl:'ITBIS Retenido por clientes (607)',always:false,sign:'−',amt:s7.totRet},
     {lbl:'ITBIS Retenido por tarjetas',always:false,sign:'−',amt:cardRet},
@@ -1685,7 +1692,7 @@ function updateIT1() {
     {lbl:'Tarjeta débito / crédito',amt:p.card,source:sales.source},{lbl:'Venta a crédito',amt:p.credit},
     {lbl:'Bonos o certificados',amt:p.bonds},{lbl:'Permutas',amt:p.swap},{lbl:'Otras formas de venta',amt:p.other},
   ];
-  if(Math.abs(sales.discrepancy)>.01) paymentRows.push({lbl:'Diferencia por clasificar',amt:sales.discrepancy,muted:true});
+  if(Math.abs(sales.discrepancy)>.01) paymentRows.push({lbl:'Diferencia entre ventas brutas y formas de pago',amt:sales.discrepancy,muted:true});
   $('cuadre-body').innerHTML=`<div class="cuadre-group-title">Ventas por tipo de comprobante</div>${cuadreRows(ncfRows)}<div class="cuadre-group-title">Ventas por forma de pago</div>${cuadreRows(paymentRows)}<div class="cuadre-group-title">Liquidación del ITBIS</div>${cuadreRows(taxRows)}`;
   const isPagar=resultado>0, isEven=resultado===0;
   $('ct-lbl').textContent=isEven?'CUADRE EXACTO':isPagar?'ITBIS A PAGAR':'SALDO A FAVOR';
@@ -1777,7 +1784,7 @@ async function exportIT1DGII() {
     const groupRows=[['credito',15],['consumo',16],['debito',17],['notaCredito',18],['unico',19],['especial',20],['gobierno',21],['exportacion',22],['otros',23]];
     groupRows.forEach(([key,row])=>{anexo=setTemplateCell(anexo,`T${row}`,ncf[key].count);anexo=setTemplateCell(anexo,`W${row}`,ncf[key].monto);});
     const sales=getIT1SalesBreakdown(s7),pay=sales.payments,card=getCardConsolidation(s7);
-    if(Math.abs(sales.discrepancy)>.01) throw new Error('Las formas de pago del 607 no concilian con el total facturado. Revisa el archivo antes de exportar.');
+    if(Math.abs(sales.discrepancy)>.01) throw new Error('Las formas de pago no concilian con las ventas brutas. Revisa el 607 antes de exportar.');
     const anexoNumbers={W28:pay.cash,W29:pay.transfer,W30:pay.card,W31:pay.credit,W32:pay.bonds,W33:pay.swap,W34:pay.other,W38:r2(s7.totGrav+s7.totExento),W47:r2(s7.totRet+cardRet),O80:s6.credBien,P81:s6.credServ,T80:imports};
     Object.entries(anexoNumbers).forEach(([cell,value])=>{anexo=setTemplateCell(anexo,cell,value);});
     const base18=r2((bt.t18?.monto||0)+card.additionalBase);
