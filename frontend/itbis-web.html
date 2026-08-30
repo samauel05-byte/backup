@@ -639,13 +639,13 @@ tbody tr{transition:background .12s ease;}
       <div class="drop-inner">
         <div class="drop-icon-wrap"><svg class="icon" aria-hidden="true"><use href="#ic-606"></use></svg></div>
         <div class="drop-title">Arrastra el archivo 606 aquí</div>
-        <div class="drop-sub">Suelta cualquier archivo de compras del período<br><strong>CSV · XLSX · XLS</strong> — cualquier formato</div>
+        <div class="drop-sub">Suelta cualquier archivo de compras del período<br><strong>XLSX · XLSM · XLS · CSV · TXT</strong> — cualquier formato</div>
         <div class="drop-tags">
           <span class="drop-tag">DGII Plantilla</span>
           <span class="drop-tag">Excel Propio</span>
           <span class="drop-tag">CSV Exportado</span>
         </div>
-        <input type="file" id="fi-606" accept=".csv,.xlsx,.xls">
+        <input type="file" id="fi-606" accept=".csv,.txt,.tsv,.xlsx,.xlsm,.xlsb,.xls,.xlt,.xltx,.xltm,.ods">
         <button class="btn btn-primary" id="bs-606">Seleccionar archivo</button>
       </div>
     </div>
@@ -687,13 +687,13 @@ tbody tr{transition:background .12s ease;}
       <div class="drop-inner">
         <div class="drop-icon-wrap" style="background:linear-gradient(135deg,#7C3AED,#06B6D4);"><svg class="icon" aria-hidden="true"><use href="#ic-607"></use></svg></div>
         <div class="drop-title">Arrastra el archivo 607 aquí</div>
-        <div class="drop-sub">Suelta cualquier archivo de ventas del período<br><strong>CSV · XLSX · XLS</strong> — cualquier formato</div>
+        <div class="drop-sub">Suelta cualquier archivo de ventas del período<br><strong>XLSX · XLSM · XLS · CSV · TXT</strong> — cualquier formato</div>
         <div class="drop-tags">
           <span class="drop-tag">DGII Plantilla</span>
           <span class="drop-tag">Excel Propio</span>
           <span class="drop-tag">CSV Exportado</span>
         </div>
-        <input type="file" id="fi-607" accept=".csv,.xlsx,.xls">
+        <input type="file" id="fi-607" accept=".csv,.txt,.tsv,.xlsx,.xlsm,.xlsb,.xls,.xlt,.xltx,.xltm,.ods">
         <button class="btn btn-primary" id="bs-607" style="background:var(--violet);box-shadow:0 2px 8px rgba(124,58,237,.3);">Seleccionar archivo</button>
       </div>
     </div>
@@ -835,6 +835,12 @@ const r2  = n => Math.round((n||0)*100)/100;
 const ico = (id,cls='icon') => `<svg class="${cls}" aria-hidden="true"><use href="#${id}"></use></svg>`;
 const lessMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Formatos aceptados. Los .xlsm/.xltm son plantillas DGII con macros; SheetJS
+// las lee igual (ignora las macros). Los .txt/.tsv van por el lector de texto,
+// que detecta el delimitador solo (coma, punto y coma, tab o barra vertical).
+const EXT_EXCEL = ['xlsx','xlsm','xlsb','xls','xlt','xltx','xltm','ods','fods'];
+const EXT_TEXTO = ['csv','txt','tsv'];
+
 // Cuenta ascendente para cifras; siempre termina en el texto exacto ya formateado.
 function animateNums(root) {
   root.querySelectorAll('[data-num]').forEach((el,i) => {
@@ -944,7 +950,10 @@ function readExcel(buf, sheetHint) {
 }
 
 function readCSV(text) {
-  return (Papa.parse(text, { header:true, skipEmptyLines:true, dynamicTyping:false }).data) || [];
+  return (Papa.parse(text, {
+    header:true, skipEmptyLines:true, dynamicTyping:false,
+    delimitersToGuess:['|',';','\t',',']
+  }).data) || [];
 }
 
 function loadFile(file, sheetHint) {
@@ -952,7 +961,7 @@ function loadFile(file, sheetHint) {
     const ext = file.name.split('.').pop().toLowerCase();
     const rd  = new FileReader();
     rd.onerror = () => fail(new Error('Error leyendo el archivo'));
-    if (['xlsx','xls'].includes(ext)) {
+    if (EXT_EXCEL.includes(ext)) {
       rd.onload = e => { try { ok(readExcel(e.target.result, sheetHint)); } catch(err) { fail(err); } };
       rd.readAsArrayBuffer(file);
     } else {
@@ -1192,7 +1201,7 @@ function exportXLS(mod) {
 
 async function handleFile(file, mod) {
   const ext=file.name.split('.').pop().toLowerCase();
-  if (!['csv','xlsx','xls'].includes(ext)){showToast('Formato no soportado. Use CSV, XLSX o XLS.','err');return;}
+  if (![...EXT_EXCEL,...EXT_TEXTO].includes(ext)){showToast(`Formato .${ext} no soportado. Use Excel (.xlsx .xlsm .xls), CSV o TXT.`,'err');return;}
   if (file.size>20*1024*1024){showToast('El archivo supera el límite de 20 MB.','err');return;}
   $('loader').hidden=false;
   try {
