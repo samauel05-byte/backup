@@ -1243,29 +1243,37 @@ function process607(rows) {
     p._total = cm.monto_total     ? cleanNum(r[cm.monto_total])     : p._serv + p._bien;
     p._itbis = cm.itbis_facturado ? Math.abs(cleanNum(r[cm.itbis_facturado])) : 0;
     p._ret   = cm.itbis_retenido  ? Math.abs(cleanNum(r[cm.itbis_retenido]))  : 0;
-    if (cm.monto_gravado) { p._gravado=cleanNum(r[cm.monto_gravado]); p._exento=cm.monto_exento?cleanNum(r[cm.monto_exento]):r2(p._total-p._gravado); }
-    else { p._gravado=p._itbis>0?p._total:0; p._exento=p._itbis>0?0:p._total; }
-    if (cm.tasa_itbis) { p._tasa=cleanNum(r[cm.tasa_itbis]); }
-    else if (p._total > 0 && p._itbis > 0) {
-      const ratio=p._itbis/p._total*100;
-      const standardRates=[10,16,18];
-      const nearest=standardRates.reduce((best,rate) =>
-        Math.abs(ratio-rate)<Math.abs(ratio-best) ? rate : best
-      );
-      p._tasa=Math.abs(ratio-nearest)<3 ? nearest : r2(ratio);
-    } else { p._tasa=0; }
+    const standardRates=[18,16,10,9,8];
+    const declaredRate=cm.tasa_itbis?cleanNum(r[cm.tasa_itbis]):0;
+    if(cm.monto_gravado){
+      p._gravado=Math.abs(cleanNum(r[cm.monto_gravado]));
+      p._tasa=declaredRate||(p._gravado>0?r2(p._itbis/p._gravado*100):0);
+    }else if(p._total>0&&p._itbis>0){
+      const bases=[Math.abs(p._total),Math.max(Math.abs(p._total)-p._itbis,0)].filter(n=>n>0);
+      let best={base:bases[0],rate:declaredRate||0,error:Infinity};
+      bases.forEach(base=>{
+        const rawRate=p._itbis/base*100;
+        const rate=declaredRate||standardRates.reduce((selected,candidate)=>Math.abs(rawRate-candidate)<Math.abs(rawRate-selected)?candidate:selected);
+        const error=Math.abs(rawRate-rate);
+        if(error<best.error)best={base,rate,error};
+      });
+      p._gravado=r2(best.base);p._tasa=best.error<3?best.rate:r2(p._itbis/best.base*100);
+    }else{p._gravado=0;p._tasa=declaredRate||0;}
+    p._exento=cm.monto_exento?Math.abs(cleanNum(r[cm.monto_exento])):(p._itbis>0?0:Math.abs(p._total));
     if (cm.construccion) { const v=String(r[cm.construccion]||'').toLowerCase(); p._constr=v==='si'||v==='sí'||v==='1'||v==='true'||v==='construccion'; }
     else { p._constr=p._tasa===10; }
     return p;
   });
   const totTotal=r2(sum(data,'_total')),totGrav=r2(sum(data,'_gravado')),totExento=r2(sum(data,'_exento'));
   const totItbis=r2(sum(data,'_itbis')),totRet=r2(sum(data,'_ret'));
-  const tasa18=data.filter(r=>r._tasa===18),tasa16=data.filter(r=>r._tasa===16),tasa10=data.filter(r=>r._tasa===10);
+  const tasa18=data.filter(r=>r._tasa===18),tasa16=data.filter(r=>r._tasa===16),tasa10=data.filter(r=>r._tasa===10),tasa9=data.filter(r=>r._tasa===9),tasa8=data.filter(r=>r._tasa===8);
   const tasa0=data.filter(r=>r._tasa===0||(!r._tasa&&r._itbis===0));
   const byTasa={
     t18:{monto:r2(sum(tasa18,'_gravado')),itbis:r2(sum(tasa18,'_itbis')),count:tasa18.length},
     t16:{monto:r2(sum(tasa16,'_gravado')),itbis:r2(sum(tasa16,'_itbis')),count:tasa16.length},
     t10:{monto:r2(sum(tasa10,'_gravado')),itbis:r2(sum(tasa10,'_itbis')),count:tasa10.length},
+    t9: {monto:r2(sum(tasa9,'_gravado')),itbis:r2(sum(tasa9,'_itbis')),count:tasa9.length},
+    t8: {monto:r2(sum(tasa8,'_gravado')),itbis:r2(sum(tasa8,'_itbis')),count:tasa8.length},
     t0: {monto:r2(sum(tasa0,'_total')),itbis:0,count:tasa0.length},
   };
   const ret30rows=data.filter(r=>r._itbis>0&&r._ret>0&&Math.abs(r._ret/r._itbis-0.30)<0.08);
@@ -1276,7 +1284,8 @@ function process607(rows) {
     const raw=String((cm.ncf&&r[cm.ncf])||(cm.tipo_comprobante&&r[cm.tipo_comprobante])||'').toUpperCase();
     const code=(raw.match(/(?:^|[^0-9])(01|02|03|04|12|14|15|16|31|32|33|34|44|45|46)(?:[^0-9]|$)/)||raw.match(/[BE](01|02|03|04|12|14|15|16|31|32|33|34|44|45|46)/)||[])[1];
     const key=code==='01'||code==='31'?'credito':code==='02'||code==='32'?'consumo':code==='03'||code==='33'?'debito':code==='04'||code==='34'?'notaCredito':code==='12'?'unico':code==='14'||code==='44'?'especial':code==='15'||code==='45'?'gobierno':code==='16'||code==='46'?'exportacion':'otros';
-    ncfGroups[key].count+=1;ncfGroups[key].monto=r2(ncfGroups[key].monto+Math.abs(r._total||0));
+    const netOperation=r2(Math.abs(r._gravado||0)+Math.abs(r._exento||0));
+    ncfGroups[key].count+=1;ncfGroups[key].monto=r2(ncfGroups[key].monto+netOperation);
   });
   const cleanRow = r => { const o={}; headers.forEach(h=>{o[h]=r[h];}); return o; };
   return { summary:{registros:data.length,totTotal,totGrav,totExento,totItbis,totRet,byTasa,ncfGroups,ret30,ret100}, columns:headers, preview:data.slice(0,200).map(cleanRow), allRows:data.map(cleanRow) };
@@ -1377,6 +1386,8 @@ function render607(data, filename) {
   $('kpis-tasa-607').innerHTML=
     kpiCard('ITBIS 18%',fmtM(bt.t18.itbis),'',`${fmtM(bt.t18.monto)} gravado · ${fmtI(bt.t18.count)} fact.`)+
     (bt.t16.count?kpiCard('ITBIS 16%',fmtM(bt.t16.itbis),'a',`${fmtM(bt.t16.monto)} gravado · ${fmtI(bt.t16.count)} fact.`):'')+
+    (bt.t9.count?kpiCard('ITBIS 9%',fmtM(bt.t9.itbis),'a',`${fmtM(bt.t9.monto)} gravado · ${fmtI(bt.t9.count)} fact.`):'')+
+    (bt.t8.count?kpiCard('ITBIS 8%',fmtM(bt.t8.itbis),'a',`${fmtM(bt.t8.monto)} gravado · ${fmtI(bt.t8.count)} fact.`):'')+
     kpiCard('ITBIS 10% Constr.',fmtM(bt.t10.itbis),'t',`${fmtM(bt.t10.monto)} gravado · ${fmtI(bt.t10.count)} fact.`)+
     kpiCard('Exentos / No Grav.',fmtM(bt.t0.monto),'m',`${fmtI(bt.t0.count)} comprobante${bt.t0.count!==1?'s':''}`);
   $('ret-607').innerHTML=`
@@ -1562,21 +1573,21 @@ async function exportIT1DGII() {
     Object.entries(generalIT1).forEach(([cell,value])=>{it1=setTemplateCell(it1,cell,value,'string');});
     const groupRows=[['credito',15],['consumo',16],['debito',17],['notaCredito',18],['unico',19],['especial',20],['gobierno',21],['exportacion',22],['otros',23]];
     groupRows.forEach(([key,row])=>{anexo=setTemplateCell(anexo,`T${row}`,ncf[key].count);anexo=setTemplateCell(anexo,`W${row}`,ncf[key].monto);});
-    const anexoNumbers={W28:0,W29:0,W30:0,W31:0,W32:0,W33:0,W34:s7.totTotal,W38:s7.totTotal,W47:r2(s7.totRet+cardRet),O80:s6.credBien,P81:s6.credServ,T80:imports};
+    const anexoNumbers={W28:0,W29:0,W30:0,W31:0,W32:0,W33:0,W34:s7.totTotal,W38:r2(s7.totGrav+s7.totExento),W47:r2(s7.totRet+cardRet),O80:s6.credBien,P81:s6.credServ,T80:imports};
     Object.entries(anexoNumbers).forEach(([cell,value])=>{anexo=setTemplateCell(anexo,cell,value);});
-    const base18=r2(Math.max(0,s7.totGrav-(bt.t16?.monto||0)));
-    const it1Numbers={V16:0,V17:0,V18:s7.totExento,V19:0,V22:0,V26:base18,V27:bt.t16?.monto||0,V28:0,V29:0,V30:0,V45:0,V46:saldo,V48:abonos,V49:0};
+    const base18=bt.t18?.monto||0;
+    const it1Numbers={V16:0,V17:0,V18:s7.totExento,V19:0,V22:0,V26:base18,V27:bt.t16?.monto||0,V28:bt.t9?.monto||0,V29:bt.t8?.monto||0,V30:0,V45:0,V46:saldo,V48:abonos,V49:0};
     Object.entries(it1Numbers).forEach(([cell,value])=>{it1=setTemplateCell(it1,cell,value);});
     const anexoTotal=r2(ncf.credito.monto+ncf.consumo.monto+ncf.debito.monto+ncf.unico.monto+ncf.especial.monto+ncf.gobierno.monto+ncf.exportacion.monto+ncf.otros.monto-ncf.notaCredito.monto);
     const retenciones=r2(s7.totRet+cardRet),creditoTotal=r2(s6.credBien+s6.credServ+imports);
-    const anexoCaches={W25:anexoTotal,W35:s7.totTotal,W44:s7.totTotal,W53:retenciones,O82:s6.credBien,P82:s6.credServ,T82:imports,W82:creditoTotal,O87:s6.credBien,P87:s6.credServ,T87:imports,W87:creditoTotal};
+    const anexoCaches={W25:anexoTotal,W35:s7.totTotal,W44:r2(s7.totGrav+s7.totExento),W53:retenciones,O82:s6.credBien,P82:s6.credServ,T82:imports,W82:creditoTotal,O87:s6.credBien,P87:s6.credServ,T87:imports,W87:creditoTotal};
     Object.entries(anexoCaches).forEach(([cell,value])=>{anexo=setFormulaCache(anexo,cell,value);});
     const exento=s7.totExento,gravado=r2(Math.max(anexoTotal-exento,0));
-    const debitoCalculado=r2(base18*.18+(bt.t16?.monto||0)*.16);
+    const debitoCalculado=r2(base18*.18+(bt.t16?.monto||0)*.16+(bt.t9?.monto||0)*.09+(bt.t8?.monto||0)*.08);
     const impuesto=r2(Math.max(debitoCalculado-creditoTotal,0)),saldoPeriodo=r2(Math.max(creditoTotal-debitoCalculado,0));
     const diferencia=r2(Math.max(impuesto-saldo-retenciones-abonos,0));
     const nuevoSaldo=r2(Math.max(saldoPeriodo+saldo+retenciones+abonos-impuesto,0));
-    const it1Caches={V14:anexoTotal,V23:exento,V25:gravado,V33:r2(base18*.18),V34:r2((bt.t16?.monto||0)*.16),V35:0,V36:0,V37:0,V38:debitoCalculado,V39:s6.credBien,V40:s6.credServ,V41:imports,V42:creditoTotal,V43:impuesto,V44:saldoPeriodo,V47:retenciones,V50:diferencia,V51:nuevoSaldo,V54:0,V55:0,V59:diferencia,V96:diferencia};
+    const it1Caches={V14:anexoTotal,V23:exento,V25:gravado,V33:r2(base18*.18),V34:r2((bt.t16?.monto||0)*.16),V35:r2((bt.t9?.monto||0)*.09),V36:r2((bt.t8?.monto||0)*.08),V37:0,V38:debitoCalculado,V39:s6.credBien,V40:s6.credServ,V41:imports,V42:creditoTotal,V43:impuesto,V44:saldoPeriodo,V47:retenciones,V50:diferencia,V51:nuevoSaldo,V54:0,V55:0,V59:diferencia,V96:diferencia};
     Object.entries(it1Caches).forEach(([cell,value])=>{it1=setFormulaCache(it1,cell,value);});
     zip.file('xl/worksheets/sheet1.xml',anexo);
     zip.file('xl/worksheets/sheet2.xml',it1);
@@ -1601,7 +1612,7 @@ function exportXLS(mod) {
     ss['!cols']=[{wch:36},{wch:20}];XLSX.utils.book_append_sheet(wb,ss,'Resumen 606');
   }else{
     const bt=s.byTasa;
-    const ss=XLSX.utils.aoa_to_sheet([['Métrica','Valor'],['Registros',s.registros],['Total Facturado',s.totTotal],['Total Gravado',s.totGrav],['Total Exento',s.totExento],['ITBIS Facturado',s.totItbis],['ITBIS Ret. Clientes',s.totRet],['18% Base',bt.t18.monto],['18% ITBIS',bt.t18.itbis],['16% Base',bt.t16.monto],['16% ITBIS',bt.t16.itbis],['10% Base',bt.t10.monto],['10% ITBIS',bt.t10.itbis],['Exentos',bt.t0.monto],['Ret.30%',s.ret30.monto],['Ret.100%',s.ret100.monto]]);
+    const ss=XLSX.utils.aoa_to_sheet([['Métrica','Valor'],['Registros',s.registros],['Total Facturado',s.totTotal],['Total Gravado',s.totGrav],['Total Exento',s.totExento],['ITBIS Facturado',s.totItbis],['ITBIS Ret. Clientes',s.totRet],['18% Base',bt.t18.monto],['18% ITBIS',bt.t18.itbis],['16% Base',bt.t16.monto],['16% ITBIS',bt.t16.itbis],['9% Base',bt.t9.monto],['9% ITBIS',bt.t9.itbis],['8% Base',bt.t8.monto],['8% ITBIS',bt.t8.itbis],['10% Base',bt.t10.monto],['10% ITBIS',bt.t10.itbis],['Exentos',bt.t0.monto],['Ret.30%',s.ret30.monto],['Ret.100%',s.ret100.monto]]);
     ss['!cols']=[{wch:36},{wch:20}];XLSX.utils.book_append_sheet(wb,ss,'Resumen 607');
   }
   const ds=XLSX.utils.json_to_sheet(d.allRows,{header:d.columns});
