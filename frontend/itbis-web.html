@@ -1565,17 +1565,17 @@ function renderSalesConsolidated() {
   const target=$('kpis-sales-total'),s7=STATE?.['607']?.summary;
   if(!target)return;
   if(!s7){target.innerHTML=kpiCard('Pendiente','Carga el reporte 607','m','Luego se sumarán CardNET y Azul.');return;}
+  const card=getCardConsolidation(s7);
   const reports=Object.values(CARD_STATE).filter(Boolean);
-  const cardSales=r2(reports.reduce((n,r)=>n+(r.totalSujetoRetencion||r.monto||0),0));
-  const cardItbis=r2(reports.reduce((n,r)=>n+(r.itbisTarjeta||0),0));
   const cardRetention=r2(reports.reduce((n,r)=>n+(r.retenido||0),0));
   target.innerHTML=
     kpiCard('Ventas según 607',fmtM(s7.totTotal),'g')+
-    kpiCard('Ventas por tarjeta',fmtM(cardSales),'c','Calculadas desde la retención del 2%')+
-    kpiCard('Ventas consolidadas',fmtM(r2(s7.totTotal+cardSales)),'v','607 + CardNET + Azul')+
+    kpiCard('Ventas por tarjeta',fmtM(card.uniqueGross),'c','607 + procesadores, sin duplicados')+
+    kpiCard('Coincidencia descontada',fmtM(card.overlapGross),'m','Ya incluida en 607 y CardNET/Azul')+
+    kpiCard('Ventas consolidadas',fmtM(card.consolidatedTotal),'v','607 + CardNET + Azul − coincidencias')+
     kpiCard('ITBIS según 607',fmtM(s7.totItbis),'a')+
-    kpiCard('ITBIS por tarjeta',fmtM(cardItbis),'t')+
-    kpiCard('ITBIS consolidado',fmtM(r2(s7.totItbis+cardItbis)),'r')+
+    kpiCard('ITBIS adicional tarjetas',fmtM(card.additionalItbis),'t')+
+    kpiCard('ITBIS consolidado',fmtM(r2(s7.totItbis+card.additionalItbis)),'r')+
     kpiCard('Retenido por clientes',fmtM(s7.totRet),'m')+
     kpiCard('Retenido por tarjeta',fmtM(cardRetention),'r');
 }
@@ -1584,39 +1584,42 @@ function calculateIT1({debito,credito,importaciones,retenciones,saldo,abonos}) {
   return r2(debito-credito-importaciones-retenciones-saldo-abonos);
 }
 
+function getCardConsolidation(s7) {
+  const reports=Object.values(CARD_STATE).filter(Boolean);
+  const reportGross=r2(reports.reduce((n,r)=>n+(r.totalSujetoRetencion||r.monto||0),0));
+  const reportBase=r2(reports.reduce((n,r)=>n+(r.baseGravable||0),0));
+  const reportItbis=r2(reports.reduce((n,r)=>n+(r.itbisTarjeta||0),0));
+  const card607=r2(s7.paymentSummary?.card||0);
+  const overlapGross=r2(Math.min(card607,reportGross));
+  const additionalGross=r2(Math.max(reportGross-overlapGross,0));
+  const additionalRatio=reportGross>0?additionalGross/reportGross:0;
+  const additionalBase=r2(reportBase*additionalRatio);
+  const additionalItbis=r2(reportItbis*additionalRatio);
+  return {reportGross,reportBase,reportItbis,card607,overlapGross,additionalGross,additionalBase,additionalItbis,uniqueGross:r2(card607+additionalGross),consolidatedTotal:r2(s7.totTotal+additionalGross)};
+}
+
 function getIT1SalesBreakdown(s7) {
   const source=s7.paymentSummary||{cash:0,transfer:0,card:0,credit:0,bonds:0,swap:0,other:0,columns:{}};
   const payments={cash:source.cash||0,transfer:source.transfer||0,card:source.card||0,credit:source.credit||0,bonds:source.bonds||0,swap:source.swap||0,other:source.other||0};
   const hasExplicit=Object.values(source.columns||{}).some(Boolean);
-  const cardReports=Object.values(CARD_STATE).filter(Boolean);
-  const reportedCard=r2(cardReports.reduce((n,r)=>n+(r.totalSujetoRetencion||r.monto||0),0));
-  if(!(source.columns||{}).card&&reportedCard>0){
-    const nonCard=r2(payments.cash+payments.transfer+payments.credit+payments.bonds+payments.swap+payments.other);
-    payments.card=r2(Math.min(reportedCard,Math.max(s7.totTotal-nonCard,0)));
-  }
+  const card=getCardConsolidation(s7);
+  if(card.reportGross>0)payments.card=card.uniqueGross;
   let classified=r2(Object.values(payments).reduce((n,v)=>n+v,0));
-  const remainder=r2(s7.totTotal-classified);
+  const remainder=r2(card.consolidatedTotal-classified);
   if(remainder>0){
     if(!hasExplicit) payments.cash=r2(payments.cash+remainder);
     else payments.other=r2(payments.other+remainder);
   }
   classified=r2(Object.values(payments).reduce((n,v)=>n+v,0));
-  return {payments,total:s7.totTotal,reportedCard,discrepancy:r2(s7.totTotal-classified),source:hasExplicit?'607':'607 + reportes de tarjetas'};
+  return {payments,total:card.consolidatedTotal,reportedCard:card.reportGross,overlap:card.overlapGross,discrepancy:r2(card.consolidatedTotal-classified),source:card.overlapGross>0?'607 + tarjetas − coincidencias':'607 + reportes de tarjetas'};
 }
 
 function getIT1NCFBreakdown(s7) {
   const groups={};
   Object.entries(s7.ncfGroups).forEach(([key,value])=>{groups[key]={...value};});
-  const cardBase=r2(Object.values(CARD_STATE).filter(Boolean).reduce((n,r)=>n+(r.baseGravable||0),0));
-  let adjustment=0;
-  if(cardBase>0){
-    const explicitCardBase=groups.consumo.cardMonto||0;
-    const hasCardColumn=!!s7.paymentSummary?.columns?.card;
-    const adjusted=hasCardColumn?r2(Math.max(groups.consumo.monto-explicitCardBase,0)+cardBase):r2(Math.max(groups.consumo.monto,cardBase));
-    adjustment=r2(adjusted-groups.consumo.monto);
-    groups.consumo.monto=adjusted;
-  }
-  return {groups,cardBase,adjustment};
+  const card=getCardConsolidation(s7),adjustment=card.additionalBase;
+  groups.consumo.monto=r2(groups.consumo.monto+adjustment);
+  return {groups,cardBase:card.reportBase,adjustment,overlap:card.overlapGross};
 }
 
 function cuadreRows(rows){
@@ -1641,12 +1644,12 @@ function updateIT1() {
     alertEl.innerHTML=`<div class="alert warn"><strong>Datos requeridos:</strong> carga el archivo 606 (Compras) y el 607 (Ventas) para generar el cuadre IT-1.</div>`;
     cuadreEl.hidden=true;return;
   }
-  const s6=STATE['606'].summary,s7=STATE['607'].summary,sales=getIT1SalesBreakdown(s7);
+  const s6=STATE['606'].summary,s7=STATE['607'].summary,sales=getIT1SalesBreakdown(s7),card=getCardConsolidation(s7);
   const saldo=parseFloat($('in-saldo').value)||0;
   const importaciones=parseFloat($('in-importaciones').value)||0;
   const abonos=parseFloat($('in-abonos').value)||0;
   const cardRet=r2(Object.values(CARD_STATE).filter(Boolean).reduce((n,r)=>n+(r.retenido||0),0));
-  const debito=s7.totItbis,credito=s6.totAdel,itbisRetVentas=r2(s7.totRet+cardRet);
+  const debito=r2(s7.totItbis+card.additionalItbis),credito=s6.totAdel,itbisRetVentas=r2(s7.totRet+cardRet);
   const resultado=calculateIT1({debito,credito,importaciones,retenciones:itbisRetVentas,saldo,abonos});
   if(s7.ncfGroups.sinClasificar.count>0){
     alertEl.hidden=false;
@@ -1670,7 +1673,7 @@ function updateIT1() {
   const ncfData=getIT1NCFBreakdown(s7),ncf=ncfData.groups;
   const ncfRows=[
     {lbl:'B01 / E31 — Crédito fiscal',amt:ncf.credito.monto},
-    {lbl:'B02 / E32 — Consumo',amt:ncf.consumo.monto,source:ncfData.cardBase>0?`incluye base CardNET + Azul: ${fmtM(ncfData.cardBase)}`:''},
+    {lbl:'B02 / E32 — Consumo',amt:ncf.consumo.monto,source:ncfData.cardBase>0?`base tarjetas ${fmtM(ncfData.cardBase)} · adicional sin duplicar ${fmtM(ncfData.adjustment)}`:''},
     {lbl:'Notas de débito',amt:ncf.debito.monto},
     {lbl:'Notas de crédito',sign:'−',amt:ncf.notaCredito.monto},
     {lbl:'Otros comprobantes',amt:r2(ncf.unico.monto+ncf.especial.monto+ncf.gobierno.monto+ncf.exportacion.monto+ncf.otros.monto)},
@@ -1773,16 +1776,16 @@ async function exportIT1DGII() {
     Object.entries(generalIT1).forEach(([cell,value])=>{it1=setTemplateCell(it1,cell,value,'string');});
     const groupRows=[['credito',15],['consumo',16],['debito',17],['notaCredito',18],['unico',19],['especial',20],['gobierno',21],['exportacion',22],['otros',23]];
     groupRows.forEach(([key,row])=>{anexo=setTemplateCell(anexo,`T${row}`,ncf[key].count);anexo=setTemplateCell(anexo,`W${row}`,ncf[key].monto);});
-    const sales=getIT1SalesBreakdown(s7),pay=sales.payments;
+    const sales=getIT1SalesBreakdown(s7),pay=sales.payments,card=getCardConsolidation(s7);
     if(Math.abs(sales.discrepancy)>.01) throw new Error('Las formas de pago del 607 no concilian con el total facturado. Revisa el archivo antes de exportar.');
     const anexoNumbers={W28:pay.cash,W29:pay.transfer,W30:pay.card,W31:pay.credit,W32:pay.bonds,W33:pay.swap,W34:pay.other,W38:r2(s7.totGrav+s7.totExento),W47:r2(s7.totRet+cardRet),O80:s6.credBien,P81:s6.credServ,T80:imports};
     Object.entries(anexoNumbers).forEach(([cell,value])=>{anexo=setTemplateCell(anexo,cell,value);});
-    const base18=bt.t18?.monto||0;
+    const base18=r2((bt.t18?.monto||0)+card.additionalBase);
     const it1Numbers={V16:0,V17:0,V18:s7.totExento,V19:0,V22:0,V26:base18,V27:bt.t16?.monto||0,V28:bt.t9?.monto||0,V29:bt.t8?.monto||0,V30:0,V45:0,V46:saldo,V48:abonos,V49:0};
     Object.entries(it1Numbers).forEach(([cell,value])=>{it1=setTemplateCell(it1,cell,value);});
     const anexoTotal=r2(ncf.credito.monto+ncf.consumo.monto+ncf.debito.monto+ncf.unico.monto+ncf.especial.monto+ncf.gobierno.monto+ncf.exportacion.monto+ncf.otros.monto-ncf.notaCredito.monto);
     const retenciones=r2(s7.totRet+cardRet),creditoTotal=r2(s6.credBien+s6.credServ+imports);
-    const anexoCaches={W25:anexoTotal,W35:s7.totTotal,W44:r2(s7.totGrav+s7.totExento),W53:retenciones,O82:s6.credBien,P82:s6.credServ,T82:imports,W82:creditoTotal,O87:s6.credBien,P87:s6.credServ,T87:imports,W87:creditoTotal};
+    const anexoCaches={W25:anexoTotal,W35:sales.total,W44:r2(s7.totGrav+s7.totExento+card.additionalGross),W53:retenciones,O82:s6.credBien,P82:s6.credServ,T82:imports,W82:creditoTotal,O87:s6.credBien,P87:s6.credServ,T87:imports,W87:creditoTotal};
     Object.entries(anexoCaches).forEach(([cell,value])=>{anexo=setFormulaCache(anexo,cell,value);});
     const exento=s7.totExento,gravado=r2(Math.max(anexoTotal-exento,0));
     const debitoCalculado=r2(base18*.18+(bt.t16?.monto||0)*.16+(bt.t9?.monto||0)*.09+(bt.t8?.monto||0)*.08);

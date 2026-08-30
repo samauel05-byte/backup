@@ -29,9 +29,13 @@ assert.strictEqual(explicit.summary.ncfGroups.sinClasificar.count,0);
 context.explicit=explicit;
 vm.runInContext(`CARD_STATE.azul={baseGravable:750,totalSujetoRetencion:885,retenido:17.7};`,context);
 const explicitNCF=JSON.parse(vm.runInContext(`JSON.stringify(getIT1NCFBreakdown(explicit.summary))`,context));
+const explicitConsolidated=JSON.parse(vm.runInContext(`JSON.stringify(getCardConsolidation(explicit.summary))`,context));
 assert.strictEqual(explicitNCF.cardBase,750);
 assert.strictEqual(explicitNCF.groups.credito.monto,1000);
 assert.strictEqual(explicitNCF.groups.consumo.monto,750);
+assert.strictEqual(explicitConsolidated.overlapGross,826);
+assert.strictEqual(explicitConsolidated.additionalGross,59);
+assert.strictEqual(explicitConsolidated.consolidatedTotal,2065);
 
 const withoutPayment=vm.runInContext(`process607(${JSON.stringify([
   {NCF:'E310000000001','Total Monto Facturado':1180,'ITBIS Facturado':180},
@@ -41,11 +45,12 @@ context.withoutPayment=withoutPayment;
 vm.runInContext(`CARD_STATE.azul={totalSujetoRetencion:600,retenido:12};`,context);
 const inferred=JSON.parse(vm.runInContext(`JSON.stringify(getIT1SalesBreakdown(withoutPayment.summary))`,context));
 assert.strictEqual(inferred.payments.card,600);
-assert.strictEqual(inferred.payments.cash,1170);
+assert.strictEqual(inferred.payments.cash,1770);
+assert.strictEqual(inferred.total,2370);
 assert.strictEqual(inferred.discrepancy,0);
 vm.runInContext(`CARD_STATE.azul={baseGravable:600,totalSujetoRetencion:708,retenido:12};`,context);
 const inferredNCF=JSON.parse(vm.runInContext(`JSON.stringify(getIT1NCFBreakdown(withoutPayment.summary))`,context));
-assert.strictEqual(inferredNCF.groups.consumo.monto,600);
+assert.strictEqual(inferredNCF.groups.consumo.monto,1100);
 
 const inconsistent=vm.runInContext(`process607(${JSON.stringify([
   {NCF:'B01000000001','Total Monto Facturado':1000,'ITBIS Facturado':0,'Monto Facturado en Efectivo':700,'Monto Facturado en Tarjeta Debito Credito':500},
