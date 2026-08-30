@@ -576,13 +576,13 @@ tbody tr:hover{background:var(--blue-lt);}
       <div class="drop-inner">
         <div class="drop-icon-wrap"><span class="drop-icon">606</span></div>
         <div class="drop-title">Arrastra el archivo 606 aquí</div>
-        <div class="drop-sub">Suelta cualquier archivo de compras del período<br><strong>CSV · XLSX · XLS</strong> — cualquier formato</div>
+        <div class="drop-sub">Suelta el archivo de compras del período<br><strong>CSV · XLSX · XLS · XLSM · XLSB</strong></div>
         <div class="drop-tags">
           <span class="drop-tag">DGI Plantilla</span>
           <span class="drop-tag">Excel Propio</span>
           <span class="drop-tag">CSV Exportado</span>
         </div>
-        <input type="file" id="fi-606" accept=".csv,.xlsx,.xls">
+        <input type="file" id="fi-606" accept=".csv,.xlsx,.xls,.xlsm,.xlsb,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
         <button class="btn btn-primary" id="bs-606">Seleccionar archivo</button>
       </div>
     </div>
@@ -624,13 +624,13 @@ tbody tr:hover{background:var(--blue-lt);}
       <div class="drop-inner">
         <div class="drop-icon-wrap" style="background:linear-gradient(135deg,#7C3AED,#06B6D4);"><span class="drop-icon">607</span></div>
         <div class="drop-title">Arrastra el archivo 607 aquí</div>
-        <div class="drop-sub">Suelta cualquier archivo de ventas del período<br><strong>CSV · XLSX · XLS</strong> — cualquier formato</div>
+        <div class="drop-sub">Suelta el archivo de ventas del período<br><strong>CSV · XLSX · XLS · XLSM · XLSB</strong></div>
         <div class="drop-tags">
           <span class="drop-tag">DGI Plantilla</span>
           <span class="drop-tag">Excel Propio</span>
           <span class="drop-tag">CSV Exportado</span>
         </div>
-        <input type="file" id="fi-607" accept=".csv,.xlsx,.xls">
+        <input type="file" id="fi-607" accept=".csv,.xlsx,.xls,.xlsm,.xlsb,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
         <button class="btn btn-primary" id="bs-607" style="background:var(--violet);box-shadow:0 2px 8px rgba(124,58,237,.3);">Seleccionar archivo</button>
       </div>
     </div>
@@ -862,12 +862,35 @@ function readCSV(text) {
   return (Papa.parse(text, { header:true, skipEmptyLines:true, dynamicTyping:false }).data) || [];
 }
 
+const EXCEL_EXTENSIONS = new Set(['xlsx','xls','xlsm','xlsb']);
+const CSV_MIME_TYPES = new Set(['text/csv','application/csv','text/comma-separated-values']);
+const EXCEL_MIME_TYPES = new Set([
+  'application/vnd.ms-excel',
+  'application/vnd.ms-excel.sheet.binary.macroenabled.12',
+  'application/vnd.ms-excel.sheet.macroenabled.12',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/octet-stream',
+]);
+
+function fileExtension(file) {
+  const name=String(file?.name||'').trim();
+  const dot=name.lastIndexOf('.');
+  return dot>=0 ? name.slice(dot+1).trim().toLowerCase() : '';
+}
+
+function fileKind(file) {
+  const ext=fileExtension(file),mime=String(file?.type||'').toLowerCase();
+  if (ext==='csv'||CSV_MIME_TYPES.has(mime)) return 'csv';
+  if (EXCEL_EXTENSIONS.has(ext)||EXCEL_MIME_TYPES.has(mime)) return 'excel';
+  return null;
+}
+
 function loadFile(file, sheetHint) {
   return new Promise((ok, fail) => {
-    const ext = file.name.split('.').pop().toLowerCase();
+    const kind = fileKind(file);
     const rd  = new FileReader();
     rd.onerror = () => fail(new Error('Error leyendo el archivo'));
-    if (['xlsx','xls'].includes(ext)) {
+    if (kind==='excel') {
       rd.onload = e => { try { ok(readExcel(e.target.result, sheetHint)); } catch(err) { fail(err); } };
       rd.readAsArrayBuffer(file);
     } else {
@@ -1099,8 +1122,8 @@ function exportXLS(mod) {
 }
 
 async function handleFile(file, mod) {
-  const ext=file.name.split('.').pop().toLowerCase();
-  if (!['csv','xlsx','xls'].includes(ext)){showToast('Formato no soportado. Use CSV, XLSX o XLS.','err');return;}
+  const ext=fileExtension(file),kind=fileKind(file);
+  if (!kind){showToast(`Formato ${ext?'.'+ext:'sin extensión'} no soportado. Use CSV, XLSX, XLS, XLSM o XLSB.`,'err');return;}
   if (file.size>20*1024*1024){showToast('El archivo supera el límite de 20 MB.','err');return;}
   $('loader').hidden=false;
   try {
