@@ -12,18 +12,20 @@ vm.createContext(context);
 vm.runInContext(code,context);
 
 const explicit=vm.runInContext(`process607(${JSON.stringify([
-  {NCF:'B01000000001','Total Monto Facturado':1180,'ITBIS Facturado':180,'Monto Facturado en Tarjeta Debito Credito':1180,'Monto Facturado en Efectivo':0},
-  {NCF:'B02000000001','Total Monto Facturado':590,'ITBIS Facturado':90,'Monto Facturado en Tarjeta Debito Credito':0,'Monto Facturado en Efectivo':590},
+  {'NCF o E-NCF':' B-01 000000001','Total Monto Facturado':1180,'ITBIS Facturado':180,'Monto Facturado en Tarjeta Debito Credito':0,'Monto Facturado en Efectivo':1180},
+  {'NCF o E-NCF':'B02000000001','Total Monto Facturado':590,'ITBIS Facturado':90,'Monto Facturado en Tarjeta Debito Credito':590,'Monto Facturado en Efectivo':0},
+  {'NCF o E-NCF':'E320000000001','Total Monto Facturado':236,'ITBIS Facturado':36,'Monto Facturado en Tarjeta Debito Credito':236,'Monto Facturado en Efectivo':0},
 ])})`,context);
 context.explicit=explicit;
 const explicitBreakdown=JSON.parse(vm.runInContext(`JSON.stringify(getIT1SalesBreakdown(explicit.summary))`,context));
 if(process.env.DEBUG_IT1) console.log(JSON.stringify({summary:explicit.summary,breakdown:explicitBreakdown},null,2));
-assert.strictEqual(explicitBreakdown.total,1770);
-assert.strictEqual(explicitBreakdown.payments.card,1180);
-assert.strictEqual(explicitBreakdown.payments.cash,590);
+assert.strictEqual(explicitBreakdown.total,2006);
+assert.strictEqual(explicitBreakdown.payments.card,826);
+assert.strictEqual(explicitBreakdown.payments.cash,1180);
 assert.strictEqual(explicitBreakdown.discrepancy,0);
 assert.strictEqual(explicit.summary.ncfGroups.credito.monto,1000);
-assert.strictEqual(explicit.summary.ncfGroups.consumo.monto,500);
+assert.strictEqual(explicit.summary.ncfGroups.consumo.monto,700);
+assert.strictEqual(explicit.summary.ncfGroups.sinClasificar.count,0);
 
 const withoutPayment=vm.runInContext(`process607(${JSON.stringify([
   {NCF:'E310000000001','Total Monto Facturado':1180,'ITBIS Facturado':180},
@@ -42,6 +44,12 @@ const inconsistent=vm.runInContext(`process607(${JSON.stringify([
 context.inconsistent=inconsistent;
 const inconsistentBreakdown=JSON.parse(vm.runInContext(`JSON.stringify(getIT1SalesBreakdown(inconsistent.summary))`,context));
 assert.strictEqual(inconsistentBreakdown.discrepancy,-200);
+
+const unknown=vm.runInContext(`process607(${JSON.stringify([
+  {'Número de Comprobante Fiscal':'XYZ-123','Total Monto Facturado':100,'ITBIS Facturado':0},
+])})`,context);
+assert.strictEqual(unknown.summary.ncfGroups.otros.count,0);
+assert.strictEqual(unknown.summary.ncfGroups.sinClasificar.count,1);
 
 assert.match(code,/W28:pay\.cash,W29:pay\.transfer,W30:pay\.card,W31:pay\.credit,W32:pay\.bonds,W33:pay\.swap,W34:pay\.other/);
 console.log('IT-1 logic: OK');

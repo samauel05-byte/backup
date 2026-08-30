@@ -935,7 +935,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc='vendor/pdf.worker.min.js';
 
 const AL606 = {
   rnc:              ['rnc','cedula','rncocedula','rnc_o_cedula','identificacion','rnc_cedula','rncoproveedor','proveedor_rnc'],
-  ncf:              ['ncf','comprobante','numero_comprobante','numerodecomprobante','no_comprobante','nfc'],
+  ncf:              ['ncf','e_ncf','ncf_e_ncf','ncf_o_e_ncf','comprobante','numero_comprobante','numero_de_comprobante','numero_comprobante_fiscal','numero_de_comprobante_fiscal','numero_ncf','numerodecomprobante','no_comprobante','nfc'],
   fecha:            ['fecha','date','fecha_comprobante','fechadecomprobante','fecha_factura','fechafactura','fechapago','fecha_pago'],
   tipo_comprobante: ['tipo_bienes_y_servicios_comprados','tipobienesyservicioscomprados','tipo','tipo_comprobante','tipodecomprobante','tipo_ncf','tipocomprobante','tipo_bienes_servicios','tipobienesservicios'],
   monto_servicios:  ['monto_facturado_en_servicios','monto_servicios','servicios','montoenservicios','facturado_servicios','monto_serv','montoservicio','monto_facturado_servicios'],
@@ -950,7 +950,7 @@ const AL606 = {
 
 const AL607 = {
   rnc:              ['rnc','cedula','rncocedula','rnc_o_cedula','identificacion','rnc_cedula','rncocliente','cliente_rnc'],
-  ncf:              ['ncf','comprobante','numero_comprobante','numerodecomprobante','no_comprobante','nfc'],
+  ncf:              ['ncf','e_ncf','ncf_e_ncf','ncf_o_e_ncf','comprobante','numero_comprobante','numero_de_comprobante','numero_comprobante_fiscal','numero_de_comprobante_fiscal','numero_ncf','numerodecomprobante','no_comprobante','nfc'],
   fecha:            ['fecha','date','fecha_comprobante','fechadecomprobante','fecha_factura','fechafactura','fechacobro','fecha_cobro'],
   tipo_comprobante: ['tipo_bienes_y_servicios_vendidos','tipobienesyserviciosvendidos','tipo','tipo_comprobante','tipodecomprobante','tipo_ncf','tipocomprobante','tipo_ingreso','tipoingreso'],
   monto_servicios:  ['monto_facturado_en_servicios','monto_servicios','servicios','montoenservicios','facturado_servicios','monto_serv'],
@@ -1032,6 +1032,28 @@ function cleanNum(val) {
 }
 
 function sum(arr, key) { return arr.reduce((s,r) => s + (r[key]||0), 0); }
+
+function detectNCFCode(ncfValue,typeValue) {
+  const allowed='01|02|03|04|12|14|15|16|31|32|33|34|44|45|46';
+  const values=[ncfValue,typeValue].filter(v=>v!=null&&String(v).trim()!=='');
+  for(const value of values){
+    const compact=String(value).toUpperCase().replace(/[^A-Z0-9]/g,'');
+    const prefixed=compact.match(new RegExp(`(?:B|E)(${allowed})`));
+    if(prefixed)return prefixed[1];
+  }
+  for(const value of values){
+    const raw=String(value).toUpperCase(),normalized=normKey(raw);
+    const standalone=raw.match(new RegExp(`(?:^|[^0-9])(${allowed})(?:[^0-9]|$)`));
+    if(standalone)return standalone[1];
+    if(/credito_fiscal/.test(normalized))return '01';
+    if(/consumo/.test(normalized))return '02';
+    if(/nota_debito/.test(normalized))return '03';
+    if(/nota_credito/.test(normalized))return '04';
+    if(/otras?_operaciones/.test(normalized))return 'OTROS';
+    if(/^0?[1-4]$/.test(raw.trim()))return raw.trim().padStart(2,'0');
+  }
+  return '';
+}
 
 function parseSheet(ws) {
   const raw = XLSX.utils.sheet_to_json(ws, { header:1, defval:'', raw:false });
@@ -1372,11 +1394,10 @@ function process607(rows) {
   const ret30={monto:r2(sum(ret30rows,'_ret')),count:ret30rows.length},ret100={monto:r2(sum(ret100rows,'_ret')),count:ret100rows.length};
   const paymentColumns={cash:!!cm.pago_efectivo,transfer:!!cm.pago_cheque,card:!!cm.pago_tarjeta,credit:!!cm.pago_credito,bonds:!!cm.pago_bonos,swap:!!cm.pago_permuta,other:!!cm.pago_otras};
   const paymentSummary={cash:r2(sum(data,'_payCash')),transfer:r2(sum(data,'_payTransfer')),card:r2(sum(data,'_payCard')),credit:r2(sum(data,'_payCredit')),bonds:r2(sum(data,'_payBonds')),swap:r2(sum(data,'_paySwap')),other:r2(sum(data,'_payOther')),columns:paymentColumns};
-  const ncfGroups={credito:{count:0,monto:0},consumo:{count:0,monto:0},debito:{count:0,monto:0},notaCredito:{count:0,monto:0},unico:{count:0,monto:0},especial:{count:0,monto:0},gobierno:{count:0,monto:0},exportacion:{count:0,monto:0},otros:{count:0,monto:0}};
+  const ncfGroups={credito:{count:0,monto:0},consumo:{count:0,monto:0},debito:{count:0,monto:0},notaCredito:{count:0,monto:0},unico:{count:0,monto:0},especial:{count:0,monto:0},gobierno:{count:0,monto:0},exportacion:{count:0,monto:0},otros:{count:0,monto:0},sinClasificar:{count:0,monto:0}};
   data.forEach((r,index)=>{
-    const raw=String((cm.ncf&&r[cm.ncf])||(cm.tipo_comprobante&&r[cm.tipo_comprobante])||'').toUpperCase();
-    const code=(raw.match(/(?:^|[^0-9])(01|02|03|04|12|14|15|16|31|32|33|34|44|45|46)(?:[^0-9]|$)/)||raw.match(/[BE](01|02|03|04|12|14|15|16|31|32|33|34|44|45|46)/)||[])[1];
-    const key=code==='01'||code==='31'?'credito':code==='02'||code==='32'?'consumo':code==='03'||code==='33'?'debito':code==='04'||code==='34'?'notaCredito':code==='12'?'unico':code==='14'||code==='44'?'especial':code==='15'||code==='45'?'gobierno':code==='16'||code==='46'?'exportacion':'otros';
+    const code=detectNCFCode(cm.ncf?r[cm.ncf]:'',cm.tipo_comprobante?r[cm.tipo_comprobante]:'');
+    const key=code==='01'||code==='31'?'credito':code==='02'||code==='32'?'consumo':code==='03'||code==='33'?'debito':code==='04'||code==='34'?'notaCredito':code==='12'?'unico':code==='14'||code==='44'?'especial':code==='15'||code==='45'?'gobierno':code==='16'||code==='46'?'exportacion':code==='OTROS'?'otros':'sinClasificar';
     const netOperation=r2(Math.abs(r._gravado||0)+Math.abs(r._exento||0));
     ncfGroups[key].count+=1;ncfGroups[key].monto=r2(ncfGroups[key].monto+netOperation);
   });
@@ -1608,7 +1629,10 @@ function updateIT1() {
   const cardRet=r2(Object.values(CARD_STATE).filter(Boolean).reduce((n,r)=>n+(r.retenido||0),0));
   const debito=s7.totItbis,credito=s6.totAdel,itbisRetVentas=r2(s7.totRet+cardRet);
   const resultado=calculateIT1({debito,credito,importaciones,retenciones:itbisRetVentas,saldo,abonos});
-  if(Math.abs(sales.discrepancy)>.01){
+  if(s7.ncfGroups.sinClasificar.count>0){
+    alertEl.hidden=false;
+    alertEl.innerHTML=`<div class="alert warn"><strong>Revisión requerida:</strong> ${fmtI(s7.ncfGroups.sinClasificar.count)} comprobante(s) no tienen un NCF o tipo reconocible. No se enviarán a “otros”; corrige el 607 antes de exportar.</div>`;
+  }else if(Math.abs(sales.discrepancy)>.01){
     alertEl.hidden=false;
     alertEl.innerHTML=`<div class="alert warn"><strong>Revisión requerida:</strong> las formas de pago del 607 exceden el total facturado por ${fmtM(Math.abs(sales.discrepancy))}. Corrige el archivo antes de exportar.</div>`;
   }else if (saldo===0&&credito+importaciones+itbisRetVentas+abonos>=debito){
@@ -1632,6 +1656,7 @@ function updateIT1() {
     {lbl:'Notas de crédito',sign:'−',amt:ncf.notaCredito.monto},
     {lbl:'Otros comprobantes',amt:r2(ncf.unico.monto+ncf.especial.monto+ncf.gobierno.monto+ncf.exportacion.monto+ncf.otros.monto)},
   ];
+  if(ncf.sinClasificar.count)ncfRows.push({lbl:`Sin clasificar (${fmtI(ncf.sinClasificar.count)})`,amt:ncf.sinClasificar.monto,muted:true});
   const p=sales.payments;
   const paymentRows=[
     {lbl:'Efectivo',amt:p.cash},{lbl:'Cheque / transferencia / depósito',amt:p.transfer},
@@ -1722,6 +1747,7 @@ async function exportIT1DGII() {
     const identity=contributorValues();
     if(!identity.rnc||!identity.razon||!identity.periodo) throw new Error('Completa RNC, razón social y período antes de exportar.');
     if(identity.formulario!=='IT-1') throw new Error('El formulario IR-2 estará disponible próximamente. Selecciona IT-1 para exportar.');
+    if(ncf.sinClasificar.count>0) throw new Error(`${ncf.sinClasificar.count} comprobante(s) no tienen un NCF o tipo reconocible. Corrige el 607 antes de exportar.`);
     const generalAnexo={D7:identity.rnc,I7:identity.razon,Q10:identity.periodo};
     const generalIT1={D7:identity.rnc,I7:identity.razon,P10:identity.periodo};
     Object.entries(generalAnexo).forEach(([cell,value])=>{anexo=setTemplateCell(anexo,cell,value,'string');});
