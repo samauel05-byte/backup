@@ -367,9 +367,10 @@ tbody tr:hover{background:var(--blue-lt);}
   padding:22px;box-shadow:var(--shadow);border:1px solid var(--border);
   margin-bottom:18px;
 }
-.manual-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+.manual-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:16px;}
 .field-grp{display:flex;flex-direction:column;gap:6px;}
 .field-lbl{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+.field-help{font-size:.65rem;color:var(--muted);line-height:1.35;}
 .field-inp{
   background:var(--surface-2);border:1.5px solid var(--border);
   border-radius:8px;padding:10px 14px;
@@ -753,12 +754,19 @@ tbody tr:hover{background:var(--blue-lt);}
       <div class="slabel" style="margin-bottom:6px;">Datos adicionales (manuales)</div>
       <div class="manual-grid">
         <div class="field-grp">
-          <label class="field-lbl" for="in-saldo">Saldo a favor anterior (DGI)</label>
+          <label class="field-lbl" for="in-saldo">Saldo a favor anterior (DGII)</label>
           <input class="field-inp" id="in-saldo" type="number" min="0" step="0.01" placeholder="0.00" value="0">
+          <div class="field-help">Saldo disponible del período anterior.</div>
         </div>
         <div class="field-grp">
-          <label class="field-lbl" for="in-aduana">ITBIS Aduana (si aplica)</label>
-          <input class="field-inp" id="in-aduana" type="number" min="0" step="0.01" placeholder="0.00" value="0">
+          <label class="field-lbl" for="in-importaciones">ITBIS pagado en importaciones</label>
+          <input class="field-inp" id="in-importaciones" type="number" min="0" step="0.01" placeholder="0.00" value="0">
+          <div class="field-help">Importe deducible proveniente del Anexo A.</div>
+        </div>
+        <div class="field-grp">
+          <label class="field-lbl" for="in-abonos">Abonos / pagos a cuenta</label>
+          <input class="field-inp" id="in-abonos" type="number" min="0" step="0.01" placeholder="0.00" value="0">
+          <div class="field-help">Otros pagos computables realizados previamente.</div>
         </div>
       </div>
     </div>
@@ -1176,6 +1184,10 @@ function renderCardTotal() {
     kpiCard('ITBIS reportado',fmtM(total('itbis')),'a');
 }
 
+function calculateIT1({debito,credito,importaciones,retenciones,saldo,abonos}) {
+  return r2(debito-credito-importaciones-retenciones-saldo-abonos);
+}
+
 function updateIT1() {
   const has606=!!STATE['606'],has607=!!STATE['607'];
   $('pi-606').className=`prereq-dot ${has606?'ok':'pending'}`;
@@ -1191,10 +1203,12 @@ function updateIT1() {
     cuadreEl.hidden=true;return;
   }
   const s6=STATE['606'].summary,s7=STATE['607'].summary;
-  const saldo=parseFloat($('in-saldo').value)||0,aduana=parseFloat($('in-aduana').value)||0;
+  const saldo=parseFloat($('in-saldo').value)||0;
+  const importaciones=parseFloat($('in-importaciones').value)||0;
+  const abonos=parseFloat($('in-abonos').value)||0;
   const debito=s7.totItbis,credito=s6.totAdel,itbisRetVentas=s7.totRet;
-  const resultado=r2(debito-credito-itbisRetVentas-saldo+aduana);
-  if (saldo===0&&credito+itbisRetVentas>=debito){
+  const resultado=calculateIT1({debito,credito,importaciones,retenciones:itbisRetVentas,saldo,abonos});
+  if (saldo===0&&credito+importaciones+itbisRetVentas+abonos>=debito){
     alertEl.hidden=false;
     alertEl.innerHTML=`<div class="alert warn">Hay un posible <strong>saldo a favor</strong>. Verifica el saldo anterior en la DGII e ingrésalo.</div>`;
   }else{alertEl.hidden=true;}
@@ -1202,8 +1216,9 @@ function updateIT1() {
     {lbl:'ITBIS Débito (ventas facturadas)',always:true, sign:'+',amt:debito},
     {lbl:'ITBIS Crédito (compras)',          always:false,sign:'−',amt:credito},
     {lbl:'ITBIS Ret. en Ventas (clientes)', always:false,sign:'−',amt:itbisRetVentas},
-    {lbl:'Saldo a Favor Anterior (DGI)',    always:false,sign:'−',amt:saldo},
-    {lbl:'ITBIS Aduana',                    always:false,sign:'+',amt:aduana},
+    {lbl:'ITBIS Pagado en Importaciones',  always:false,sign:'−',amt:importaciones},
+    {lbl:'Saldo a Favor Anterior (DGII)',   always:false,sign:'−',amt:saldo},
+    {lbl:'Otros Pagos / Abonos a Cuenta',  always:false,sign:'−',amt:abonos},
   ].filter(r=>r.always||r.amt!==0);
   $('cuadre-body').innerHTML=rows.map(r=>
     `<div class="cuadre-row"><span class="cuadre-lbl">${r.lbl}</span><span><span class="cuadre-sign">${r.sign}</span><span class="cuadre-amt">${fmtM(r.amt)}</span></span></div>`
@@ -1312,7 +1327,7 @@ document.querySelectorAll('.nav-item').forEach(el=>{
   fi.addEventListener('change',()=>{if(fi.files[0])handleCardFile(fi.files[0],provider);});
 });
 
-['in-saldo','in-aduana'].forEach(id=>{$(id).addEventListener('input',updateIT1);});
+['in-saldo','in-importaciones','in-abonos'].forEach(id=>{$(id).addEventListener('input',updateIT1);});
 </script>
 </body>
 </html>
