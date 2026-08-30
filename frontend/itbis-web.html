@@ -1114,6 +1114,7 @@ function countPDFMovements(lines) {
 
 function cardPDFToRows(lines,provider) {
   const isCardNET=/cardnet/i.test(String(provider||''));
+  const isAzul=/azul/i.test(String(provider||''));
   const countPatterns=[
     /(?:cantidad|total|numero)(?:_de)?_movimientos(?:_procesados)?/,
     /(?:^|_)cant(?:idad)?(?:_de)?_(?:mov|movimientos)(?:_|$)/,
@@ -1126,7 +1127,9 @@ function cardPDFToRows(lines,provider) {
   ];
   const cardNETPeriodTotal=isCardNET?bestPDFSummaryValue(lines,[/cantidad_de_ventas/],{integer:true,exclude:[/rechazad|declinad|anulad|cancelad|devolucion|subtotal/]}):null;
   if(isCardNET&&cardNETPeriodTotal==null)throw new Error('No se encontró la fila “Cantidad de Ventas” con su “Total Período” en el reporte CardNET.');
-  const summaryCount=isCardNET?cardNETPeriodTotal:bestPDFSummaryValue(lines,countPatterns,{integer:true,exclude:[/rechazad|declinad|anulad|cancelad|devolucion|subtotal/]});
+  const azulSalesCount=isAzul?bestPDFSummaryValue(lines,[/^ventas(?:_|$)/],{integer:true,exclude:[/rechazad|declinad|anulad|cancelad|devolucion|subtotal|monto|importe/]}):null;
+  if(isAzul&&azulSalesCount==null)throw new Error('No se encontró la fila “Ventas” con su columna “Cantidad” en el reporte Azul.');
+  const summaryCount=isCardNET?cardNETPeriodTotal:isAzul?azulSalesCount:bestPDFSummaryValue(lines,countPatterns,{integer:true,exclude:[/rechazad|declinad|anulad|cancelad|devolucion|subtotal/]});
   const movementCount=countPDFMovements(lines);
   const facturas=summaryCount||movementCount;
   if(!facturas)throw new Error(`No se pudo determinar la cantidad de movimientos del reporte de ${provider}.`);
@@ -1135,7 +1138,7 @@ function cardPDFToRows(lines,provider) {
   const itbis=bestPDFSummaryValue(lines,[/itbis_reportado/,/total_itbis/,/monto_itbis/],{exclude:[/reten/]})||0;
   return [{
     cantidad_movimientos:facturas,monto_total:monto,itbis_retenido:retenido,itbis_reportado:itbis,
-    __pdf_report:true,__metodo_conteo:isCardNET?'Cantidad de Ventas → Total Período':summaryCount?'total de control del PDF':'movimientos únicos detectados',
+    __pdf_report:true,__metodo_conteo:isCardNET?'Cantidad de Ventas → Total Período':isAzul?'Ventas → Cantidad':summaryCount?'total de control del PDF':'movimientos únicos detectados',
     __movimientos_detectados:movementCount,
   }];
 }
