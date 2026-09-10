@@ -91,7 +91,7 @@
 body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased;}
 
 /* ── Shell ── */
-.shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
+.shell{display:grid;grid-template-columns:244px 1fr;min-height:100vh;}
 
 /* ── Sidebar ── */
 .sidebar{
@@ -101,24 +101,25 @@ body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height
   box-shadow:4px 0 24px rgba(0,0,0,.18);
 }
 .sid-logo{
-  padding:20px 18px 16px;
+  min-height:84px;padding:18px 18px;
   border-bottom:1px solid rgba(255,255,255,.06);
   display:flex;align-items:center;gap:12px;
+  background:linear-gradient(135deg,rgba(37,99,235,.08),rgba(14,165,233,.025));
 }
 .sid-logo-icon{
-  width:42px;height:42px;border-radius:11px;
+  width:48px;height:48px;border-radius:13px;
   background:#fff;
   display:flex;align-items:center;justify-content:center;
   font-size:.9rem;font-weight:800;color:#fff;font-family:var(--f-display);
   flex-shrink:0;letter-spacing:-.5px;
-  box-shadow:0 2px 10px rgba(59,91,219,.45);
+  box-shadow:0 6px 18px rgba(8,145,178,.24),0 2px 8px rgba(59,91,219,.3);
   position:relative;overflow:hidden;
 }
 .sid-logo-icon img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit;position:relative;z-index:1;}
 .sid-logo-icon::after{content:'';position:absolute;inset:-45%;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.38) 50%,transparent 65%);transform:translateX(-75%) rotate(10deg);animation:logoShine 5.5s ease-in-out infinite;}
-.sid-logo-text{}
-.sid-logo-mark{font-family:var(--f-display);font-weight:800;font-size:.9rem;color:#fff;letter-spacing:-.3px;line-height:1;}
-.sid-logo-sub{font-size:.62rem;color:var(--sid-text);margin-top:2px;letter-spacing:.2px;}
+.sid-logo-text{min-width:0;display:flex;flex-direction:column;justify-content:center;}
+.sid-logo-mark{font-family:var(--f-display);font-weight:850;font-size:1rem;color:#fff;letter-spacing:-.2px;line-height:1.1;}
+.sid-logo-sub{max-width:154px;font-size:.65rem;line-height:1.35;color:#91A7C5;margin-top:4px;letter-spacing:.12px;text-wrap:balance;}
 
 .nav-section{padding:16px 10px 8px;}
 .nav-label{font-size:.58rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--sid-text);padding:0 10px;margin-bottom:8px;}
@@ -517,6 +518,51 @@ tbody tr:hover{background:var(--blue-lt);}
 .prereq-card{border-top:5px solid var(--violet);}
 .cuadre-card{border-top:6px solid var(--green);}
 
+/* ── Accounting workspace ── */
+body{background:var(--bg);}
+.sidebar{background:linear-gradient(180deg,#0B1D32 0%,#102A46 100%);box-shadow:3px 0 18px rgba(5,20,38,.2);}
+.nav-section{padding-top:18px;}
+.nav-label{color:#7189A8;font-size:.56rem;letter-spacing:1.45px;}
+.nav-item{border:1px solid transparent;border-radius:7px;}
+.nav-item:hover{transform:none;border-color:rgba(255,255,255,.07);}
+.nav-item.active{background:#1D4ED8;border-color:rgba(147,197,253,.28);box-shadow:inset 3px 0 #67E8F9,0 4px 14px rgba(0,0,0,.2);}
+.currency-box{border-radius:7px;background:rgba(3,16,31,.26);}
+.topbar{min-height:82px;padding:14px 30px;border-top-width:3px;box-shadow:0 2px 10px rgba(15,35,58,.06);}
+.tb-left::before{content:'CONTABILIDAD FISCAL  /  PERÍODO DE TRABAJO';display:block;font-size:.52rem;font-weight:800;letter-spacing:1.15px;color:var(--blue);margin-bottom:4px;}
+.tb-title{font-size:1.08rem;letter-spacing:-.25px;}
+.tb-sub{font-size:.7rem;}
+.dash,.it1-body{padding-top:28px;}
+.slabel{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;margin:8px 0 10px;color:var(--muted);font-size:.62rem;}
+.slabel::before{height:12px;width:2px;}
+.kpi-row{gap:9px;margin-bottom:25px;}
+.kpi{border-radius:7px;padding:14px 15px 13px;border-top-width:3px;box-shadow:0 1px 4px rgba(14,27,54,.055);background:var(--surface)!important;min-height:104px;}
+.kpi::after{display:none;}
+.kpi-lbl{font-size:.59rem;letter-spacing:.7px;margin-bottom:7px;}
+.kpi-val{font-family:var(--f-body);font-weight:750;font-size:clamp(.9rem,1.35vw,1.17rem);font-variant-numeric:tabular-nums lining-nums;}
+.kpi-sub{font-size:.61rem;line-height:1.35;}
+.processor-card,.processor-total,.ret-card,.manual-card,.prereq-card,.cuadre-card{border-radius:8px;box-shadow:0 1px 5px rgba(14,27,54,.065);}
+.processor-card,.processor-total{border-top-width:3px;}
+.processor-upload{border-radius:6px;background:var(--surface-2);}
+.processor-metric{border-radius:5px;background:var(--surface-2);padding:11px;border-left-width:2px;}
+.processor-metric strong{font-variant-numeric:tabular-nums lining-nums;}
+.table-wrap{border-radius:7px;box-shadow:0 1px 5px rgba(14,27,54,.06);max-height:460px;}
+table{font-size:.75rem;}
+thead th{background:#173B5E!important;border-right:1px solid rgba(255,255,255,.12);font-size:.64rem;text-transform:uppercase;letter-spacing:.55px;padding:11px 13px;}
+tbody td{padding:9px 13px;border-right:1px solid var(--border);font-variant-numeric:tabular-nums lining-nums;}
+tbody tr:nth-child(even){background:var(--surface-2);}
+.manual-card{border-top-width:3px;}
+.manual-grid{gap:14px;}
+.field-inp{border-radius:5px;background:var(--surface-2);padding:9px 11px;}
+.field-lbl{font-size:.61rem;letter-spacing:.65px;}
+.cuadre-card{border-top-width:4px;}
+.cuadre-group-title{border-radius:4px;background:var(--surface-2);border-left-width:3px;}
+.cuadre-row{padding:10px 8px;}
+.cuadre-amt{font-family:var(--f-body);font-variant-numeric:tabular-nums lining-nums;}
+.btn{border-radius:5px;text-transform:none;}
+.dropzone{border-radius:10px;border-top-width:3px;padding:42px 36px;}
+.drop-icon-wrap{border-radius:8px;}
+.kpi:hover,.processor-card:hover,.processor-total:hover,.ret-card:hover,.manual-card:hover,.prereq-card:hover,.cuadre-card:hover{transform:translateY(-2px);box-shadow:0 7px 20px rgba(14,27,54,.09);}
+
 .kpi,.processor-card,.processor-total,.ret-card,.manual-card,.prereq-card,.cuadre-card,.coming-card{
   transition:transform .24s cubic-bezier(.22,1,.36,1),box-shadow .24s ease,border-color .24s ease;
 }
@@ -547,7 +593,7 @@ tbody tr:hover{background:var(--blue-lt);}
 @media (max-width:720px){
   .shell{display:block;min-height:100vh;}
   .sidebar{position:static;height:auto;display:block;box-shadow:0 2px 12px rgba(0,0,0,.2);}
-  .sid-logo{border-bottom:1px solid rgba(255,255,255,.08);padding:10px 14px;width:100%;}
+  .sid-logo{min-height:56px;border-bottom:1px solid rgba(255,255,255,.08);padding:10px 14px;width:100%;}
   .sid-logo-icon{width:36px;height:36px;border-radius:9px;}
   .sid-logo-sub{display:none;}
   .nav-section{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:8px;width:100%;overflow:visible;}
@@ -616,12 +662,12 @@ tbody tr:hover{background:var(--blue-lt);}
     <div class="sid-logo-icon"><img src="assets/favicon-64.png" alt="Logo de CAMI" width="42" height="42"></div>
     <div class="sid-logo-text">
       <div class="sid-logo-mark">CAMI</div>
-      <div class="sid-logo-sub">Control y Análisis de Movimientos e Impuestos</div>
+      <div class="sid-logo-sub">Plataforma contable y tributaria</div>
     </div>
   </div>
 
   <div class="nav-section">
-    <div class="nav-label">Módulos</div>
+    <div class="nav-label">Registros fiscales</div>
     <div class="nav-item active" data-nav="606">
       <div class="ni-icon">606</div>
       <span>606 — Compras</span>
@@ -633,6 +679,7 @@ tbody tr:hover{background:var(--blue-lt);}
       <span class="nav-badge" id="badge-607">○</span>
     </div>
     <div class="sid-divider"></div>
+    <div class="nav-label" style="margin-top:12px;">Declaraciones</div>
     <div class="nav-item" data-nav="it1">
       <div class="ni-icon">IT1</div>
       <span>IT-1 Declaración</span>
@@ -657,7 +704,7 @@ tbody tr:hover{background:var(--blue-lt);}
 
   <div class="sid-bottom">
     <div class="sid-bottom-dot"></div>
-    DGII · República Dominicana
+    Entorno contable activo
   </div>
 </nav>
 
@@ -792,7 +839,47 @@ tbody tr:hover{background:var(--blue-lt);}
     <div class="slabel">Totales del período</div>
     <div class="kpi-row" id="kpis-607"></div>
 
-    <div class="slabel">Consolidado de ventas — 607 + Tarjetas</div>
+    <div class="manual-card" style="margin-bottom:24px;border-top-color:var(--violet);">
+      <div class="slabel" style="margin-bottom:6px;">Ventas adicionales no incluidas en los archivos</div>
+      <div class="field-help">Registra aquí solamente cobros que no estén ya incluidos en el 607, CardNET o Azul. Cada forma de pago tiene su propio campo.</div>
+      <div class="manual-grid">
+        <div class="field-grp">
+          <label class="field-lbl" for="in-b02-count">Cantidad de facturas B02/E32 adicionales</label>
+          <input class="field-inp sales-manual-input" id="in-b02-count" type="number" min="0" step="1" placeholder="0" value="0">
+        </div>
+        <div class="field-grp">
+          <label class="field-lbl" for="in-b02-taxable">Base gravada adicional</label>
+          <input class="field-inp sales-manual-input" id="in-b02-taxable" type="number" min="0" step="0.01" placeholder="0.00" value="0">
+        </div>
+        <div class="field-grp">
+          <label class="field-lbl" for="in-b02-exempt">Ventas exentas adicionales</label>
+          <input class="field-inp sales-manual-input" id="in-b02-exempt" type="number" min="0" step="0.01" placeholder="0.00" value="0">
+        </div>
+        <div class="field-grp">
+          <label class="field-lbl" for="in-b02-itbis">ITBIS de ventas adicionales</label>
+          <input class="field-inp sales-manual-input" id="in-b02-itbis" type="number" min="0" step="0.01" placeholder="0.00" value="0">
+        </div>
+        <div class="field-grp">
+          <label class="field-lbl" for="in-sale-cash">Cobrado en efectivo (ITBIS incluido)</label>
+          <input class="field-inp sales-manual-input" id="in-sale-cash" type="number" min="0" step="0.01" placeholder="0.00" value="0">
+        </div>
+        <div class="field-grp">
+          <label class="field-lbl" for="in-sale-transfer">Cheque / transferencia / depósito (ITBIS incluido)</label>
+          <input class="field-inp sales-manual-input" id="in-sale-transfer" type="number" min="0" step="0.01" placeholder="0.00" value="0">
+        </div>
+        <div class="field-grp">
+          <label class="field-lbl" for="in-sale-credit">Venta a crédito (ITBIS incluido)</label>
+          <input class="field-inp sales-manual-input" id="in-sale-credit" type="number" min="0" step="0.01" placeholder="0.00" value="0">
+        </div>
+        <div class="field-grp">
+          <label class="field-lbl" for="in-sale-other">Otros medios de pago (ITBIS incluido)</label>
+          <input class="field-inp sales-manual-input" id="in-sale-other" type="number" min="0" step="0.01" placeholder="0.00" value="0">
+        </div>
+      </div>
+      <div class="alert warn" id="sales-manual-alert" hidden style="margin-top:14px;"></div>
+    </div>
+
+    <div class="slabel">Reporte global de ventas — 607 + CardNET + Azul + adicionales</div>
     <div class="kpi-row" id="kpis-sales-total"></div>
 
     <div class="slabel">Por tasa de ITBIS</div>
@@ -879,14 +966,6 @@ tbody tr:hover{background:var(--blue-lt);}
           <input class="field-inp" id="in-abonos" type="number" min="0" step="0.01" placeholder="0.00" value="0">
           <div class="field-help">Otros pagos computables realizados previamente.</div>
         </div>
-        <div class="field-grp">
-          <label class="field-lbl" for="in-confirm-overlap">Conciliación 607 vs. tarjetas</label>
-          <label class="field-help" style="display:flex;gap:8px;align-items:flex-start;cursor:pointer">
-            <input id="in-confirm-overlap" type="checkbox" style="margin-top:2px">
-            Confirmo que el monto pagado con tarjeta del 607 corresponde al mismo período de CardNET/Azul y ya está incluido en esos reportes.
-          </label>
-          <div class="field-help">Sin esta confirmación CAMI no descontará coincidencias ni exportará el IT-1.</div>
-        </div>
       </div>
     </div>
 
@@ -897,7 +976,7 @@ tbody tr:hover{background:var(--blue-lt);}
         <div class="cuadre-hd-icon"><span class="drop-icon">IT1</span></div>
         <div>
           <div class="cuadre-hd-title">Cuadre IT-1</div>
-          <div class="cuadre-hd-sub">Cálculo automático basado en 606, 607, CardNET y Azul</div>
+          <div class="cuadre-hd-sub">Cálculo basado en 606, 607, resumen de consumo y retenciones CardNET/Azul</div>
         </div>
       </div>
       <div id="cuadre-body"></div>
@@ -1396,7 +1475,7 @@ function process606(rows) {
     p._ret   = cm.itbis_retenido   ? Math.abs(cleanNum(r[cm.itbis_retenido]))*fiscalSign   : 0;
     p._adel  = cm.itbis_adelantado ? Math.abs(cleanNum(r[cm.itbis_adelantado]))*fiscalSign : 0;
     p._costo = cm.itbis_costo      ? Math.abs(cleanNum(r[cm.itbis_costo]))*fiscalSign      : 0;
-    if (!cm.itbis_adelantado && !cm.itbis_costo && p._itbis > 0) { p._adel = r2(p._itbis - p._ret); p._costo = 0; }
+    if (!cm.itbis_adelantado && !cm.itbis_costo && p._itbis > 0) { p._adel = p._itbis; p._costo = 0; }
     if (cm.pct_retencion) { p._pct = cleanNum(r[cm.pct_retencion]); }
     else if (p._ret > 0 && p._itbis > 0) {
       const ratio = p._ret / p._itbis;
@@ -1424,6 +1503,7 @@ function process607(rows) {
     : rows;
   const data = validRows.map(r => {
     const p = {...r};
+    p._ncfRaw=cm.ncf?String(r[cm.ncf]||'').toUpperCase().replace(/[^A-Z0-9]/g,''):'';
     p._ncfCode=detectNCFCode(cm.ncf?r[cm.ncf]:'',cm.tipo_comprobante?r[cm.tipo_comprobante]:'');
     p._fiscalSign=p._ncfCode==='04'||p._ncfCode==='34'?-1:1;
     p._serv  = cm.monto_servicios ? cleanNum(r[cm.monto_servicios]) : 0;
@@ -1492,8 +1572,12 @@ function process607(rows) {
       ncfGroups.consumo.cardMonto=r2(ncfGroups.consumo.cardMonto+netOperation*cardRatio);
     }
   });
+  const ncfSeen=new Map();
+  data.forEach(r=>{if(r._ncfRaw)ncfSeen.set(r._ncfRaw,(ncfSeen.get(r._ncfRaw)||0)+1);});
+  const invalidNCF=data.filter(r=>!r._ncfRaw||!(/^(?:B\d{10}|E\d{12})$/.test(r._ncfRaw))).length;
+  const duplicateNCF=[...ncfSeen.values()].filter(n=>n>1).reduce((n,count)=>n+count-1,0);
   const cleanRow = r => { const o={}; headers.forEach(h=>{o[h]=r[h];}); return o; };
-  return { summary:{registros:data.length,totTotal,totGrav,totExento,totItbis,totRet,byTasa,ncfGroups,paymentSummary,ret30,ret100}, columns:headers, preview:data.slice(0,200).map(cleanRow), allRows:data.map(cleanRow) };
+  return { summary:{registros:data.length,totTotal,totGrav,totExento,totItbis,totRet,byTasa,ncfGroups,paymentSummary,ret30,ret100,audit:{invalidNCF,duplicateNCF}}, columns:headers, preview:data.slice(0,200).map(cleanRow), allRows:data.map(cleanRow) };
 }
 
 function processCardReport(rows, provider) {
@@ -1512,18 +1596,20 @@ function processCardReport(rows, provider) {
   const total = key => key ? r2(pdfSummary?Math.abs(cleanNum(pdfSummary[key])):useful.reduce((n,r)=>n+Math.abs(cleanNum(r[key])),0)) : 0;
   const montoReporte=total(cm.monto);
   let retenido=total(cm.retenido),retencionCalculada=false;
+  const retencionAcreditable=retenido;
   if(!retenido&&montoReporte>0){retenido=r2(montoReporte*0.02);retencionCalculada=true;}
   const totalSujetoRetencion=r2(retenido/0.02);
-  const montoProcesado=montoReporte||totalSujetoRetencion;
+  const montoProcesado=totalSujetoRetencion||montoReporte;
   const itbisReporte=total(cm.itbis_reportado);
-  const itbisEstimado=itbisReporte<=0;
-  const itbisTarjeta=itbisReporte||r2(montoProcesado-(montoProcesado/1.18));
-  const baseGravable=r2(Math.max(montoProcesado-itbisTarjeta,0));
+  const baseGravable=montoProcesado;
+  const itbisTarjeta=r2(montoProcesado*.18);
+  const itbisEstimado=true;
   return {
     provider,
     facturas,
     monto:montoProcesado,
     retenido,
+    retencionAcreditable,
     itbis:itbisReporte,
     totalSujetoRetencion,
     baseGravable,
@@ -1661,10 +1747,10 @@ function renderCardReport(provider, data, filename) {
   $(`${id}-file`).textContent=filename;
   $(`kpis-${id}`).innerHTML=`
     <div class="processor-metric"><span>Movimientos</span><strong>${fmtI(data.facturas)}</strong></div>
-    <div class="processor-metric"><span>Monto procesado</span><strong>${fmtM(data.monto)}</strong></div>
+    <div class="processor-metric"><span>${data.retencionAcreditable>0?'Monto sujeto según retención 2%':'Monto procesado'}</span><strong>${fmtM(data.monto)}</strong></div>
     <div class="processor-metric"><span>${data.retencionCalculada?'Retención calculada (2%)':'Retenido por tarjeta'}</span><strong>${fmtM(data.retenido)}</strong></div>
-    <div class="processor-metric"><span>Base gravable estimada</span><strong>${fmtM(data.baseGravable)}</strong></div>
-    <div class="processor-metric"><span>ITBIS según retención 2%</span><strong>${fmtM(data.itbisTarjeta)}</strong></div>
+    <div class="processor-metric"><span>ITBIS calculado sobre monto sujeto (18%)</span><strong>${fmtM(data.itbisTarjeta)}</strong></div>
+    <div class="processor-metric"><span>Total cobrado con ITBIS</span><strong>${fmtM(r2(data.monto+data.itbisTarjeta))}</strong></div>
     <div class="processor-metric"><span>ITBIS del reporte</span><strong>${fmtM(data.itbis)}</strong></div>`;
   $(`${id}-file`).title=`Conteo: ${data.metodoConteo}`;
   renderCardTotal();
@@ -1679,14 +1765,15 @@ function renderCardTotal() {
     kpiCard('Movimientos',fmtI(total('facturas')),'c')+
     kpiCard('Monto procesado',fmtM(total('monto')),'g')+
     kpiCard('Retenido por tarjeta',fmtM(total('retenido')),'r')+
-    kpiCard('Base gravable tarjetas',fmtM(total('baseGravable')),'v','Monto procesado − ITBIS')+
-    kpiCard('ITBIS de tarjetas',fmtM(total('itbisTarjeta')),'a','Del reporte; estimado al 18% si falta')+
+    kpiCard('Monto sujeto al cálculo',fmtM(total('baseGravable')),'v','Obtenido desde la retención del 2%')+
+    kpiCard('ITBIS calculado al 18%',fmtM(total('itbisTarjeta')),'a','Monto sujeto × 18%')+
+    kpiCard('Total cobrado con ITBIS',fmtM(r2(total('monto')+total('itbisTarjeta'))),'g','Base procesada + ITBIS')+
     kpiCard('ITBIS del reporte',fmtM(total('itbis')),'t');
   $('ret-card-607').innerHTML=
     kpiCard('Retención por tarjeta (2%)',fmtM(total('retenido')),'r')+
     kpiCard('Total sujeto a retención',fmtM(total('totalSujetoRetencion')),'g','Retención ÷ 2%')+
-    kpiCard('Base gravable',fmtM(total('baseGravable')),'v','Monto procesado − ITBIS')+
-    kpiCard('ITBIS de tarjetas',fmtM(total('itbisTarjeta')),'a','Reportado o estimado al 18%');
+    kpiCard('Monto sujeto al cálculo',fmtM(total('baseGravable')),'v','Retención ÷ 2%')+
+    kpiCard('ITBIS calculado al 18%',fmtM(total('itbisTarjeta')),'a','Monto sujeto × 18%; no se extrae dividiendo entre 1.18');
   renderSalesConsolidated();
 }
 
@@ -1694,19 +1781,35 @@ function renderSalesConsolidated() {
   const target=$('kpis-sales-total'),s7=STATE?.['607']?.summary;
   if(!target)return;
   if(!s7){target.innerHTML=kpiCard('Pendiente','Carga el reporte 607','m','Luego se sumarán CardNET y Azul.');return;}
-  const card=getCardConsolidation(s7);
+  const consumer=getConsumerSummary();
   const reports=Object.values(CARD_STATE).filter(Boolean);
-  const cardRetention=r2(reports.reduce((n,r)=>n+(r.retenido||0),0));
+  const cardRetention=r2(reports.reduce((n,r)=>n+(r.retencionAcreditable||0),0));
+  const card=getCardConsolidation(s7);
+  const cardnetBase=r2(CARD_STATE.cardnet?.totalSujetoRetencion||CARD_STATE.cardnet?.monto||0);
+  const azulBase=r2(CARD_STATE.azul?.totalSujetoRetencion||CARD_STATE.azul?.monto||0);
+  const cardnet=r2(cardnetBase+(CARD_STATE.cardnet?.itbisTarjeta||0));
+  const azul=r2(azulBase+(CARD_STATE.azul?.itbisTarjeta||0));
+  const fiscal607=get607GrossTotal(s7),fiscalTotal=r2(fiscal607+consumer.gross+card.additionalGross);
+  const manualPayments=r2(consumer.cash+consumer.transfer+consumer.credit+consumer.other);
+  const manualDifference=r2(consumer.gross-manualPayments);
+  const manualAlert=$('sales-manual-alert');
+  if(manualAlert){
+    manualAlert.hidden=Math.abs(manualDifference)<=.01;
+    manualAlert.innerHTML=manualAlert.hidden?'':`<strong>Revisa las ventas adicionales:</strong> las formas de pago difieren del total facturado por ${fmtM(Math.abs(manualDifference))}.`;
+  }
   target.innerHTML=
-    kpiCard('Ventas según 607',fmtM(s7.totTotal),'g')+
-    kpiCard('Ventas por tarjeta',fmtM(card.uniqueGross),'c','607 + procesadores, sin duplicados')+
-    kpiCard('Coincidencia descontada',fmtM(card.overlapGross),'m','Ya incluida en 607 y CardNET/Azul')+
-    kpiCard('Ventas brutas consolidadas',fmtM(card.consolidatedTotal),'v','607 + ITBIS + CardNET + Azul − coincidencias')+
-    kpiCard('ITBIS según 607',fmtM(s7.totItbis),'a')+
-    kpiCard('ITBIS adicional tarjetas',fmtM(card.additionalItbis),'t')+
-    kpiCard('ITBIS consolidado',fmtM(r2(s7.totItbis+card.additionalItbis)),'r')+
+    kpiCard('Ventas brutas según 607',fmtM(fiscal607),'g')+
+    kpiCard('Cobrado por CardNET',fmtM(cardnet),'c','Base + ITBIS')+
+    kpiCard('Cobrado por Azul',fmtM(azul),'t','Base + ITBIS')+
+    kpiCard('Tarjetas ya incluidas en 607',fmtM(card.overlapGross),'m','Se descuentan para evitar duplicidad')+
+    kpiCard('Tarjetas adicionales',fmtM(card.additionalGross),'v','Parte no identificada dentro del 607')+
+    kpiCard('Ventas adicionales manuales',fmtM(consumer.gross),'a',`${fmtI(consumer.count)} factura(s) B02/E32`)+
+    kpiCard('VENTAS GLOBALES',fmtM(fiscalTotal),'g','607 + tarjetas únicas + ventas adicionales')+
+    kpiCard('Efectivo global',fmtM(r2((s7.paymentSummary?.cash||0)+consumer.cash)),'c')+
+    kpiCard('Tarjetas globales',fmtM(r2((s7.paymentSummary?.card||0)+card.additionalGross)),'v','Sin contar operaciones dos veces')+
+    kpiCard('ITBIS global de ventas',fmtM(r2(s7.totItbis+consumer.itbis+card.additionalItbis)),'a')+
     kpiCard('Retenido por clientes',fmtM(s7.totRet),'m')+
-    kpiCard('Retenido por tarjeta',fmtM(cardRetention),'r');
+    kpiCard('Retención computable reportada',fmtM(cardRetention),'r','Solo valor leído del reporte; no estimaciones');
 }
 
 function calculateIT1({debito,credito,importaciones,retenciones,saldo,abonos}) {
@@ -1719,43 +1822,64 @@ function get607GrossTotal(s7) {
   return Math.abs((s7.totTotal||0)-grossFromBase)<=Math.abs((s7.totTotal||0)-base)?r2(s7.totTotal):grossFromBase;
 }
 
+function getConsumerSummary() {
+  const read=id=>Math.max(parseFloat($(id)?.value)||0,0);
+  const count=Math.round(read('in-b02-count'));
+  const taxable=r2(read('in-b02-taxable')),exempt=r2(read('in-b02-exempt')),itbis=r2(read('in-b02-itbis'));
+  const cash=r2(read('in-sale-cash')),transfer=r2(read('in-sale-transfer')),credit=r2(read('in-sale-credit')),other=r2(read('in-sale-other'));
+  return {count,taxable,exempt,itbis,cash,transfer,credit,other,net:r2(taxable+exempt),gross:r2(taxable+exempt+itbis)};
+}
+
 function getCardConsolidation(s7) {
   const reports=Object.values(CARD_STATE).filter(Boolean);
   const reportGross=r2(reports.reduce((n,r)=>n+(r.totalSujetoRetencion||r.monto||0),0));
   const reportBase=r2(reports.reduce((n,r)=>n+(r.baseGravable||0),0));
   const reportItbis=r2(reports.reduce((n,r)=>n+(r.itbisTarjeta||0),0));
+  const reportPaymentGross=r2(reportGross+reportItbis);
   const card607=r2(s7.paymentSummary?.card||0);
-  const overlapConfirmed=$('in-confirm-overlap')?.checked===true;
-  const overlapGross=overlapConfirmed?r2(Math.min(card607,reportGross)):0;
-  const additionalGross=r2(Math.max(reportGross-overlapGross,0));
-  const additionalRatio=reportGross>0?additionalGross/reportGross:0;
+  const overlapConfirmed=true;
+  const overlapGross=r2(Math.min(card607,reportPaymentGross));
+  const additionalGross=r2(Math.max(reportPaymentGross-overlapGross,0));
+  const additionalRatio=reportPaymentGross>0?additionalGross/reportPaymentGross:0;
   const additionalBase=r2(reportBase*additionalRatio);
   const additionalItbis=r2(reportItbis*additionalRatio);
+  const reportCount=reports.reduce((n,r)=>n+(r.facturas||0),0);
+  const additionalCount=Math.round(reportCount*additionalRatio);
   const gross607=get607GrossTotal(s7);
-  return {reportGross,reportBase,reportItbis,card607,overlapConfirmed,overlapGross,additionalGross,additionalBase,additionalItbis,gross607,uniqueGross:r2(card607+additionalGross),consolidatedTotal:r2(gross607+additionalGross)};
+  return {reportGross,reportBase,reportItbis,reportPaymentGross,reportCount,card607,overlapConfirmed,overlapGross,additionalGross,additionalBase,additionalItbis,additionalCount,gross607,uniqueGross:r2(card607+additionalGross),consolidatedTotal:r2(gross607+additionalGross)};
 }
 
 function getIT1SalesBreakdown(s7) {
   const source=s7.paymentSummary||{cash:0,transfer:0,card:0,credit:0,bonds:0,swap:0,other:0,columns:{}};
   const payments={cash:source.cash||0,transfer:source.transfer||0,card:source.card||0,credit:source.credit||0,bonds:source.bonds||0,swap:source.swap||0,other:source.other||0};
   const hasExplicit=Object.values(source.columns||{}).some(Boolean);
-  const card=getCardConsolidation(s7);
-  if(card.reportGross>0)payments.card=card.uniqueGross;
+  const card=getCardConsolidation(s7),consumer=getConsumerSummary();
+  const fiscalGross=r2(get607GrossTotal(s7)+consumer.gross+card.additionalGross);
+  payments.cash=r2(payments.cash+consumer.cash);
+  payments.transfer=r2(payments.transfer+consumer.transfer);
+  payments.credit=r2(payments.credit+consumer.credit);
+  payments.other=r2(payments.other+consumer.other);
+  payments.card=r2(payments.card+card.additionalGross);
   let classified=r2(Object.values(payments).reduce((n,v)=>n+v,0));
-  const remainder=r2(card.consolidatedTotal-classified);
+  const remainder=r2(fiscalGross-classified);
   if(remainder>0){
     if(!hasExplicit) payments.cash=r2(payments.cash+remainder);
     else payments.other=r2(payments.other+remainder);
   }
   classified=r2(Object.values(payments).reduce((n,v)=>n+v,0));
-  return {payments,total:card.consolidatedTotal,reportedCard:card.reportGross,overlap:card.overlapGross,discrepancy:r2(card.consolidatedTotal-classified),source:card.overlapGross>0?'607 + tarjetas − coincidencias':'607 + reportes de tarjetas'};
+  return {payments,total:fiscalGross,reportedCard:card.reportGross,overlap:card.overlapGross,discrepancy:r2(fiscalGross-classified),source:'607 + CardNET/Azul sin duplicidad + ventas adicionales'};
 }
 
 function getIT1NCFBreakdown(s7) {
   const groups={};
   Object.entries(s7.ncfGroups).forEach(([key,value])=>{groups[key]={...value};});
-  const card=getCardConsolidation(s7),adjustment=card.additionalBase;
-  return {groups,cardBase:card.reportBase,adjustment,overlap:card.overlapGross,unclassifiedCardBase:adjustment};
+  const consumer=getConsumerSummary();
+  const card=getCardConsolidation(s7);
+  if(consumer.net>0||consumer.count>0||card.additionalBase>0){
+    groups.consumo.monto=r2(groups.consumo.monto+consumer.net+card.additionalBase);
+    groups.consumo.count+=consumer.count+card.additionalCount;
+  }
+  return {groups,consumer,card};
 }
 
 function cuadreRows(rows){
@@ -1780,25 +1904,22 @@ function updateIT1() {
     alertEl.innerHTML=`<div class="alert warn"><strong>Datos requeridos:</strong> carga el archivo 606 (Compras) y el 607 (Ventas) para generar el cuadre IT-1.</div>`;
     cuadreEl.hidden=true;return;
   }
-  const s6=STATE['606'].summary,s7=STATE['607'].summary,sales=getIT1SalesBreakdown(s7),card=getCardConsolidation(s7);
+  const s6=STATE['606'].summary,s7=STATE['607'].summary,sales=getIT1SalesBreakdown(s7),card=getCardConsolidation(s7),consumer=getConsumerSummary();
   const saldo=parseFloat($('in-saldo').value)||0;
   const importaciones=parseFloat($('in-importaciones').value)||0;
   const abonos=parseFloat($('in-abonos').value)||0;
-  const cardRet=r2(Object.values(CARD_STATE).filter(Boolean).reduce((n,r)=>n+(r.retenido||0),0));
-  const debito=r2(s7.totItbis+card.additionalItbis),credito=s6.totAdel,itbisRetVentas=r2(s7.totRet+cardRet);
+  const cardRet=r2(Object.values(CARD_STATE).filter(Boolean).reduce((n,r)=>n+(r.retencionAcreditable||0),0));
+  const debito=r2(s7.totItbis+consumer.itbis+card.additionalItbis),credito=s6.totAdel,itbisRetVentas=r2(s7.totRet+cardRet);
   const resultado=calculateIT1({debito,credito,importaciones,retenciones:itbisRetVentas,saldo,abonos});
   if(DISPLAY_CURRENCY!=='DOP'){
     alertEl.hidden=false;
     alertEl.innerHTML=`<div class="alert warn"><strong>Moneda no válida para el IT-1:</strong> convierte y carga los valores en pesos dominicanos (DOP). Cambiar el símbolo no convierte importes.</div>`;
-  }else if(card.reportGross>0&&card.card607>0&&!card.overlapConfirmed){
-    alertEl.hidden=false;
-    alertEl.innerHTML=`<div class="alert warn"><strong>Conciliación pendiente:</strong> confirma que las ventas con tarjeta del 607 pertenecen al mismo período y están incluidas en CardNET/Azul. No se descontarán automáticamente.</div>`;
-  }else if(card.additionalBase>0){
-    alertEl.hidden=false;
-    alertEl.innerHTML=`<div class="alert warn"><strong>Ventas de tarjeta por clasificar:</strong> ${fmtM(card.additionalBase)} de base no tiene NCF comprobado. El medio de pago no determina si corresponde a B01/E31 o B02/E32; clasifícalo en el 607 antes de exportar.</div>`;
   }else if(s7.ncfGroups.sinClasificar.count>0){
     alertEl.hidden=false;
     alertEl.innerHTML=`<div class="alert warn"><strong>Revisión requerida:</strong> ${fmtI(s7.ncfGroups.sinClasificar.count)} comprobante(s) no tienen un NCF o tipo reconocible. No se enviarán a “otros”; corrige el 607 antes de exportar.</div>`;
+  }else if((s7.audit?.invalidNCF||0)>0||(s7.audit?.duplicateNCF||0)>0){
+    alertEl.hidden=false;
+    alertEl.innerHTML=`<div class="alert warn"><strong>Control de NCF:</strong> ${fmtI(s7.audit?.invalidNCF||0)} NCF faltante(s) o mal formado(s) y ${fmtI(s7.audit?.duplicateNCF||0)} duplicado(s). Corrige el 607 antes de exportar.</div>`;
   }else if(Math.abs(sales.discrepancy)>.01){
     alertEl.hidden=false;
     alertEl.innerHTML=`<div class="alert warn"><strong>Revisión requerida:</strong> las formas de pago no coinciden con las ventas brutas por ${fmtM(Math.abs(sales.discrepancy))}. Corrige el 607 antes de exportar.</div>`;
@@ -1818,13 +1939,12 @@ function updateIT1() {
   const ncfData=getIT1NCFBreakdown(s7),ncf=ncfData.groups;
   const ncfRows=[
     {lbl:'B01 / E31 — Crédito fiscal',amt:ncf.credito.monto},
-    {lbl:'B02 / E32 — Consumo',amt:ncf.consumo.monto},
+    {lbl:'B02 / E32 — Consumo',amt:ncf.consumo.monto,source:(ncfData.consumer.net>0||ncfData.card.additionalBase>0)?'607 + tarjetas únicas + ventas adicionales':''},
     {lbl:'Notas de débito',amt:ncf.debito.monto},
     {lbl:'Notas de crédito',sign:'−',amt:ncf.notaCredito.monto},
     {lbl:'Otros comprobantes',amt:r2(ncf.unico.monto+ncf.especial.monto+ncf.gobierno.monto+ncf.exportacion.monto+ncf.otros.monto)},
   ];
   if(ncf.sinClasificar.count)ncfRows.push({lbl:`Sin clasificar (${fmtI(ncf.sinClasificar.count)})`,amt:ncf.sinClasificar.monto,muted:true});
-  if(ncfData.unclassifiedCardBase>0)ncfRows.push({lbl:'Tarjetas sin NCF por clasificar',amt:ncfData.unclassifiedCardBase,muted:true});
   const p=sales.payments;
   const paymentRows=[
     {lbl:'Efectivo',amt:p.cash},{lbl:'Cheque / transferencia / depósito',amt:p.transfer},
@@ -2007,39 +2127,44 @@ async function exportIT1DGII() {
     const zip=await JSZip.loadAsync(await response.arrayBuffer());
     let anexo=await zip.file('xl/worksheets/sheet1.xml').async('string');
     let it1=await zip.file('xl/worksheets/sheet2.xml').async('string');
-    const s6=STATE['606'].summary,s7=STATE['607'].summary,bt=s7.byTasa,ncf=getIT1NCFBreakdown(s7).groups;
+    const s6=STATE['606'].summary,s7=STATE['607'].summary,bt=s7.byTasa,ncfData=getIT1NCFBreakdown(s7),ncf=ncfData.groups,consumer=ncfData.consumer,auditCard=ncfData.card;
     const imports=parseFloat($('in-importaciones').value)||0;
     const saldo=parseFloat($('in-saldo').value)||0;
     const abonos=parseFloat($('in-abonos').value)||0;
-    const cardRet=r2(Object.values(CARD_STATE).filter(Boolean).reduce((n,r)=>n+(r.retenido||0),0));
+    const cardRet=r2(Object.values(CARD_STATE).filter(Boolean).reduce((n,r)=>n+(r.retencionAcreditable||0),0));
     const identity=contributorValues();
     if(!identity.rnc||!identity.razon||!identity.periodo) throw new Error('Completa RNC, razón social y período antes de exportar.');
     if(identity.formulario!=='IT-1') throw new Error('El formulario IR-2 estará disponible próximamente. Selecciona IT-1 para exportar.');
     if(DISPLAY_CURRENCY!=='DOP') throw new Error('El formato IT-1 debe generarse en pesos dominicanos (DOP). El selector de moneda no convierte valores.');
     if(!/^\d{9}$|^\d{11}$/.test(identity.rnc.replace(/\D/g,''))) throw new Error('El RNC/cédula debe contener 9 u 11 dígitos.');
-    const auditCard=getCardConsolidation(s7);
-    if(auditCard.reportGross>0&&auditCard.card607>0&&!auditCard.overlapConfirmed) throw new Error('Confirma la conciliación del 607 con CardNET/Azul antes de exportar.');
-    if(auditCard.additionalBase>0) throw new Error('Hay ventas de tarjeta sin NCF por clasificar. Regístralas correctamente en el 607 antes de exportar el IT-1.');
     if(ncf.sinClasificar.count>0) throw new Error(`${ncf.sinClasificar.count} comprobante(s) no tienen un NCF o tipo reconocible. Corrige el 607 antes de exportar.`);
+    if((s7.audit?.invalidNCF||0)>0) throw new Error(`${s7.audit.invalidNCF} NCF del 607 están faltantes o tienen una estructura inválida.`);
+    if((s7.audit?.duplicateNCF||0)>0) throw new Error(`${s7.audit.duplicateNCF} NCF del 607 están duplicados. Corrígelos antes de exportar.`);
+    if(consumer.count===0&&consumer.net>0) throw new Error('Indica la cantidad de facturas B02/E32 del resumen de consumo.');
+    if(consumer.count>0&&consumer.net===0) throw new Error('Completa el monto gravado o exento del resumen B02/E32.');
+    if(consumer.taxable>0&&consumer.itbis<=0) throw new Error('La base gravada B02/E32 requiere el ITBIS facturado correspondiente.');
+    if(consumer.taxable>0&&Math.abs(consumer.itbis-r2(consumer.taxable*.18))>.02) throw new Error('El ITBIS del resumen B02/E32 no equivale al 18% de la base gravada. Revisa ambos valores.');
+    if(consumer.gross>0&&Math.abs(consumer.gross-r2(consumer.cash+consumer.transfer+consumer.credit+consumer.other))>.01) throw new Error('Las formas de pago de las ventas adicionales no coinciden con su total facturado.');
     const generalAnexo={D7:identity.rnc,I7:identity.razon,Q10:identity.periodo};
     const generalIT1={D7:identity.rnc,I7:identity.razon,P10:identity.periodo};
     Object.entries(generalAnexo).forEach(([cell,value])=>{anexo=setTemplateCell(anexo,cell,value,'string');});
     Object.entries(generalIT1).forEach(([cell,value])=>{it1=setTemplateCell(it1,cell,value,'string');});
     const groupRows=[['credito',15],['consumo',16],['debito',17],['notaCredito',18],['unico',19],['especial',20],['gobierno',21],['exportacion',22],['otros',23]];
     groupRows.forEach(([key,row])=>{anexo=setTemplateCell(anexo,`T${row}`,ncf[key].count);anexo=setTemplateCell(anexo,`W${row}`,ncf[key].monto);});
-    const sales=getIT1SalesBreakdown(s7),pay=sales.payments,card=getCardConsolidation(s7);
+    const sales=getIT1SalesBreakdown(s7),pay=sales.payments;
     if(Math.abs(sales.discrepancy)>.01) throw new Error('Las formas de pago no concilian con las ventas brutas. Revisa el 607 antes de exportar.');
-    const anexoNumbers={W28:pay.cash,W29:pay.transfer,W30:pay.card,W31:pay.credit,W32:pay.bonds,W33:pay.swap,W34:pay.other,W38:r2(s7.totGrav+s7.totExento),W47:r2(s7.totRet+cardRet),O80:s6.credBien,P81:s6.credServ,T80:imports};
+    const anexoNumbers={W28:pay.cash,W29:pay.transfer,W30:pay.card,W31:pay.credit,W32:pay.bonds,W33:pay.swap,W34:pay.other,W38:r2(s7.totGrav+s7.totExento+consumer.net+auditCard.additionalBase),W47:cardRet,W49:s7.totRet,O80:s6.credBien,P81:s6.credServ,T80:imports};
     Object.entries(anexoNumbers).forEach(([cell,value])=>{anexo=setTemplateCell(anexo,cell,value);});
-    const base18=r2((bt.t18?.monto||0)+card.additionalBase);
-    const it1Numbers={V16:0,V17:0,V18:s7.totExento,V19:0,V22:0,V26:base18,V27:bt.t16?.monto||0,V28:bt.t9?.monto||0,V29:bt.t8?.monto||0,V30:0,V45:0,V46:saldo,V48:abonos,V49:0};
+    const base18=r2((bt.t18?.monto||0)+consumer.taxable+auditCard.additionalBase);
+    const totalExento=r2(s7.totExento+consumer.exempt);
+    const it1Numbers={V16:0,V17:0,V18:totalExento,V19:0,V22:0,V26:base18,V27:bt.t16?.monto||0,V28:bt.t9?.monto||0,V29:bt.t8?.monto||0,V30:0,V45:0,V46:saldo,V48:abonos,V49:0};
     Object.entries(it1Numbers).forEach(([cell,value])=>{it1=setTemplateCell(it1,cell,value);});
     const anexoTotal=r2(ncf.credito.monto+ncf.consumo.monto+ncf.debito.monto+ncf.unico.monto+ncf.especial.monto+ncf.gobierno.monto+ncf.exportacion.monto+ncf.otros.monto-ncf.notaCredito.monto);
     const retenciones=r2(s7.totRet+cardRet),creditoTotal=r2(s6.credBien+s6.credServ+imports);
-    const anexoCaches={W25:anexoTotal,W35:sales.total,W44:r2(s7.totGrav+s7.totExento+card.additionalGross),W53:retenciones,O82:s6.credBien,P82:s6.credServ,T82:imports,W82:creditoTotal,O87:s6.credBien,P87:s6.credServ,T87:imports,W87:creditoTotal};
+    const anexoCaches={W25:anexoTotal,W35:sales.total,W44:anexoTotal,W53:retenciones,O82:s6.credBien,P82:s6.credServ,T82:imports,W82:creditoTotal,O87:s6.credBien,P87:s6.credServ,T87:imports,W87:creditoTotal};
     Object.entries(anexoCaches).forEach(([cell,value])=>{anexo=setFormulaCache(anexo,cell,value);});
-    const exento=s7.totExento,gravado=r2(Math.max(anexoTotal-exento,0));
-    const debitoCalculado=r2(base18*.18+(bt.t16?.monto||0)*.16+(bt.t9?.monto||0)*.09+(bt.t8?.monto||0)*.08);
+    const exento=totalExento,gravado=r2(Math.max(anexoTotal-exento,0));
+    const debitoCalculado=r2((s7.totItbis||0)+consumer.itbis+auditCard.additionalItbis);
     const impuesto=r2(Math.max(debitoCalculado-creditoTotal,0)),saldoPeriodo=r2(Math.max(creditoTotal-debitoCalculado,0));
     const diferencia=r2(Math.max(impuesto-saldo-retenciones-abonos,0));
     const nuevoSaldo=r2(Math.max(saldoPeriodo+saldo+retenciones+abonos-impuesto,0));
@@ -2163,7 +2288,7 @@ document.querySelectorAll('.nav-item').forEach(el=>{
 document.querySelectorAll('.ir2-input,#ir2-rnc,#ir2-razon,#ir2-inicio,#ir2-fin').forEach(el=>el.addEventListener('input',updateIR2));
 $('btn-xls-ir2').addEventListener('click',exportIR2Draft);$('btn-rst-ir2').addEventListener('click',resetIR2);
 
-['in-saldo','in-importaciones','in-abonos','in-confirm-overlap'].forEach(id=>{$(id).addEventListener('input',updateIT1);});
+['in-saldo','in-importaciones','in-abonos','in-b02-count','in-b02-taxable','in-b02-exempt','in-b02-itbis','in-sale-cash','in-sale-transfer','in-sale-credit','in-sale-other'].forEach(id=>{$(id).addEventListener('input',()=>{updateIT1();renderSalesConsolidated();});});
 $('in-tipo-declaracion').addEventListener('change',e=>{if(e.target.value==='IR-2'){document.querySelector('[data-nav="ir2"]').click();showToast('IR-2 anual: carga el balance de comprobación del ejercicio.');}});
 $('btn-it1-dgii').addEventListener('click',exportIT1DGII);
 renderCardTotal();
